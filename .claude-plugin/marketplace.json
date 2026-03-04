@@ -1,0 +1,27 @@
+{
+  "name": "yifan-personal",
+  "description": "Yifan's personal skills and workflows",
+  "owner": {
+    "name": "Yifan"
+  },
+  "plugins": [
+    {
+      "name": "dev-workflow",
+      "description": "Development workflow automation: Git PR, Copilot lint, Agent Team implementation, browser MCP routing",
+      "source": "./plugins/dev-workflow",
+      "category": "productivity"
+    },
+    {
+      "name": "work-tools",
+      "description": "Work integrations: Feishu/Lark messaging and document operations",
+      "source": "./plugins/work-tools",
+      "category": "productivity"
+    },
+    {
+      "name": "writing",
+      "description": "Vibe writing assistant: Socratic dialogue → structure → write → finalize",
+      "source": "./plugins/writing",
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "document",
+  "version": "1.0.0",
+  "description": "Document creation tools: printable A4 cheatsheets from Markdown with multi-column layout",
+  "author": {
+    "name": "Yifan"
+  }
+}

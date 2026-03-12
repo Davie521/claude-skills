@@ -22,6 +22,12 @@
       "description": "Vibe writing assistant: Socratic dialogue → structure → write → finalize",
       "source": "./plugins/writing",
       "category": "productivity"
+    },
+    {
+      "name": "document",
+      "description": "Document creation tools: printable A4 cheatsheets from Markdown",
+      "source": "./plugins/document",
+      "category": "productivity"
     }
   ]
 }

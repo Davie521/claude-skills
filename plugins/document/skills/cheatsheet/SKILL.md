@@ -98,12 +98,18 @@ Second paragraph is separate. ==highlight==.
 - Tables: keep under 8 rows
 - Use `@@sub-title@@` for sub-headers within a `##` block (avoids creating new break-avoid)
 
-### Multi-Page Workflow
+### Multi-Page Workflow — Page-by-Page
 
-1. Write all content without `---PAGE---` first
-2. Check total line count vs capacity (N pages × ~380 lines)
-3. Insert `---PAGE---` markers at logical chapter boundaries
-4. Rebuild HTML and verify each page fills 5 columns
+Work one page at a time. Do NOT write all pages at once.
+
+1. **Page 1**: Write ~380 lines of content (no `---PAGE---` yet)
+2. Run `md2html.py` → open HTML → verify all 5 columns are filled
+3. If under-filled: add more content. If overflowing: trim or move content to next page
+4. Once Page 1 is good, append `---PAGE---` and start **Page 2** content
+5. Repeat: write → build → verify → adjust for each page
+6. Continue until all content is placed
+
+> **Why page-by-page?** Writing everything at once makes it hard to judge density. Tables and `##` break-avoid blocks consume unpredictable vertical space. Filling one page at a time ensures every page uses all 5 columns with no overflow.
 
 ## HTML Generation
 

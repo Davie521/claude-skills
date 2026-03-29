@@ -1,5 +1,7 @@
 # Claude Skills
 
+**English** | [中文](README.zh-CN.md)
+
 A collection of Claude Code plugins for development workflow automation, writing assistance, and productivity tools.
 
 ## Plugins

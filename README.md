@@ -8,36 +8,99 @@ A collection of Claude Code plugins for development workflow automation, writing
 
 Automated development workflows for Claude Code.
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| **cpr** | `/cpr` | Git PR pipeline: detect status -> commit -> create PR -> wait for CI -> fix failures -> check Copilot comments -> loop until all green |
-| **cl** | `/cl` | Copilot Lint review: check CI -> run local lint/build -> critically review Copilot comments -> fix only necessary issues |
-| **impl** | `/impl` | Multi-agent implementation: Plan (2-3 rounds) -> Implementer (worktree) -> Reviewer -> Tester -> Reviewer -> PR |
-| **browser** | auto | Browser MCP routing: auto-select browser-use, Chrome DevTools, or Playwright based on intent |
+#### `/cpr` — Git PR Pipeline
+
+One command to go from local changes to a merged-ready PR. Claude automatically:
+
+1. Detects current git state (uncommitted changes, existing PR, CI status)
+2. Commits and pushes code, creates a PR via `gh`
+3. Watches CI checks with `gh pr checks --watch`
+4. On failure: reads error logs, fixes code, pushes again
+5. On pass: reviews Copilot comments, fixes real issues (ignores false positives)
+6. Loops steps 3-5 until everything is green
+
+No manual intervention needed — just type `/cpr` and walk away.
+
+#### `/cl` — Copilot Lint Review
+
+Focused CI + Copilot code review workflow. Unlike `/cpr`, this doesn't create PRs — it reviews an existing one:
+
+- Checks CI status and fixes build/lint failures locally
+- Pulls Copilot review comments from the PR
+- **Critically evaluates each suggestion** — only fixes real bugs, security issues, and meaningful improvements
+- Ignores over-defensive suggestions, false positives, and style-only nitpicks
+- Loops until CI passes and all valid comments are addressed
+
+#### `/impl` — Multi-Agent Implementation
+
+Orchestrates a team of specialized agents for larger features:
+
+| Phase | Agent | What it does |
+|-------|-------|-------------|
+| 0 | **Planner** | 2-3 rounds of plan iteration in plan mode before any code is written |
+| 1 | **Implementer** | Writes code in an isolated git worktree following the plan |
+| 2 | **Reviewer** | Code review against plan, coding standards, security, a11y |
+| 3 | **Tester** | Runs tests, Playwright screenshots, fixes bugs on the spot |
+| 4 | **Reviewer** | Final review of test fixes |
+| 5 | **Wrap-up** | Clean commit history, create feature branch and PR |
+
+Each agent completes → gets reviewed → issues fixed → next agent starts.
+
+#### `browser` — Browser MCP Routing
+
+Automatically selects the right browser tool based on your intent:
+
+| Intent | MCP Selected |
+|--------|-------------|
+| Browse, fill forms, open pages | **browser-use** (Agent Browser) |
+| Performance, debugging, network, console | **Chrome DevTools** |
+| E2E testing, full flow testing | **Playwright** |
+
+---
 
 ### writing
 
-AI-assisted writing with a structured 4-phase workflow.
+#### `vibe-writing` — AI Writing Assistant
 
-| Skill | Description |
-|-------|-------------|
-| **vibe-writing** | Socratic dialogue -> knowledge cards -> structure -> write -> finalize. Supports starting from scratch, existing ideas, or drafts. |
+A 4-phase co-writing workflow where you lead, AI assists:
+
+| Phase | Trigger | What happens |
+|-------|---------|-------------|
+| **Learn** | Default entry | Socratic dialogue — AI asks probing questions, every 4 rounds generates a knowledge card (core insight + evidence + quotes) |
+| **Structure** | Say "structure" | Aggregates cards, proposes 2-3 article structures (problem-solution, comparison, progressive, story, listicle, SCQA) |
+| **Write** | Say "write" / "iterate" | Say "organize" to consolidate, "polish" to fact-check and refine language |
+| **Finalize** | Say "finalize" | Chains all output cards + transitions + intro/conclusion into a complete article |
+
+Start from any phase depending on how much you already have.
+
+---
 
 ### document
 
-Document creation tools.
+#### `cheatsheet` — Printable A4 Cheatsheet Creator
 
-| Skill | Description |
-|-------|-------------|
-| **cheatsheet** | Create dense, printable A4 landscape cheatsheets (5-column, 6pt font) from Markdown. Supports math, tables, highlights, multi-page output. |
+Creates dense, exam-ready cheatsheets from Markdown:
+
+- **A4 landscape**, 5-column layout, 6pt font — maximum information density
+- Supports LaTeX math formulas, tables, highlighted blocks, notes
+- Multi-page output for larger topics
+- Pipeline: write Markdown → `python3 md2html.py input.md` → open HTML → print to PDF
+
+---
 
 ### work-tools
 
-Work integrations (Feishu/Lark messaging and document operations).
+#### `feishu` — Feishu/Lark Integration
 
-| Skill | Description |
-|-------|-------------|
-| **feishu** | Feishu (Lark) MCP integration: send messages, create groups, create documents, upload files |
+Operates Feishu (Lark) via MCP server:
+
+- Send messages to users or groups
+- Create group chats
+- Create and edit documents
+- Upload files
+- Query user information
+
+Requires a Feishu MCP server to be configured.
 
 ## Installation
 

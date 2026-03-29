@@ -9,13 +9,7 @@ description: "Feishu (Lark) MCP integration: send messages, create groups, creat
 
 ## 用户 Open ID
 
-| 姓名 | Open ID |
-|------|---------|
-| 姜奕帆 | `ou_ff448e11e249b1c458329e0f32c16b25` |
-| 朱轩宇 | `ou_a09f4460d13fb8d914e97512816edd68` |
-| 陈朝阳 | `ou_5aab72810b2750cba9efe3e152f02047` |
-| 孙力 | `ou_8fd2ff9466f0f239ceea8c7d06593bc9` |
-| 顾宇 | `ou_f176d9fe6073ba216d5dbdc3de05f74e` |
+Configure your team's Open IDs in your project's CLAUDE.md or as environment variables.
 
 ## 操作模式
 

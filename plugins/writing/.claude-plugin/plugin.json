@@ -1,7 +1,7 @@
 {
   "name": "writing",
-  "version": "1.0.0",
-  "description": "Vibe writing assistant: AI-guided four-phase writing workflow with Socratic dialogue",
+  "version": "1.1.0",
+  "description": "Writing tools: Vibe writing assistant, article writing, content engine, cross-platform publishing, video editing",
   "author": {
     "name": "Yifan"
   }

@@ -1,7 +1,7 @@
 {
   "name": "dev-workflow",
-  "version": "1.0.0",
-  "description": "Development workflow automation: Git PR pipeline, Copilot lint review, multi-agent implementation, browser MCP routing",
+  "version": "1.1.0",
+  "description": "Dev workflow: Git PR pipeline, Copilot lint, multi-agent impl, browser MCP, git patterns, repo audit, multi-session blueprints",
   "author": {
     "name": "Yifan"
   }

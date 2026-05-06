@@ -1,0 +1,8 @@
+{
+  "name": "swift",
+  "version": "1.0.0",
+  "description": "Swift and iOS: SwiftUI, concurrency, persistence, on-device LLM",
+  "author": {
+    "name": "Yifan"
+  }
+}

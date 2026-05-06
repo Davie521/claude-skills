@@ -1,0 +1,8 @@
+{
+  "name": "research",
+  "version": "1.0.0",
+  "description": "Research and LLM engineering: deep research, prompt optimization, cost-aware pipelines",
+  "author": {
+    "name": "Yifan"
+  }
+}

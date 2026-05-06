@@ -7,8 +7,14 @@
   "plugins": [
     {
       "name": "dev-workflow",
-      "description": "Development workflow automation: Git PR, Copilot lint, Agent Team implementation, browser MCP routing",
+      "description": "Dev workflow: Git PR, Copilot lint, multi-agent impl, browser MCP, git patterns, repo audit, blueprints",
       "source": "./plugins/dev-workflow",
+      "category": "productivity"
+    },
+    {
+      "name": "document",
+      "description": "Document tools: cheatsheets, co-authoring, PDF, docs lookup, onboarding, ADR, visa translation",
+      "source": "./plugins/document",
       "category": "productivity"
     },
     {
@@ -19,14 +25,62 @@
     },
     {
       "name": "writing",
-      "description": "Vibe writing assistant: Socratic dialogue → structure → write → finalize",
+      "description": "Writing: vibe assistant, article writing, content engine, crosspost, video editing",
       "source": "./plugins/writing",
       "category": "productivity"
     },
     {
-      "name": "document",
-      "description": "Document tools: A4 cheatsheets, structured doc co-authoring, PDF manipulation",
-      "source": "./plugins/document",
+      "name": "design",
+      "description": "UI/UX design family: design systems, styling, animation, accessibility, audits (23 skills)",
+      "source": "./plugins/design",
+      "category": "design"
+    },
+    {
+      "name": "python",
+      "description": "Python and Django: patterns, testing, security, verification",
+      "source": "./plugins/python",
+      "category": "development"
+    },
+    {
+      "name": "swift",
+      "description": "Swift and iOS: SwiftUI, concurrency, persistence, on-device LLM",
+      "source": "./plugins/swift",
+      "category": "development"
+    },
+    {
+      "name": "web",
+      "description": "Web stack: TypeScript frontend, Node backend, MCP servers, Docker, deployment",
+      "source": "./plugins/web",
+      "category": "development"
+    },
+    {
+      "name": "data",
+      "description": "Data and ML: PostgreSQL, ClickHouse, migrations, PyTorch, automated scraping",
+      "source": "./plugins/data",
+      "category": "development"
+    },
+    {
+      "name": "quality",
+      "description": "Code quality: testing, E2E, benchmarks, security review, coding standards",
+      "source": "./plugins/quality",
+      "category": "testing"
+    },
+    {
+      "name": "research",
+      "description": "Research and LLM engineering: deep research, prompt optimization, cost-aware pipelines",
+      "source": "./plugins/research",
+      "category": "productivity"
+    },
+    {
+      "name": "skills",
+      "description": "Skill management: create, audit, evolve, promote skills and instincts",
+      "source": "./plugins/skills",
+      "category": "productivity"
+    },
+    {
+      "name": "business",
+      "description": "Business: investor outreach, pitch materials, product evaluation",
+      "source": "./plugins/business",
       "category": "productivity"
     }
   ]

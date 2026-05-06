@@ -1,0 +1,8 @@
+{
+  "name": "quality",
+  "version": "1.0.0",
+  "description": "Code quality: testing, E2E, benchmarks, security review, coding standards",
+  "author": {
+    "name": "Yifan"
+  }
+}

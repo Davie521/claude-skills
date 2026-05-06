@@ -1,0 +1,8 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "Web stack: TS frontend, Node backend, MCP servers, Docker, deployment",
+  "author": {
+    "name": "Yifan"
+  }
+}

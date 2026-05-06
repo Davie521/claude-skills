@@ -25,7 +25,7 @@
     },
     {
       "name": "document",
-      "description": "Document creation tools: printable A4 cheatsheets from Markdown",
+      "description": "Document tools: A4 cheatsheets, structured doc co-authoring, PDF manipulation",
       "source": "./plugins/document",
       "category": "productivity"
     }

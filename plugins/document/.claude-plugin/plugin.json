@@ -1,7 +1,7 @@
 {
   "name": "document",
-  "version": "1.0.0",
-  "description": "Document creation tools: printable A4 cheatsheets from Markdown with multi-column layout",
+  "version": "1.1.0",
+  "description": "Document tools: A4 cheatsheets, structured doc co-authoring, PDF manipulation (extract/forms/OCR)",
   "author": {
     "name": "Yifan"
   }

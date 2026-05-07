@@ -2,13 +2,13 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **13 plugins, 108 skills** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **13 plugins, 116 skills** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 7 | Git PR automation, multi-agent implementation, browser routing, blueprints |
+| [`dev-workflow`](#dev-workflow) | 15 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
@@ -77,6 +77,14 @@ Selects the right browser tool by intent:
 - **`blueprint`** — Turn a one-line goal into a multi-session, multi-agent construction plan with self-contained context briefs, dependency graph, and adversarial review gate
 - **`git-workflow`** — Branching strategies, commit conventions, merge vs rebase, conflict resolution
 - **`repo-scan`** — Cross-stack source code asset audit, classifies every file, detects embedded third-party libs
+- **`grill-me`** — Get relentlessly interviewed about a plan, one question at a time, until every branch of the design tree is resolved (lite version, no doc updates)
+- **`grill-with-docs`** — Same grilling, but updates `CONTEXT.md` (domain glossary) and `docs/adr/` inline as terms and decisions crystallise — the producer of `CONTEXT.md` culture
+- **`diagnose`** — 6-phase debug discipline (build a feedback loop → reproduce → ranked hypotheses → instrument with `[DEBUG-xxxx]` tags → fix + regression test → cleanup) for hard bugs and perf regressions
+- **`improve-codebase-architecture`** — Find deepening opportunities (Module / Interface / Depth / Seam vocabulary, "deletion test" heuristic), present candidates, drop into a grilling loop on the chosen one
+- **`prototype`** — Throwaway prototype with explicit branch decision: terminal TUI for state/logic questions, multi-variant UI on one route for design questions
+- **`to-prd`** — Synthesize the current conversation into a PRD without re-interviewing; publishes to GitHub issue or saves to `docs/prds/`
+- **`triage`** — Issue triage state machine (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix) with `.out-of-scope/` knowledge base for rejected enhancements
+- **`caveman`** — Persistent ultra-compressed response mode (~75% token cut) that strips filler while keeping technical accuracy
 
 ---
 

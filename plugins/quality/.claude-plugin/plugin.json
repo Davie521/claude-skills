@@ -1,7 +1,7 @@
 {
   "name": "quality",
-  "version": "1.0.0",
-  "description": "Code quality: testing, E2E, benchmarks, security review, coding standards",
+  "version": "1.1.0",
+  "description": "Code quality: testing (with vertical-tracer-bullet TDD discipline), E2E, benchmarks, security review, coding standards",
   "author": {
     "name": "Yifan"
   }

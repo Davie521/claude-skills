@@ -60,6 +60,33 @@ ALWAYS write tests first, then implement code to make tests pass.
   - one optional commit for refactor complete
 - Separate evidence-only commits are not required if the test commit clearly corresponds to RED and the fix commit clearly corresponds to GREEN
 
+## Anti-Pattern: Horizontal Slicing
+
+**DO NOT write all tests first, then all implementation.** This is "horizontal slicing" — treating RED as "write all tests" and GREEN as "write all code."
+
+This produces **bad tests**:
+
+- Tests written in bulk test _imagined_ behavior, not _actual_ behavior
+- You end up testing the _shape_ of things (data structures, function signatures) rather than user-facing behavior
+- Tests become insensitive to real changes — they pass when behavior breaks, fail when behavior is fine
+- You outrun your headlights, committing to test structure before understanding the implementation
+
+**Correct approach**: Vertical slices via tracer bullets. One test → one implementation → repeat. Each test responds to what you learned from the previous cycle. Because you just wrote the code, you know exactly what behavior matters and how to verify it.
+
+```
+WRONG (horizontal):
+  RED:   test1, test2, test3, test4, test5
+  GREEN: impl1, impl2, impl3, impl4, impl5
+
+RIGHT (vertical):
+  RED→GREEN: test1→impl1
+  RED→GREEN: test2→impl2
+  RED→GREEN: test3→impl3
+  ...
+```
+
+The TDD Workflow Steps below describe **one vertical slice**. Repeat the cycle for each behavior — don't unroll Step 2-5 into a parallel list of all tests at once.
+
 ## TDD Workflow Steps
 
 ### Step 1: Write User Journeys
@@ -152,6 +179,9 @@ Recommended commit message format:
 - Verify that this checkpoint commit is on the current active branch before continuing
 
 ### Step 6: Refactor
+
+**Never refactor while RED.** Step 5's GREEN gate is mandatory before this step — if any test is failing, get back to GREEN first. Refactoring on top of a RED state mixes "did the refactor break it" with "was it already broken," and you lose the ability to bisect.
+
 Improve code quality while keeping tests green:
 - Remove duplication
 - Improve naming
@@ -461,3 +491,7 @@ npm test && npm run lint
 ---
 
 **Remember**: Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.
+
+## Provenance
+
+Anti-pattern guidance (vertical-tracer-bullet vs horizontal slicing) and the explicit "never refactor while RED" rule were grafted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/tdd`. License: MIT. The rest of this skill (RED-gate validation rules, coverage targets, Git checkpoint discipline, test patterns) is original to this collection.

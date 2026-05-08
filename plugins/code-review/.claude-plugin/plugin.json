@@ -1,0 +1,8 @@
+{
+  "name": "code-review",
+  "version": "1.0.0",
+  "description": "Multi-language code review: /code-review dispatches to language-specific reviewer (Python, TypeScript, Swift) plus mandatory security-reviewer. General code-reviewer fallback.",
+  "author": {
+    "name": "Yifan"
+  }
+}

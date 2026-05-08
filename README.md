@@ -2,7 +2,7 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **13 plugins, 116 skills** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
@@ -13,11 +13,12 @@ Yifan's personal Claude Code plugin marketplace — **13 plugins, 116 skills** f
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
 | [`design`](#design) | 23 | UI/UX Pro Max design family — design systems, styling, animation, audits |
-| [`python`](#python) | 7 | Python and Django: patterns, testing, security, verification |
+| [`python`](#python) | 6 | Python and Django: patterns, testing, security, verification |
 | [`swift`](#swift) | 6 | Swift/iOS: SwiftUI, concurrency, persistence, on-device LLM |
 | [`web`](#web) | 9 | TS frontend, Node backend, MCP servers, Docker, deployment |
 | [`data`](#data) | 5 | PostgreSQL, ClickHouse, migrations, PyTorch, automated scraping |
 | [`quality`](#quality) | 14 | Testing, E2E, benchmarks, security review, coding standards |
+| [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
 | [`research`](#research) | 8 | Deep research, prompt optimization, cost-aware LLM pipelines |
 | [`skills`](#skills) | 13 | Skill management — create, audit, evolve, promote |
 | [`business`](#business) | 3 | Investor outreach, pitch materials, product evaluation |
@@ -169,7 +170,6 @@ Python and Django patterns:
 
 - **`python-patterns`** — Pythonic idioms, PEP 8, type hints
 - **`python-testing`** — pytest, TDD, fixtures, mocking, coverage
-- **`python-review`** — Comprehensive code review
 - **`django-patterns`** — Django architecture, DRF, ORM, caching
 - **`django-security`** — Authn/authz, CSRF, SQL injection, XSS, secure deploy
 - **`django-tdd`** — pytest-django, factory_boy, DRF testing
@@ -242,6 +242,22 @@ Code quality, testing, and review:
 
 ---
 
+## code-review
+
+Multi-language code review with auto-dispatch. Single command (`/code-review`) detects which languages changed and runs the matching specialist agents in parallel, plus a mandatory security pass.
+
+**Command:**
+- **`/code-review`** — Local uncommitted changes review, or `/code-review <pr>` for GitHub PR review (fetches diff, validates, posts review)
+
+**Agents (5):**
+- **`code-reviewer`** — General-purpose fallback when no language specialist matches
+- **`python-reviewer`** — PEP 8, Pythonic idioms, type hints, security (bandit), Django/FastAPI/Flask patterns
+- **`typescript-reviewer`** — Type safety, async correctness, React/Next.js patterns, Node security
+- **`swift-reviewer`** — Swift 6 concurrency, value types, actor patterns, SwiftUI, Keychain/ATS security
+- **`security-reviewer`** — OWASP Top 10, secrets detection, injection, unsafe crypto. Always invoked by `/code-review` regardless of language.
+
+---
+
 ## research
 
 Research and LLM engineering:
@@ -303,10 +319,10 @@ claude plugin install python@yifan-personal
 # ... etc
 ```
 
-Or install all 13 at once:
+Or install all 14 at once:
 
 ```bash
-for p in dev-workflow document work-tools writing design python swift web data quality research skills business; do
+for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business; do
   claude plugin install "$p@yifan-personal"
 done
 ```

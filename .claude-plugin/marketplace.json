@@ -66,6 +66,12 @@
       "category": "testing"
     },
     {
+      "name": "code-review",
+      "description": "Multi-language code review: /code-review auto-dispatches to language specialist (Python/TypeScript/Swift) plus mandatory security review",
+      "source": "./plugins/code-review",
+      "category": "testing"
+    },
+    {
       "name": "research",
       "description": "Research and LLM engineering: deep research, prompt optimization, cost-aware pipelines",
       "source": "./plugins/research",

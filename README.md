@@ -2,13 +2,13 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **13 plugins, 117 skills** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **13 plugins, 116 skills** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 16 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage, zoom-out** |
+| [`dev-workflow`](#dev-workflow) | 15 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
@@ -85,7 +85,6 @@ Selects the right browser tool by intent:
 - **`to-prd`** — Synthesize the current conversation into a PRD without re-interviewing; publishes to GitHub issue or saves to `docs/prds/`
 - **`triage`** — Issue triage state machine (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix) with `.out-of-scope/` knowledge base for rejected enhancements
 - **`caveman`** — Persistent ultra-compressed response mode (~75% token cut) that strips filler while keeping technical accuracy
-- **`zoom-out`** — One-shot shortcut: "go up a layer of abstraction; give me a module + caller map using domain glossary vocabulary." Manual-invocation only (`disable-model-invocation: true`)
 
 ---
 

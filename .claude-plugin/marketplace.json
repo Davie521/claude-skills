@@ -88,6 +88,12 @@
       "description": "Business: investor outreach, pitch materials, product evaluation",
       "source": "./plugins/business",
       "category": "productivity"
+    },
+    {
+      "name": "session-summary",
+      "description": "Session analytics — 15-section summary on session end (tools, files, git diff, cost, models). Vendored from FlorianBruniaux/claude-code-plugins (MIT)",
+      "source": "./plugins/session-summary",
+      "category": "productivity"
     }
   ]
 }

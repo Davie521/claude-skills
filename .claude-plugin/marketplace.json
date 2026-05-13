@@ -94,6 +94,12 @@
       "description": "Session analytics — 15-section summary on session end (tools, files, git diff, cost, models). Vendored from FlorianBruniaux/claude-code-plugins (MIT)",
       "source": "./plugins/session-summary",
       "category": "productivity"
+    },
+    {
+      "name": "codex",
+      "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
+      "source": "./plugins/codex",
+      "category": "testing"
     }
   ]
 }

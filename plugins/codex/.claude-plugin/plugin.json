@@ -1,0 +1,8 @@
+{
+  "name": "codex",
+  "version": "0.1.0",
+  "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
+  "author": {
+    "name": "Yifan"
+  }
+}

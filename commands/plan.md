@@ -11,8 +11,8 @@ This command invokes the **planner** agent to create a comprehensive implementat
 1. **Restate Requirements** - Clarify what needs to be built
 2. **Identify Risks** - Surface potential issues and blockers
 3. **Create Step Plan** - Break down implementation into phases
-4. **Wait for Confirmation** - MUST receive user approval before proceeding
-5. **Create Worktree** - After confirmation, set up an isolated git worktree before any coding
+4. **Create Worktree** - Auto-create an isolated git worktree (no need to ask)
+5. **Wait for Confirmation** - MUST receive user approval before proceeding
 
 ## When to Use
 
@@ -32,7 +32,12 @@ The planner agent will:
 3. **Identify dependencies** between components
 4. **Assess risks** and potential blockers
 5. **Estimate complexity** (High/Medium/Low)
-6. **Present the plan** and WAIT for your explicit confirmation
+6. **Auto-create a worktree** (no need to ask — default behavior):
+   - Slugify request → `plan-<slug>` (non-ASCII → short English slug). `git init` if not a repo.
+   - `git fetch origin` (if remote); detect default branch via `git symbolic-ref --short refs/remotes/origin/HEAD`.
+   - Prefer `EnterWorktree` off latest main, else `git worktree add ../<name> -b <name> origin/<default-branch>`.
+   - Announce path + base ref (e.g. "worktree: `../plan-add-podcast` off `origin/main`"). All code changes happen inside.
+7. **Present the plan** and WAIT for your explicit confirmation
 
 ## Example Usage
 
@@ -101,31 +106,10 @@ If you want changes, respond with:
 - "different approach: [alternative]"
 - "skip phase 2 and do phase 3 first"
 
-## Worktree Setup After Confirmation (REQUIRED)
-
-After the user explicitly confirms the plan (e.g. "yes", "proceed", "go") and BEFORE writing any code, set up an isolated git worktree:
-
-1. **Derive the worktree name from `$ARGUMENTS`:**
-   - Slugify: lowercase, replace whitespace and punctuation with `-`, collapse repeats, strip leading/trailing `-`, truncate to ~40 chars.
-   - If `$ARGUMENTS` is non-ASCII (e.g. Chinese), translate the gist to a short English slug instead of transliterating.
-   - Prefix with `plan-`. Example: `add podcast feature` → `plan-add-podcast-feature`.
-
-2. **Ensure we're inside a git repo:**
-   Run `git rev-parse --is-inside-work-tree` in the current working directory. If it fails (not a git repo), run `git init` first — do not skip this step.
-
-3. **Sync the latest main:**
-   If the repo has a remote, run `git fetch origin` first. Detect the default branch name with `git symbolic-ref --short refs/remotes/origin/HEAD` (typically `origin/main`, sometimes `origin/master`). This is the **base ref** for the new worktree — always branch off the latest main, never off the current HEAD or a feature branch.
-
-4. **Create the worktree** branching off the latest main. Prefer the `EnterWorktree` tool with the base ref set to that main. If unavailable, fall back to `git worktree add ../<name> -b <name> origin/<default-branch>`. (For a freshly `git init`-ed repo with no remote, use the local default branch's HEAD as the base.)
-
-5. **Announce the worktree path and base ref** to the user (e.g. "created worktree at `../plan-add-podcast` branched off `origin/main` @ abc1234"), then perform all subsequent code changes inside it.
-
 ## Integration with Other Commands
 
 After planning:
 - Use `/tdd` to implement with test-driven development
-- Use `/build-fix` if build errors occur
-- Use `/code-review` to review completed implementation
 
 ## Related Agents
 

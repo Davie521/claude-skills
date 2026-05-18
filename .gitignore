@@ -1,0 +1,7 @@
+# local heavy runtime tool — built/installed per machine
+Spider_XHS/
+
+# editor / OS
+.DS_Store
+*.swp
+__pycache__/

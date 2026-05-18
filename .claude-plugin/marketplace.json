@@ -100,6 +100,12 @@
       "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
       "source": "./plugins/codex",
       "category": "testing"
+    },
+    {
+      "name": "xhs",
+      "description": "Xiaohongshu (小红书) automation: keyword search via local Spider_XHS",
+      "source": "./plugins/xhs",
+      "category": "productivity"
     }
   ]
 }

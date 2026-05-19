@@ -1,20 +1,32 @@
 ---
 name: xhs-search
-description: "搜索小红书 (Xiaohongshu) 笔记。Trigger when user says '搜小红书 X' / '小红书搜 X' / '小红书查 X' / '小红书看看 X' / 'xhs 搜 X' / 'xhs search X'. Calls the local Spider_XHS project at ~/Desktop/claude-skills/Spider_XHS to fetch top results (title, author, likes, URL, optionally full body)."
+description: "搜索小红书 (Xiaohongshu) 笔记。**只要用户消息里出现「小红书」/「xhs」/「xiaohongshu」（任何形式、任何上下文）就必须触发本 skill 去搜**，不需要等 '搜/查/看看' 之类的动词。包括但不限于：'搜小红书 X' / '小红书搜 X' / '小红书查 X' / '小红书看看 X' / 'xhs 搜 X' / 'xhs search X' / '小红书上有没有 X' / '小红书怎么说' / 'xhs 上 X 怎么样' / '小红书有人说 X' / 用户随口提到 '小红书' 这三个字。从用户消息里推断查询词（去掉 '小红书'/'xhs' 这些触发词本身），然后调本地 Spider_XHS 项目搜出 title/author/likes/URL（必要时 desc/comments）。"
 ---
 
 # 搜小红书 (xhs-search)
 
 调用本地 `~/Desktop/claude-skills/Spider_XHS` 项目搜索小红书笔记并把结果整理给用户看。
 
-## 触发
+## 触发（重要）
 
-用户消息里出现：
-- "搜小红书 <关键词>"
-- "小红书搜<关键词>"、"小红书搜一下 <关键词>"
-- "小红书查 <关键词>"、"小红书看看 <关键词>"
-- "xhs 搜 <关键词>"、"xhs search <关键词>"
-- 上下文很明显是要搜小红书时，也可以触发
+**只要用户消息里出现以下任何一个词，立即触发本 skill 去搜，不要先反问用户**：
+
+- 「小红书」（任何位置、任何上下文）
+- 「xhs」（大小写都算）
+- 「xiaohongshu」（大小写都算）
+- 「rednote」/「red note」（小红书海外名）
+
+包括但不限于这些说法：
+- "搜小红书 <关键词>" / "小红书搜<关键词>" / "小红书搜一下 <关键词>"
+- "小红书查 <关键词>" / "小红书看看 <关键词>"
+- "xhs 搜 <关键词>" / "xhs search <关键词>"
+- "小红书上有没有 X" / "小红书有人讲 X 吗" / "小红书怎么说 X"
+- "xhs 上 X 怎么样" / "X 在小红书上口碑如何"
+- 用户只是随口提到「小红书」三个字 → 也触发，按上下文推断 query
+
+### 查询词怎么从消息里提取
+
+去掉触发词本身（「小红书」「xhs」「xiaohongshu」「搜」「查」「看看」「搜一下」），剩下的就是 query。如果上下文里有具体话题（比如刚在讨论"伦敦签证"），用那个话题做 query。**不确定就用最显著的名词短语，先搜再说，不要反问。**
 
 ## 如何执行
 

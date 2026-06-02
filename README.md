@@ -262,7 +262,7 @@ Multi-language code review with auto-dispatch. Single command (`/code-review`) d
 
 Research and LLM engineering:
 
-- **`deep-research`** — Multi-source research (firecrawl + exa MCPs) with citations
+- **`research`** — Multi-source research (firecrawl + exa MCPs) with citations
 - **`market-research`** — Competitive analysis, investor due diligence
 - **`search-first`** — Search for existing tools/libs/patterns before writing custom code
 - **`exa-search`** — Neural search via Exa MCP (web, code, company)
@@ -336,7 +336,7 @@ done
 > /docs react server components   # Look up current React docs
 > write an article about...       # Triggers vibe-writing
 > create a cheatsheet for...      # Triggers cheatsheet
-> deep research on X              # Triggers deep-research
+> deep research on X              # Triggers research
 > review this code for security   # Triggers security-review
 ```
 

@@ -262,7 +262,7 @@ TypeScript / Node Web 全栈：
 
 研究和 LLM 工程：
 
-- **`deep-research`** — 多源研究（firecrawl + exa MCPs）+ 引用
+- **`research`** — 多源研究（firecrawl + exa MCPs）+ 引用
 - **`market-research`** — 竞品分析、投资人尽调
 - **`search-first`** — 写代码前先搜现成方案
 - **`exa-search`** — Exa MCP 神经搜索（Web、代码、公司）
@@ -336,7 +336,7 @@ done
 > /docs react server components   # 查 React 最新文档
 > 帮我写一篇关于...的文章         # 触发 vibe-writing
 > 做一张...的速查表               # 触发 cheatsheet
-> 深度研究 X                      # 触发 deep-research
+> 深度研究 X                      # 触发 research
 > 帮我审查这段代码安全性          # 触发 security-review
 ```
 

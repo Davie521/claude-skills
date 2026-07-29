@@ -8,7 +8,7 @@ Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 16 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
+| [`dev-workflow`](#dev-workflow) | 15 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
@@ -86,7 +86,6 @@ Selects the right browser tool by intent:
 - **`to-prd`** — Synthesize the current conversation into a PRD without re-interviewing; publishes to GitHub issue or saves to `docs/prds/`
 - **`triage`** — Issue triage state machine (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix) with `.out-of-scope/` knowledge base for rejected enhancements
 - **`caveman`** — Persistent ultra-compressed response mode (~75% token cut) that strips filler while keeping technical accuracy
-- **`mt-upload`** — MoneyTalk batch research-PDF upload: filename parse + per-file first-page double-check (source/title/date/ticker/analyst cross-check), ticker→RIC ladder, late-upload prediction, mandatory confirm gate, result bucketing — every status code verified against a live stack
 
 ---
 

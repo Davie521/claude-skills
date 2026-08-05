@@ -1,7 +1,7 @@
 {
   "name": "dev-workflow",
-  "version": "1.10.1",
-  "description": "Dev workflow: Git PR pipeline, Copilot lint, multi-agent impl, browser MCP, git patterns, repo audit, multi-session blueprints, diagnosis loop, plan grilling (lite + docs-aware with CONTEXT.md/ADR), codebase deepening (deep modules / seams / deletion test), caveman compressed-comms mode, conversation-to-PRD synthesis, throwaway prototype (logic TUI / UI variants), issue triage state machine (with .out-of-scope knowledge base)",
+  "version": "1.12.2",
+  "description": "Dev workflow: Git PR pipeline, Copilot lint, multi-agent impl, browser MCP, git patterns, repo audit, multi-session blueprints, diagnosis loop, plan grilling (lite + docs-aware with CONTEXT.md/ADR), codebase deepening (deep modules / seams / deletion test), caveman compressed-comms mode, conversation-to-PRD synthesis, throwaway prototype (logic TUI / UI variants), issue triage state machine (with .out-of-scope knowledge base), deep-plan (restate/risk/phase planning with mandatory worktree isolation + post-impl handoff to cpr/code-review), cleanup (end-of-session: kill session processes, sync stale docs, zero leftover tasks, persist lessons to memory)",
   "author": {
     "name": "Yifan"
   }

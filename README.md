@@ -8,7 +8,7 @@ Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 15 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
+| [`dev-workflow`](#dev-workflow) | 17 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
@@ -86,6 +86,8 @@ Selects the right browser tool by intent:
 - **`to-prd`** — Synthesize the current conversation into a PRD without re-interviewing; publishes to GitHub issue or saves to `docs/prds/`
 - **`triage`** — Issue triage state machine (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix) with `.out-of-scope/` knowledge base for rejected enhancements
 - **`caveman`** — Persistent ultra-compressed response mode (~75% token cut) that strips filler while keeping technical accuracy
+- **`deep-plan`** — Restate requirements, assess risks, phase-by-phase plan, WAIT for explicit confirmation; on approval the first action is a mandatory isolated git worktree, then post-impl handoff to `/cpr` or code review
+- **`cleanup`** — End-of-session cleanup: shut down every process the session started, sync stale docs against the diff, drive leftover tasks to zero (finish or explicitly report), persist lessons to memory — every phase must end with an evidence-backed done / not-needed verdict
 
 ---
 

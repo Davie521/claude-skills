@@ -8,7 +8,7 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 
 | Plugin | Skill 数 | 用途 |
 |--------|---------|------|
-| [`dev-workflow`](#dev-workflow) | 15 | Git PR 自动化、多 Agent 实现、蓝图、浏览器路由、**拷问、调试纪律、架构深化、issue triage** |
+| [`dev-workflow`](#dev-workflow) | 17 | Git PR 自动化、多 Agent 实现、蓝图、浏览器路由、**拷问、调试纪律、架构深化、issue triage** |
 | [`document`](#document) | 7 | A4 速查表、文档协作、PDF、文档查询、代码库 onboarding |
 | [`work-tools`](#work-tools) | 1 | 飞书集成 |
 | [`writing`](#writing) | 5 | Vibe 写作、文章、内容引擎、跨平台发布、视频编辑 |
@@ -86,6 +86,8 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 - **`to-prd`** — 把当前会话直接合成成 PRD（**不再 interview**），发到 GitHub issue 或存到 `docs/prds/`
 - **`triage`** — Issue 5 状态机（needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix），自带 `.out-of-scope/` 拒绝知识库
 - **`caveman`** — 持续压缩 ~75% token 的回复模式，删冠词/客套话但保留所有技术内容
+- **`deep-plan`** — 复述需求 → 评估风险 → 分阶段计划 → **等明确确认**；批准后第一步强制建隔离 git worktree，实现完交接 `/cpr` 或 code review
+- **`cleanup`** — 会话收尾：关掉本次启动的所有进程、按 diff 同步过时文档、残留任务清零（做完或明确报告）、经验沉淀进记忆——每个 Phase 必须给出带证据的「已处理/无需处理」结论
 
 ---
 

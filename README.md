@@ -12,11 +12,11 @@ Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
-| [`design`](#design) | 23 | UI/UX Pro Max design family — design systems, styling, animation, audits |
-| [`python`](#python) | 6 | Python and Django: patterns, testing, security, verification |
+| [`design`](#design) | 3 | UI/UX Pro Max, UX critique, codebase-to-course |
+| [`python`](#python) | 2 | General Python: patterns, testing |
 | [`swift`](#swift) | 6 | Swift/iOS: SwiftUI, concurrency, persistence, on-device LLM |
 | [`web`](#web) | 9 | TS frontend, Node backend, MCP servers, Docker, deployment |
-| [`data`](#data) | 5 | PostgreSQL, ClickHouse, migrations, PyTorch, automated scraping |
+| [`data`](#data) | 4 | PostgreSQL, migrations, PyTorch, automated scraping |
 | [`quality`](#quality) | 14 | Testing, E2E, benchmarks, security review, coding standards |
 | [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
 | [`research`](#research) | 8 | Deep research, prompt optimization, cost-aware LLM pipelines |
@@ -62,16 +62,6 @@ Orchestrates a team of specialized agents for larger features:
 | 3 | **Tester** | Runs tests, Playwright screenshots, fixes bugs |
 | 4 | **Reviewer** | Final review of test fixes |
 | 5 | **Wrap-up** | Clean commit history, feature branch, PR |
-
-#### `browser` — Browser MCP Routing
-
-Selects the right browser tool by intent:
-
-| Intent | MCP |
-|--------|-----|
-| Browse, fill forms, open pages | **browser-use** |
-| Performance, debugging, network, console | **Chrome DevTools** |
-| E2E testing, full flow testing | **Playwright** |
 
 #### Other dev-workflow skills
 
@@ -152,30 +142,32 @@ Requires a Feishu MCP server.
 
 ## design
 
-UI/UX Pro Max design family — 23 skills covering the full design lifecycle:
+Three skills. Anti-slop discipline lives in [Hallmark](https://github.com/Nutlope/hallmark);
+measured a11y/perf auditing lives in the `chrome-devtools` MCP (`lighthouse_audit`).
+This plugin covers what neither of those does.
 
-**Foundation (5):** `ui-ux-pro-max` (router, 67 styles, 96 palettes, 13 stacks), `ui-styling` (shadcn/ui + Tailwind), `design-system` (token architecture), `brand`, `teach-impeccable`
+- **`ui-ux-pro-max`** — design intelligence: 67 styles, 96 palettes, 57 font pairings,
+  13 stacks, searchable DB. Emits `design-system/MASTER.md` + a root `design.md`
+  pointer so Hallmark sees the project as system-managed.
+  See `reference/design-system-map.md` for routing to official design systems
+  (Fluent, Material 3, Carbon, Polaris, Atlaskit, Primer, govuk-frontend, USWDS).
+- **`critique`** — UX evaluation: cognitive load, emotional journey (peak-end),
+  visual hierarchy, discoverability, persona red flags. 10 dimensions + scoring
+  + 5 user archetypes. Answers "does this experience work", not "does this look AI-made".
+- **`codebase-to-course`** — turn a codebase into an interactive HTML course.
 
-**Enhance (4):** `delight`, `bolder`, `colorize`, `overdrive`
-
-**Refine (4):** `quieter`, `distill`, `normalize`, `harden`
-
-**Targeted (7):** `optimize`, `adapt`, `arrange`, `typeset`, `clarify`, `onboard`, `extract`
-
-**Evaluate (3):** `audit`, `critique`, `codebase-to-course`
+The 20 single-verb skills (`bolder`, `quieter`, `distill`, `audit`, …) were removed
+2026-08-08: zero invocations, and their dispatcher depended on a disabled
+`frontend-design` skill.
 
 ---
 
 ## python
 
-Python and Django patterns:
+General Python patterns (framework-agnostic):
 
 - **`python-patterns`** — Pythonic idioms, PEP 8, type hints
 - **`python-testing`** — pytest, TDD, fixtures, mocking, coverage
-- **`django-patterns`** — Django architecture, DRF, ORM, caching
-- **`django-security`** — Authn/authz, CSRF, SQL injection, XSS, secure deploy
-- **`django-tdd`** — pytest-django, factory_boy, DRF testing
-- **`django-verification`** — Migrations, linting, tests, security scans, deploy readiness
 
 ---
 
@@ -213,7 +205,6 @@ TypeScript/Node web stack:
 Data engineering and ML:
 
 - **`postgres-patterns`** — Query optimization, schema design, indexing, security
-- **`clickhouse-io`** — Analytics database patterns and query optimization
 - **`database-migrations`** — Zero-downtime schema changes (PostgreSQL, MySQL, Prisma, Drizzle, Django)
 - **`pytorch-patterns`** — Training pipelines, model architectures, data loading
 - **`data-scraper-agent`** — 100% free GitHub Actions data collection agent (Gemini Flash + Notion/Sheets/Supabase)
@@ -348,7 +339,6 @@ Most skills auto-trigger from natural language matching their description.
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) for cpr/cl workflows
-- Browser MCP servers for `browser` skill
 - Feishu MCP server for `feishu` skill
 - Various API keys depending on skill (Exa, firecrawl, Context7, etc.)
 

@@ -5,9 +5,15 @@ user-invocable: true
 argument-hint: "[area (feature, page, component...)]"
 ---
 
-## MANDATORY PREPARATION
+## PREPARATION
 
-Invoke /frontend-design — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run /teach-impeccable first. Additionally gather: what the interface is trying to accomplish.
+Gather two things before critiquing — do not block on them, infer and state your assumption if unavailable:
+
+1. **What the interface is trying to accomplish** — ask the user if it isn't obvious.
+2. **Project design context** — read the project root's `design.md` / `DESIGN.md`
+   (written by `ui-ux-pro-max --persist`) or a `## Design Context` section in
+   `CLAUDE.md`. If neither exists, note that the critique is running without
+   declared brand/audience context and judge on general principles.
 
 ---
 
@@ -21,7 +27,9 @@ Evaluate the interface across these dimensions:
 
 **This is the most important check.** Does this look like every other AI-generated interface from 2024-2025?
 
-Review the design against ALL the **DON'T** guidelines in the frontend-design skill — they are the fingerprints of AI-generated work. Check for the AI color palette, gradient text, dark mode with glowing accents, glassmorphism, hero metric layouts, identical card grids, generic fonts, and all other tells.
+Check for the AI color palette (cyan-on-dark, purple-to-blue gradients, neon accents), gradient text, dark mode with glowing accents, decorative glassmorphism, hero metric layouts, identical card grids, and generic fonts (Inter, Roboto, Arial, Open Sans, system defaults).
+
+**This is Hallmark's specialty, not this skill's.** For a full anti-slop punch list, run `hallmark audit <target>` — it grades against a far deeper named anti-pattern catalog with genre-aware exceptions. Flag the obvious tells here, then defer.
 
 **The test**: If you showed this to someone and said "AI made this," would they believe you immediately? If yes, that's the problem.
 
@@ -126,12 +134,12 @@ For each issue, tag with **P0–P3 severity** (consult [heuristics-scoring](refe
 - **[P?] What**: Name the problem clearly
 - **Why it matters**: How this hurts users or undermines goals
 - **Fix**: What to do about it (be concrete)
-- **Suggested command**: Which command could address this (from: /animate, /quieter, /optimize, /adapt, /clarify, /distill, /delight, /onboard, /normalize, /audit, /harden, /polish, /extract, /bolder, /arrange, /typeset, /critique, /colorize, /overdrive)
+- **Suggested fix**: One concrete correction, stated as an edit — not a command name.
 
 ### Persona Red Flags
 > *Consult [personas](reference/personas.md)*
 
-Auto-select 2–3 personas most relevant to this interface type (use the selection table in the reference). If `CLAUDE.md` contains a `## Design Context` section from `teach-impeccable`, also generate 1–2 project-specific personas from the audience/brand info.
+Auto-select 2–3 personas most relevant to this interface type (use the selection table in the reference). If the project has a `design.md` / `DESIGN.md` or a `## Design Context` section in `CLAUDE.md`, also generate 1–2 project-specific personas from the audience/brand info.
 
 For each selected persona, walk through the primary user action and list specific red flags found:
 
@@ -178,21 +186,23 @@ Ask questions along these lines (adapt to the specific findings — do NOT ask g
 
 ### Action Summary
 
-List recommended commands in priority order, based on the user's answers:
+List concrete fixes in priority order, based on the user's answers:
 
-1. **`/command-name`** — Brief description of what to fix (specific context from critique findings)
-2. **`/command-name`** — Brief description (specific context)
-...
+1. **[dimension] What to change** — the specific edit, with file/component if known
+2. **[dimension] What to change** — …
 
 **Rules for recommendations**:
-- Only recommend commands from: /animate, /quieter, /optimize, /adapt, /clarify, /distill, /delight, /onboard, /normalize, /audit, /harden, /polish, /extract, /bolder, /arrange, /typeset, /critique, /colorize, /overdrive
 - Order by the user's stated priorities first, then by impact
-- Each item's description should carry enough context that the command knows what to focus on
-- Map each Priority Issue to the appropriate command
-- Skip commands that would address zero issues
+- Each item must be an actionable edit, not a vague direction ("cut the hero to one CTA and move the trust strip below the fold", not "simplify the hero")
+- Map each Priority Issue to exactly one fix; drop issues the user scoped out
 - If the user chose a limited scope, only include items within that scope
-- If the user marked areas as off-limits, exclude commands that would touch those areas
-- End with `/polish` as the final step if any fixes were recommended
+- If the user marked areas as off-limits, exclude fixes that would touch them
+
+**Handoff**: this skill diagnoses, it does not edit. When the user wants the fixes applied:
+- Visual/structural rework → `hallmark redesign <target>` (preserves routes, copy intent, and IA; replaces the visual layer)
+- Measured a11y / performance / responsive verification → `chrome-devtools` MCP:
+  `lighthouse_audit`, `performance_start_trace`, `emulate`
+- Style, palette, or typography selection → `ui-ux-pro-max`
 
 After presenting the summary, tell the user:
 

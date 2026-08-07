@@ -132,7 +132,13 @@ Extract key information from user request:
 
 ### Step 2: Generate Design System (REQUIRED)
 
-**Always start with `--design-system`** to get comprehensive recommendations with reasoning:
+**First check [reference/design-system-map.md](reference/design-system-map.md)** —
+if the brief maps to an official design system (Fluent, Material 3, Carbon,
+Polaris, Atlaskit, Primer, govuk-frontend, USWDS, Radix, shadcn/ui), install
+and use that official package instead of generating a bespoke system. One
+system per project; never hand-recreate a system's CSS.
+
+Otherwise, **start with `--design-system`** to get comprehensive recommendations with reasoning:
 
 ```bash
 python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
@@ -160,6 +166,21 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persi
 This creates:
 - `design-system/MASTER.md` — Global Source of Truth with all design rules
 - `design-system/pages/` — Folder for page-specific overrides
+
+**ALSO write `design.md` at the project root** (a short pointer file, not a copy):
+
+```markdown
+# Design System
+This project is design-system managed.
+Source of truth: `design-system/MASTER.md`
+Page overrides: `design-system/pages/<page>.md`
+```
+
+This is required for interop with Hallmark. Hallmark's `audit` verb looks for
+`design.md` / `DESIGN.md` at the project root to decide whether the project is
+system-managed. Without it, Hallmark treats every page as unmanaged and flags
+pages that correctly follow MASTER.md as `variety drift` false positives.
+Re-run this whenever MASTER.md is regenerated.
 
 **With page-specific override:**
 ```bash

@@ -121,10 +121,9 @@ If prior triage notes exist on the issue, read them, check whether the reporter 
 
 ## Use with
 
-- `grill-with-docs` — invoked inline at Step 4 when an issue needs to be fleshed out before becoming an agent brief. The grilling session also feeds CONTEXT.md / ADRs if they exist.
+- `grill-with-docs` — invoked inline at Step 4 when an issue needs to be fleshed out before becoming an agent brief. The grilling session also feeds CONTEXT.md / ADRs if they exist. Its ADR discipline also applies to `wontfix` enhancements: the rejection often encodes an architectural decision worth preserving as an ADR (not just an `.out-of-scope/` entry).
 - `to-prd` — for new feature requests that arrive as raw issues, run `to-prd` first to crystallise the conversation, then triage the resulting PRD issue with this skill.
 - `cpr` — once an agent has implemented a `ready-for-agent` issue, `cpr` is the PR-loop counterpart that closes the loop (PR → CI → merge).
-- `architecture-decision-records` — `wontfix` enhancements often encode an architectural decision worth preserving; consider whether the rejection reasoning should also become an ADR (not just an `.out-of-scope/` entry).
 
 ## Origin
 

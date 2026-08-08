@@ -60,9 +60,13 @@ description: "End-of-session cleanup: shut down every process the session starte
    - 踩过的坑和实战解法——**仅限代码/git 历史里查不到的**（repo 已记录的不重复存）
 2. **持久/临时二分**：只沉淀「跨会话仍然成立」的知识（约束、决策、反馈、坑）；「本次改到哪了」这类会话态描述不进记忆——那是 handoff 的事，不是 memory 的事。
 3. **机密禁写**：密钥、token、密码、原始对话记录绝不写入记忆或任何文档；需要引用密钥时写 `op://` 引用。
-4. 按 memory 规范写入持久记忆（一事一文件，frontmatter + Why/How to apply），并在 `MEMORY.md` 加索引行。
-5. 顺手核对已有记忆：本次会话证明已过时/错误的旧记忆，当场修正或删除。
-6. 没有值得沉淀的就明确说「本次无新增记忆」——这也是一个合法结论，但要说出来。
+4. **放置判断（Global vs Project）**：问「换个项目还用得上吗？」——跨 2+ 项目通用的（bash 兼容性、LLM API 行为、调试技巧）放 Global（`~/.claude/skills/learned/`），只对本项目成立的（特定配置怪癖、架构决策）放本项目 memory。**拿不准就选 Global**——Global 降级成 Project 容易，反向难。
+5. **优先并入已有文件，不轻易新建**：写之前先 grep 已有记忆 / learned skills 并查 `MEMORY.md` 索引——已有文件覆盖同一主题就**追加进去**，而不是另开新文件（模型天然倾向新建，这条要逆着来）。琐碎修复（拼写、简单语法错）和一次性问题（某次 API 故障）不值得沉淀。
+6. 按 memory 规范写入持久记忆（一事一文件，frontmatter + Why/How to apply），并在 `MEMORY.md` 加索引行。**路径**：memory 是 per-project 的，位于 `~/.claude-b/projects/<project-slug>/memory/`（slug 为项目绝对路径的连字符化，如 `-Users-yifan-Desktop-claude-skills-local`），索引 `MEMORY.md` 在同一目录；`~/.claude/memories`、`~/.claude-b/memories` 均不存在，别往那写。
+7. 顺手核对已有记忆：本次会话证明已过时/错误的旧记忆，当场修正或删除。
+8. 没有值得沉淀的就明确说「本次无新增记忆」——这也是一个合法结论，但要说出来。
+
+> 决策记录：「值不值得留」的判定曾用过 5 维 1–5 数值评分 rubric（Specificity / Actionability / Scope Fit / Non-redundancy / Coverage），因定性信号被硬压成数字而失真，已废弃——用检查清单 + 整体裁决（留 / 并入已有 / 弃），别再引入打分制。
 
 ## 收尾报告（最后必须输出）
 
@@ -93,3 +97,4 @@ description: "End-of-session cleanup: shut down every process the session starte
 - Phase 2「对话遗言扫描」、Phase 3 临时文件命名模式、开头的触发防护、报告输出前自检、轻量会话快速收场 —— 改写自 [fogarasy/close-skill](https://github.com/fogarasy/close-skill)（MIT）。
 - Phase 1「kill 前核血统」思路、孤儿进程 reparent 告警与 shepherd 工具提示 —— 源自 [mgorkemuz/claude-code-shepherd](https://github.com/mgorkemuz/claude-code-shepherd)。
 - Phase 4 持久/临时知识二分、机密禁写 —— 源自 [puritysb/AgentDeck](https://github.com/puritysb/AgentDeck) 的 `session-end` skill。
+- Phase 4 Global/Project 放置判断（含「拿不准选 Global」tiebreaker）、「优先并入已有文件不新建」、废弃数值评分 rubric 的决策记录 —— 并入自本仓库原 `skills:learn-eval` skill（已删除，精华全部吸收至此）。

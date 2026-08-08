@@ -1,7 +1,7 @@
 {
   "name": "data",
-  "version": "1.0.0",
-  "description": "Data and ML: PostgreSQL, migrations, PyTorch, scraping",
+  "version": "1.1.0",
+  "description": "Data and ML: PostgreSQL patterns, zero-downtime migrations, scraping agent",
   "author": {
     "name": "Yifan"
   }

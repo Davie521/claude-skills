@@ -71,6 +71,6 @@ The discipline of maintaining a domain glossary (this file is one). Produced and
 
 ## Flagged ambiguities
 
-- **"Skill" vs "Command"** — slash commands (`/cpr`, `/triage`, `/grill-me`) are one **invocation surface** for skills. The skill is the directory + SKILL.md; the command is the trigger. Use **Skill** when discussing the artifact, **command** only when discussing how the user invokes it.
+- **"Skill" vs "Command"** — slash commands (`/cpr`, `/triage`, `/grill-with-docs`) are one **invocation surface** for skills. The skill is the directory + SKILL.md; the command is the trigger. Use **Skill** when discussing the artifact, **command** only when discussing how the user invokes it.
 - **"Migration" vs "Graft"** — see above. Resolved: distinct verbs and distinct artifacts. A migration adds a new file; a graft edits an existing one.
 - **"Plugin"** — distinct from a Claude Code MCP plugin (which is a server-side integration like `chrome-devtools`). In this repo, "plugin" means a marketplace plugin under `plugins/`. When discussing MCP, say "MCP server".

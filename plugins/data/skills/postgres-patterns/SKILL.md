@@ -6,7 +6,7 @@ origin: ECC
 
 # PostgreSQL Patterns
 
-Quick reference for PostgreSQL best practices. For detailed guidance, use the `database-reviewer` agent.
+Quick reference for PostgreSQL best practices.
 
 ## When to Activate
 
@@ -138,8 +138,6 @@ SELECT pg_reload_conf();
 
 ## Related
 
-- Agent: `database-reviewer` - Full database review workflow
-- Skill: `backend-patterns` - API and backend patterns
 
 ---
 

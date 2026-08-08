@@ -25,13 +25,14 @@ The rules distillation process follows three phases:
 #### 1a. Collect skill inventory
 
 ```bash
-bash ~/.claude/skills/rules-distill/scripts/scan-skills.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/rules-distill/scripts/scan-skills.sh"
 ```
 
 #### 1b. Collect rules index
 
 ```bash
-bash ~/.claude/skills/rules-distill/scripts/scan-rules.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/rules-distill/scripts/scan-rules.sh"
+# 注意：~/.claude/rules 不存在时 scan-rules.sh 会报错退出——此时按「现有 rules 为空」处理，直接进入从 skill 中蒸馏的流程，不视为失败。
 ```
 
 #### 1c. Present to user

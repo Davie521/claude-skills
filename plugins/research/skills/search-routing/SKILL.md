@@ -110,9 +110,22 @@ ranking, not full deep-research value. Mention this when asking.
 - Don't skip Context7 for library docs and go straight to exa —
   Context7 is more accurate and free for that case
 
+## Exa tool signatures (verified against live server, 2026-08-08)
+
+The installed exa-mcp-server exposes exactly two tools — anything else
+documented elsewhere (get_code_context_exa, web_search_advanced_exa,
+crawling_exa) does not exist:
+
+- `mcp__exa__web_search_exa(query, numResults)` — neural search; ignores
+  `site:` / quote operators
+- `mcp__exa__web_fetch_exa(urls, maxCharacters)` — fetch page content
+
+Tip: the first retrieval round is often about learning the project's own
+vocabulary — a search for "rate limit" may fail because the codebase calls
+it "throttle". Re-search with the project's terms before concluding absence.
+
 ## Related Skills
 
-- `exa-search` — parameter reference and detailed usage for exa
-- `research` — orchestrated firecrawl + exa research workflow
+- `research` — orchestrated firecrawl + exa research workflow,
+  including business-research scenario checklists
   (also requires user confirmation per §6)
-- `market-research` — business research with decision frameworks

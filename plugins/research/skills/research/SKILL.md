@@ -44,6 +44,13 @@ Break the topic into 3-5 research sub-questions. Example:
   - What companies are leading this space?
   - What's the market size and growth trajectory?
 
+**Scenario checklists** — when the topic matches one of these modes, make sure the sub-questions collect:
+
+- **Investor / fund diligence**: fund size, stage, and typical check size; relevant portfolio companies; public thesis and recent activity; concrete fit / no-fit reasons; obvious red flags or mismatches.
+- **Competitive analysis**: product reality, not marketing copy; funding and investor history if public; traction metrics if public; distribution and pricing clues; strengths, weaknesses, and positioning gaps.
+- **Market sizing**: top-down estimates from reports or public datasets; bottom-up sanity checks from realistic customer-acquisition assumptions; an explicit assumption stated for every leap in logic.
+- **Technology / vendor evaluation**: how it works; trade-offs and adoption signals; integration complexity; lock-in, security, compliance, and operational risk.
+
 ### Step 3: Execute Multi-Source Search
 
 For EACH sub-question, search using available MCP tools:

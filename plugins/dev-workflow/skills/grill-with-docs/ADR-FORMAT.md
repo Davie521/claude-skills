@@ -26,6 +26,35 @@ Only include these when they add genuine value. Most ADRs won't need them.
 
 Scan `docs/adr/` for the highest existing number and increment by one.
 
+## Index
+
+`docs/adr/README.md` is the index of all ADRs. Append a row whenever a new ADR is written:
+
+```md
+# Architecture Decision Records
+
+| ADR | Title | Status | Date |
+|-----|-------|--------|------|
+| [0001](0001-use-nextjs.md) | Use Next.js as frontend framework | accepted | 2026-01-15 |
+| [0002](0002-postgres-over-mongo.md) | PostgreSQL over MongoDB for primary datastore | accepted | 2026-01-20 |
+```
+
+## Consent
+
+Never write ADR files unprompted:
+
+- **First ADR** — ask the user for confirmation before creating `docs/adr/` and its `README.md` seeded with the index table header. Do not create files without explicit consent.
+- **Every ADR** — present the draft to the user for review. Only write `docs/adr/NNNN-slug.md` after explicit approval. If the user declines, discard the draft without writing any files.
+
+## Reading ADRs back
+
+When someone asks "why did we choose X?":
+
+1. If `docs/adr/` doesn't exist, say so and offer to start recording decisions.
+2. Scan `docs/adr/README.md` for relevant entries.
+3. Read the matching files and present the decision and its context.
+4. If nothing matches, offer to record the decision now.
+
 ## When to offer an ADR
 
 All three of these must be true:

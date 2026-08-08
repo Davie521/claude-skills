@@ -1,29 +1,34 @@
 ---
 name: crosspost
-description: Multi-platform content distribution across X, LinkedIn, Threads, and Bluesky. Adapts content per platform using content-engine patterns. Never posts identical content cross-platform. Use when the user wants to distribute content across social platforms.
+description: Multi-platform content adaptation across X, LinkedIn, Threads, Bluesky, TikTok, YouTube, and newsletters. Drafts a platform-native version for each target platform — it does not post or publish anything. Never produces identical copy cross-platform. Use when the user wants to distribute or repurpose content across platforms.
 origin: ECC
 ---
 
 # Crosspost
 
-Distribute content across multiple social platforms with platform-native adaptation.
+Adapt one piece of source content into platform-native drafts for multiple platforms. This skill produces the drafts and a suggested posting order — actual publishing is done by the user.
 
 ## When to Activate
 
-- User wants to post content to multiple platforms
-- Publishing announcements, launches, or updates across social media
+- User wants content drafted for multiple platforms
+- Announcements, launches, or updates going out across social media
 - Repurposing a post from one platform to others
+- Repurposing articles, podcasts, demos, or docs into social content
+- Scripting short-form video or YouTube versions of existing content
 - User says "crosspost", "post everywhere", "share on all platforms", or "distribute this"
 
 ## Core Rules
 
-1. **Never post identical content cross-platform.** Each platform gets a native adaptation.
-2. **Primary platform first.** Post to the main platform, then adapt for others.
+1. **Never draft identical content cross-platform.** Each platform gets a native adaptation.
+2. **Primary platform first.** Draft the main platform's version first, then adapt for others.
 3. **Respect platform conventions.** Length limits, formatting, link handling all differ.
 4. **One idea per post.** If the source content has multiple ideas, split across posts.
 5. **Attribution matters.** If crossposting someone else's content, credit the source.
+6. **Hooks matter more than summaries.** Use specifics over slogans; keep the ask small and clear.
 
 ## Platform Specifications
+
+Text platforms:
 
 | Platform | Max Length | Link Handling | Hashtags | Media |
 |----------|-----------|---------------|----------|-------|
@@ -32,14 +37,21 @@ Distribute content across multiple social platforms with platform-native adaptat
 | Threads | 500 chars | Separate link attachment | None typical | Images, video |
 | Bluesky | 300 chars | Via facets (rich text) | None (use feeds) | Images |
 
+Video and long-form targets (TikTok/short video, YouTube, newsletter) have no hard character limits — their adaptation notes are in Step 3.
+
 ## Workflow
 
 ### Step 1: Create Source Content
 
-Start with the core idea. Use `content-engine` skill for high-quality drafts:
+Start with the core idea:
 - Identify the single core message
 - Determine the primary platform (where the audience is biggest)
 - Draft the primary platform version first
+
+Before drafting, clarify if not obvious from context:
+- Source asset: what are we adapting from (article, video, demo, memo, launch doc)
+- Audience: builders, investors, customers, operators, or general audience
+- Goal: awareness, conversion, recruiting, authority, launch support, or engagement
 
 ### Step 2: Identify Target Platforms
 
@@ -74,18 +86,42 @@ For each target platform, transform the content:
 - Community-oriented tone
 - Use feeds/lists for topic targeting instead of hashtags
 
-### Step 4: Post Primary Platform
+**TikTok / short video adaptation:**
+- First 3 seconds must interrupt attention
+- Script around visuals, not just narration
+- One demo, one claim, one CTA
 
-Post to the primary platform first:
-- Use `x-api` skill for X
-- Use platform-specific APIs or tools for others
-- Capture the post URL for cross-referencing
+**YouTube adaptation:**
+- Show the result early
+- Structure by chapter
+- Refresh the visual every 20-30 seconds
 
-### Step 5: Post to Secondary Platforms
+**Newsletter adaptation:**
+- Deliver one clear lens, not a bundle of unrelated items
+- Make section titles skimmable
+- Keep the opening paragraph doing real work
 
-Post adapted versions to remaining platforms:
+### Step 4: Deliver Drafts and Posting Order
+
+Hand the user the full set of platform versions, plus a suggested rollout:
+- Primary platform first, then secondary platforms
 - Stagger timing (not all at once — 30-60 min gaps)
 - Include cross-platform references where appropriate ("longer thread on X" etc.)
+- Note any missing inputs needed before publishing (links, media, handles)
+
+This skill does not post. Publishing to each platform is the user's step.
+
+## Repurposing Cascade
+
+When adapting a larger source asset (article, podcast, demo, launch doc) into a multi-platform campaign, follow this cascade:
+
+1. **Anchor asset** — start from the article, video, demo, memo, or launch doc
+2. **Extract 3-7 atomic ideas** — each stands alone as one post
+3. **Write platform-native variants** — apply the Step 3 adaptations per idea
+4. **Trim repetition across outputs** — no duplicated copy across platforms unless requested
+5. **Align CTAs with platform intent** — the ask on LinkedIn differs from the ask on X or in a newsletter
+
+When asked for a full campaign, return: the core angle, platform-specific drafts, optional posting order, optional CTA variants, and any missing inputs needed before publishing.
 
 ## Content Adaptation Examples
 
@@ -142,49 +178,14 @@ A pattern I've been using that's made a real difference:
 #relevantHashtag
 ```
 
-## API Integration
-
-### Batch Crossposting Service (Example Pattern)
-If using a crossposting service (e.g., Postbridge, Buffer, or a custom API), the pattern looks like:
-
-```python
-import os
-import requests
-
-resp = requests.post(
-    "https://your-crosspost-service.example/api/posts",
-    headers={"Authorization": f"Bearer {os.environ['POSTBRIDGE_API_KEY']}"},
-    json={
-        "platforms": ["twitter", "linkedin", "threads"],
-        "content": {
-            "twitter": {"text": x_version},
-            "linkedin": {"text": linkedin_version},
-            "threads": {"text": threads_version}
-        }
-    },
-    timeout=30,
-)
-resp.raise_for_status()
-```
-
-### Manual Posting
-Without Postbridge, post to each platform using its native API:
-- X: Use `x-api` skill patterns
-- LinkedIn: LinkedIn API v2 with OAuth 2.0
-- Threads: Threads API (Meta)
-- Bluesky: AT Protocol API
-
 ## Quality Gate
 
-Before posting:
+Before delivering drafts:
 - [ ] Each platform version reads naturally for that platform
 - [ ] No identical content across platforms
 - [ ] Length limits respected
+- [ ] Hooks are strong and specific — no generic hype language
 - [ ] Links work and are placed appropriately
 - [ ] Tone matches platform conventions
+- [ ] CTA matches the content and audience
 - [ ] Media is sized correctly for each platform
-
-## Related Skills
-
-- `content-engine` — Generate platform-native content
-- `x-api` — X/Twitter API integration

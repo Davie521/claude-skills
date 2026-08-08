@@ -122,7 +122,6 @@ Required before declaring done:
 
 ## Use with
 
-- `canary-watch` — when the bug surfaces from production monitoring; canary-watch frames the symptom, diagnose drives the loop.
 - `click-path-audit` — for UI bugs whose repro depends on a specific user trajectory.
 - `ai-regression-testing` — after Phase 5, extend the regression coverage if the bug exposes a class of failures.
 

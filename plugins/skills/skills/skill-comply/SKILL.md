@@ -17,7 +17,7 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 
 ## Supported Targets
 
-- **Skills** (`skills/*/SKILL.md`): Workflow skills like search-first, TDD guides
+- **Skills** (`skills/*/SKILL.md`): Workflow skills like search-routing, TDD guides
 - **Rules** (`rules/common/*.md`): Mandatory rules like testing.md, security.md, git-workflow.md
 - **Agent definitions** (`agents/*.md`): Whether an agent gets invoked when expected (internal workflow verification not yet supported)
 
@@ -35,7 +35,7 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 uv run python -m scripts.run ~/.claude/rules/common/testing.md
 
 # Dry run (no cost, spec + scenarios only)
-uv run python -m scripts.run --dry-run ~/.claude/skills/search-first/SKILL.md
+uv run python -m scripts.run --dry-run plugins/research/skills/search-routing/SKILL.md
 
 # Custom models
 uv run python -m scripts.run --gen-model haiku --model sonnet <path>

@@ -105,7 +105,7 @@ jest --ci                           # Tests (Jest)
 
 ## Reference
 
-This repo's `web` plugin contains `frontend-patterns`, `backend-patterns`, and `coding-standards` skills with related guidance.
+This repo's `web` plugin contains `api-design` and `docker-patterns` skills with related guidance.
 
 ---
 

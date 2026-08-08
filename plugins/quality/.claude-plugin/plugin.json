@@ -1,7 +1,7 @@
 {
   "name": "quality",
-  "version": "1.1.0",
-  "description": "Code quality: testing (with vertical-tracer-bullet TDD discipline), E2E, benchmarks, security review, coding standards",
+  "version": "2.0.0",
+  "description": "Code quality: TDD discipline, E2E testing patterns, AI regression testing, click-path audit, santa-method adversarial verification, security review checklist, .claude config scan, Plankton write-time enforcement",
   "author": {
     "name": "Yifan"
   }

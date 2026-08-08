@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan, get grilled on their design, mentions "grill me", or wants to challenge a plan against their project's language and documented decisions.
 ---
 
 <what-to-do>
@@ -18,6 +18,8 @@ If a question can be answered by exploring the codebase, explore the codebase in
 ## Domain awareness
 
 **At session start, scan for `CONTEXT.md` / `CONTEXT-MAP.md` / `docs/adr/`.** If any are missing, surface this to the user up front: _"This project has no `CONTEXT.md` yet — I'll create it lazily as we resolve terms during this session. Same for `docs/adr/` if a real architectural decision crystallises."_ Don't block on a response; just make the intent visible so the file appearing later isn't a surprise.
+
+**Lightweight mode**: if the project has no `CONTEXT.md` and no `docs/adr/` — or the user just wants a quick stress-test without artifacts — skip the documentation updates entirely and run the interview alone. The grilling stands on its own.
 
 During codebase exploration, also look for existing documentation:
 
@@ -91,11 +93,9 @@ If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](
 
 ## Use with
 
-- `grill-me` — the lite version without doc updates. Use when the project has no domain (yet) or you just want a quick stress-test without artifacts.
 - `improve-codebase-architecture` — peer producer of `CONTEXT.md`. Use when the conversation shifts from "what to build" to "how the existing code should be shaped"; both skills share `CONTEXT-FORMAT.md` and `ADR-FORMAT.md` discipline.
 - `diagnose` — consumer of `CONTEXT.md`. After a grilling session establishes domain language, bug investigations get sharper because the agent talks about "the materialization cascade" instead of "the file-spotting code".
-- `architecture-decision-records` — your existing ADR detection skill. `grill-with-docs` writes ADRs inline during grilling; `architecture-decision-records` catches them when they slip past.
 
 ## Origin
 
-Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/grill-with-docs`. License: MIT.
+Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/grill-with-docs` and `productivity/grill-me` (absorbed as lightweight mode). License: MIT.

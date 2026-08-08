@@ -59,9 +59,8 @@ description: "Restate requirements, assess risks, create a step-by-step implemen
 
 ## 实现后 · 交接
 实现 + 自测通过后，主动引导继续：
-- **`/cpr`** — Git PR 全流程：提交 → 建 PR → 等 CI → 修复 → 循环至全绿 →（CI 过后自动合并；review 未过则暂停并通知）。
+- **`/cpr`** — Git PR 全流程：提交 → 建 PR → 等 CI → 修复 → 批判性处理 Copilot 评论 → 循环至全绿 →（CI 过后自动合并；review 未过则暂停并通知）。
 - **code review** — `/code-review`（多语言 + 强制安全审查）或 `codex` 的 codex-review 独立复审；关键产物可 `/quality:santa-method` 双 reviewer 对抗式验证。
-- **`/cl`** — Copilot Lint：跑 lint → 看 Copilot 评论 → 批判性修复。
 
 ## 示例（原 plan.md「Example Usage」，原文完整保留）
 ```

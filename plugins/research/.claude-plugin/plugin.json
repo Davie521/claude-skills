@@ -1,7 +1,7 @@
 {
   "name": "research",
-  "version": "1.2.0",
-  "description": "Research and LLM engineering: deep research, search routing, prompt optimization, cost-aware pipelines",
+  "version": "2.0.0",
+  "description": "Research and LLM engineering: deep research with scenario checklists (investor/competitor/market/vendor), search routing across MCPs, LLM cost discipline",
   "author": {
     "name": "Yifan"
   }

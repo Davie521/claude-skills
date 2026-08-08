@@ -1,7 +1,7 @@
 {
   "name": "web",
-  "version": "1.0.0",
-  "description": "Web stack: TS frontend, Node backend, MCP servers, Docker, deployment",
+  "version": "1.1.0",
+  "description": "Web stack: REST API design, Docker, deployment, MCP servers, Bun runtime, content-hash caching",
   "author": {
     "name": "Yifan"
   }

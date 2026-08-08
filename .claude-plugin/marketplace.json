@@ -7,13 +7,13 @@
   "plugins": [
     {
       "name": "dev-workflow",
-      "description": "Dev workflow: Git PR, Copilot lint, multi-agent impl, git patterns, repo audit, blueprints",
+      "description": "Dev workflow: Git PR pipeline with Copilot review triage + auto-merge (cpr), deep-plan (restate/risk/phase + mandatory worktree), diagnosis loop, plan grilling (grill-with-docs: lite mode + ADR format), codebase deepening, throwaway prototype, conversation-to-PRD, issue triage state machine, caveman compressed-comms, cleanup (end-of-session teardown + memory persistence)",
       "source": "./plugins/dev-workflow",
       "category": "productivity"
     },
     {
       "name": "document",
-      "description": "Document tools: cheatsheets, co-authoring, PDF, docs lookup, onboarding, ADR, visa translation",
+      "description": "Document tools: A4 cheatsheets, doc co-authoring, PDF, visa translation",
       "source": "./plugins/document",
       "category": "productivity"
     },
@@ -25,7 +25,7 @@
     },
     {
       "name": "writing",
-      "description": "Writing: vibe assistant, article writing, content engine, crosspost, video editing",
+      "description": "Writing tools: vibe writing (with voice capture + anti-AI-tone wordlist), multi-platform crosspost drafting (with repurposing cascade), video editing",
       "source": "./plugins/writing",
       "category": "productivity"
     },
@@ -36,32 +36,26 @@
       "category": "design"
     },
     {
-      "name": "python",
-      "description": "General Python: patterns, pytest testing",
-      "source": "./plugins/python",
-      "category": "development"
-    },
-    {
       "name": "swift",
-      "description": "Swift and iOS: SwiftUI, concurrency, persistence, on-device LLM",
+      "description": "Swift and iOS: SwiftUI patterns + architecture (actor persistence, protocol DI), Swift 6.2 concurrency, Liquid Glass, on-device LLM",
       "source": "./plugins/swift",
       "category": "development"
     },
     {
       "name": "web",
-      "description": "Web stack: TypeScript frontend, Node backend, MCP servers, Docker, deployment",
+      "description": "Web stack: REST API design, Docker, deployment, MCP servers, Bun runtime, content-hash caching",
       "source": "./plugins/web",
       "category": "development"
     },
     {
       "name": "data",
-      "description": "Data and ML: PostgreSQL, migrations, PyTorch, automated scraping",
+      "description": "Data and ML: PostgreSQL patterns, zero-downtime migrations, scraping agent",
       "source": "./plugins/data",
       "category": "development"
     },
     {
       "name": "quality",
-      "description": "Code quality: testing, E2E, benchmarks, security review, coding standards",
+      "description": "Code quality: TDD discipline, E2E testing patterns, AI regression testing, click-path audit, santa-method adversarial verification, security review checklist, .claude config scan, Plankton write-time enforcement",
       "source": "./plugins/quality",
       "category": "testing"
     },
@@ -73,19 +67,19 @@
     },
     {
       "name": "research",
-      "description": "Research and LLM engineering: deep research, search routing, prompt optimization, cost-aware pipelines",
+      "description": "Research and LLM engineering: deep research with scenario checklists (investor/competitor/market/vendor), search routing across MCPs, LLM cost discipline",
       "source": "./plugins/research",
       "category": "productivity"
     },
     {
       "name": "skills",
-      "description": "Skill management: create, audit, evolve, promote skills and instincts",
+      "description": "Skill management: stocktake audit, compliance visualization, rules distillation",
       "source": "./plugins/skills",
       "category": "productivity"
     },
     {
       "name": "business",
-      "description": "Business: investor outreach, pitch materials, product evaluation",
+      "description": "Business: investor materials with outreach cadence, pitch decks, memos",
       "source": "./plugins/business",
       "category": "productivity"
     },

@@ -2,26 +2,25 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **16 plugins, 94 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **15 plugins, 52 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 16 | Git PR automation, multi-agent impl, blueprints, **grilling, diagnosis, codebase deepening, triage** |
-| [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
+| [`dev-workflow`](#dev-workflow) | 10 | Git PR automation with auto-merge, deep planning, **grilling, diagnosis, codebase deepening, triage** |
+| [`document`](#document) | 4 | A4 cheatsheets, doc co-authoring, PDF, visa doc translation |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
-| [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
+| [`writing`](#writing) | 3 | Vibe writing with voice capture, multi-platform crosspost, video editing |
 | [`design`](#design) | 3 | UI/UX Pro Max, UX critique, codebase-to-course |
-| [`python`](#python) | 2 | General Python: patterns, testing |
-| [`swift`](#swift) | 6 | Swift/iOS: SwiftUI, concurrency, persistence, on-device LLM |
-| [`web`](#web) | 9 | TS frontend, Node backend, MCP servers, Docker, deployment |
-| [`data`](#data) | 4 | PostgreSQL, migrations, PyTorch, automated scraping |
-| [`quality`](#quality) | 14 | Testing, E2E, benchmarks, security review, coding standards |
+| [`swift`](#swift) | 4 | Swift/iOS: SwiftUI + architecture patterns, concurrency, Liquid Glass, on-device LLM |
+| [`web`](#web) | 6 | REST APIs, MCP servers, Docker, deployment, Bun, content-hash caching |
+| [`data`](#data) | 3 | PostgreSQL, migrations, automated scraping |
+| [`quality`](#quality) | 8 | TDD, E2E, security review/scan, adversarial verification |
 | [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
-| [`research`](#research) | 9 | Deep research, search routing, prompt optimization, cost-aware LLM pipelines |
-| [`skills`](#skills) | 13 | Skill management — create, audit, evolve, promote |
-| [`business`](#business) | 3 | Investor outreach, pitch materials, product evaluation |
+| [`research`](#research) | 4 | Deep research incl. market research, search routing, cost-aware LLM pipelines |
+| [`skills`](#skills) | 3 | Skill management — stocktake, compliance audit, rules distillation |
+| [`business`](#business) | 1 | Investor materials with outreach cadence |
 | [`codex`](#codex) | 2 | Codex MCP second opinion — code review, design challenge |
 | [`session-summary`](#session-summary) | hooks only | Session summary hooks and scripts (no skills) |
 
@@ -33,53 +32,28 @@ Automated development workflows.
 
 #### `/cpr` — Git PR Pipeline
 
-One command from local changes to merged-ready PR. Claude automatically:
+One command from local changes to merged PR. The old Copilot Lint review workflow is absorbed here — saying `cl` still triggers it. Claude automatically:
 
 1. Detects current git state (uncommitted changes, existing PR, CI status)
 2. Commits and pushes code, creates a PR via `gh`
 3. Watches CI checks with `gh pr checks --watch`
 4. On failure: reads error logs, fixes code, pushes again
-5. On pass: reviews Copilot comments, fixes real issues (ignores false positives)
-6. Loops steps 3–5 until everything is green
-
-#### `/cl` — Copilot Lint Review
-
-Reviews an existing PR (does not create one):
-
-- Checks CI status and fixes build/lint failures locally
-- Pulls Copilot review comments from the PR
-- **Critically evaluates each suggestion** — only fixes real bugs, security issues, meaningful improvements
-- Ignores over-defensive suggestions, false positives, style-only nitpicks
-- Loops until CI passes and all valid comments are addressed
-
-#### `/impl` — Multi-Agent Implementation
-
-Orchestrates a team of specialized agents for larger features:
-
-| Phase | Agent | What it does |
-|-------|-------|--------------|
-| 0 | **Planner** | 2–3 rounds of plan iteration in plan mode |
-| 1 | **Implementer** | Writes code in an isolated git worktree |
-| 2 | **Reviewer** | Code review (plan, standards, security, a11y) |
-| 3 | **Tester** | Runs tests, Playwright screenshots, fixes bugs |
-| 4 | **Reviewer** | Final review of test fixes |
-| 5 | **Wrap-up** | Clean commit history, feature branch, PR |
+5. On pass: pulls Copilot review comments from the PR
+6. Judges each comment against a must-fix / ignorable table — fixes real bugs and security issues, ignores over-defensive suggestions, false positives, style-only nitpicks
+7. Loops steps 3–6 until everything is green
+8. Auto-merges once CI is fully green — pauses the merge and notifies you if any review hasn't passed
 
 #### Other dev-workflow skills
 
-- **`blueprint`** — Turn a one-line goal into a multi-session, multi-agent construction plan with self-contained context briefs, dependency graph, and adversarial review gate
-- **`git-workflow`** — Branching strategies, commit conventions, merge vs rebase, conflict resolution
-- **`repo-scan`** — Cross-stack source code asset audit, classifies every file, detects embedded third-party libs
-- **`grill-me`** — Get relentlessly interviewed about a plan, one question at a time, until every branch of the design tree is resolved (lite version, no doc updates)
-- **`grill-with-docs`** — Same grilling, but updates `CONTEXT.md` (domain glossary) and `docs/adr/` inline as terms and decisions crystallise — the producer of `CONTEXT.md` culture
+- **`grill-with-docs`** — Get relentlessly interviewed about a plan, one question at a time, challenged against your project's domain model; updates `CONTEXT.md` (domain glossary) and `docs/adr/` (structured per its bundled `ADR-FORMAT.md`) inline as terms and decisions crystallise — the producer of `CONTEXT.md` culture. Without a `CONTEXT.md` it drops to a lite mode: grilling only, no doc writes. Saying "grill me" still triggers it
 - **`diagnose`** — 6-phase debug discipline (build a feedback loop → reproduce → ranked hypotheses → instrument with `[DEBUG-xxxx]` tags → fix + regression test → cleanup) for hard bugs and perf regressions
 - **`improve-codebase-architecture`** — Find deepening opportunities (Module / Interface / Depth / Seam vocabulary, "deletion test" heuristic), present candidates, drop into a grilling loop on the chosen one
 - **`prototype`** — Throwaway prototype with explicit branch decision: terminal TUI for state/logic questions, multi-variant UI on one route for design questions
 - **`to-prd`** — Synthesize the current conversation into a PRD without re-interviewing; publishes to GitHub issue or saves to `docs/prds/`
 - **`triage`** — Issue triage state machine (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix) with `.out-of-scope/` knowledge base for rejected enhancements
 - **`caveman`** — Persistent ultra-compressed response mode (~75% token cut) that strips filler while keeping technical accuracy
-- **`deep-plan`** — Restate requirements, assess risks, phase-by-phase plan, WAIT for explicit confirmation; on approval the first action is a mandatory isolated git worktree, then post-impl handoff to `/cpr` or code review
-- **`cleanup`** — End-of-session cleanup: shut down every process the session started, sync stale docs against the diff, drive leftover tasks to zero (finish or explicitly report), persist lessons to memory — every phase must end with an evidence-backed done / not-needed verdict
+- **`deep-plan`** — Restate requirements, assess risks, phase-by-phase plan, WAIT for explicit confirmation; on approval the first action is a mandatory isolated git worktree, then post-implementation handoff to `/cpr` or code review
+- **`cleanup`** — End-of-session cleanup: shut down every process the session started, sync stale docs against the diff, drive leftover tasks to zero (finish or explicitly report), persist lessons to memory — Phase 4 extracts reusable patterns from the session, self-evaluates, and decides save scope; every phase must end with an evidence-backed done / not-needed verdict
 
 ---
 
@@ -97,9 +71,6 @@ Creates dense, exam-ready cheatsheets from Markdown:
 
 - **`doc-coauthoring`** — Structured workflow for co-authoring proposals, specs, decision docs
 - **`pdf`** — PDF extraction, generation, forms, OCR
-- **`docs`** — Look up current docs for any library/framework via Context7
-- **`codebase-onboarding`** — Generate onboarding guide for unfamiliar codebases (architecture map, entry points, conventions, starter CLAUDE.md)
-- **`architecture-decision-records`** — Capture architectural decisions during sessions as structured ADRs
 - **`visa-doc-translate`** — Translate visa application documents (images) to English bilingual PDF
 
 ---
@@ -133,11 +104,11 @@ Requires a Feishu MCP server.
 | **Write** | "write" / "iterate" | "organize" consolidates, "polish" refines language |
 | **Finalize** | "finalize" | Chains output cards + transitions + intro/conclusion |
 
+Also owns long-form voice: a five-dimension voice-capture checklist plus a banned list of AI-flavored words.
+
 #### Other writing skills
 
-- **`article-writing`** — Long-form articles in a distinctive voice
-- **`content-engine`** — Platform-native content for X, LinkedIn, TikTok, YouTube, newsletters
-- **`crosspost`** — Multi-platform distribution adapted per platform (no identical cross-posting)
+- **`crosspost`** — Multi-platform distribution adapted per platform (no identical cross-posting), with per-platform essentials for the three platforms and a repurposing cascade from one source asset. Drafts only — never posts
 - **`video-editing`** — AI-assisted video editing pipeline (FFmpeg, Remotion, ElevenLabs, fal.ai)
 
 ---
@@ -164,23 +135,12 @@ The 20 single-verb skills (`bolder`, `quieter`, `distill`, `audit`, …) were re
 
 ---
 
-## python
-
-General Python patterns (framework-agnostic):
-
-- **`python-patterns`** — Pythonic idioms, PEP 8, type hints
-- **`python-testing`** — pytest, TDD, fixtures, mocking, coverage
-
----
-
 ## swift
 
 Swift and iOS development:
 
-- **`swiftui-patterns`** — SwiftUI architecture, `@Observable`, navigation, performance
+- **`swiftui-patterns`** — SwiftUI architecture, `@Observable`, navigation, performance; includes an Architecture Patterns section (actor-based thread-safe persistence, protocol-based dependency injection for testing)
 - **`swift-concurrency-6-2`** — Swift 6.2 Approachable Concurrency, `@concurrent`, isolated conformances
-- **`swift-actor-persistence`** — Thread-safe persistence with actors (in-memory cache + file-backed storage)
-- **`swift-protocol-di-testing`** — Protocol-based dependency injection for testable Swift
 - **`liquid-glass-design`** — iOS 26 Liquid Glass material (blur, reflection, morphing)
 - **`foundation-models-on-device`** — Apple FoundationModels for on-device LLM (`@Generable`, tool calling, streaming)
 
@@ -190,10 +150,7 @@ Swift and iOS development:
 
 TypeScript/Node web stack:
 
-- **`frontend-patterns`** — React, Next.js, state management
-- **`nextjs-turbopack`** — Next.js 16+ with Turbopack
 - **`bun-runtime`** — Bun as runtime, package manager, bundler, test runner
-- **`backend-patterns`** — Node/Express/Next API best practices
 - **`api-design`** — REST API patterns (resources, status codes, pagination, errors, versioning)
 - **`mcp-server-patterns`** — Build MCP servers with TS SDK (tools, resources, Zod, stdio vs HTTP)
 - **`docker-patterns`** — Docker + Compose for local dev, security, networking
@@ -204,11 +161,10 @@ TypeScript/Node web stack:
 
 ## data
 
-Data engineering and ML:
+Data engineering:
 
 - **`postgres-patterns`** — Query optimization, schema design, indexing, security
 - **`database-migrations`** — Zero-downtime schema changes (PostgreSQL, MySQL, Prisma, Drizzle, Django)
-- **`pytorch-patterns`** — Training pipelines, model architectures, data loading
 - **`data-scraper-agent`** — 100% free GitHub Actions data collection agent (Gemini Flash + Notion/Sheets/Supabase)
 
 ---
@@ -217,22 +173,16 @@ Data engineering and ML:
 
 Code quality, testing, and review:
 
-**Testing (8):**
+**Testing (4):**
 - **`tdd-workflow`** — TDD with 80%+ coverage (unit + integration + E2E)
-- **`e2e`** — Generate and run Playwright E2E tests with artifacts
 - **`e2e-testing`** — Page Object Model, CI/CD integration, flaky test strategies
-- **`benchmark`** — Performance baselines, regression detection
-- **`browser-qa`** — Visual testing and UI verification post-deploy
 - **`click-path-audit`** — Trace every button through state changes (find UI inconsistencies)
-- **`canary-watch`** — Monitor deployed URLs for regressions
 - **`ai-regression-testing`** — Catch AI blind spots when same model writes and reviews
 
-**Review (6):**
+**Review (4):**
 - **`security-review`** — Comprehensive security checklist for auth, input, secrets, APIs
 - **`security-scan`** — Scan `.claude/` config for vulnerabilities (CLAUDE.md, settings, hooks, agents)
-- **`coding-standards`** — Universal standards for TypeScript, JavaScript, React, Node
 - **`plankton-code-quality`** — Write-time auto-format/lint/fix on every edit via hooks
-- **`safety-guard`** — Prevent destructive operations on production / autonomous agents
 - **`santa-method`** — Multi-agent adversarial verification (two independent reviewers must both pass)
 
 ---
@@ -258,12 +208,7 @@ Multi-language code review with auto-dispatch. Single command (`/code-review`) d
 Research and LLM engineering:
 
 - **`search-routing`** — Pick one search MCP (exa / firecrawl / linkup) by query shape; cheapest sufficient tool, deep modes need confirmation
-- **`research`** — Multi-source research (firecrawl + exa MCPs) with citations
-- **`market-research`** — Competitive analysis, investor due diligence
-- **`search-first`** — Search for existing tools/libs/patterns before writing custom code
-- **`exa-search`** — Neural search via Exa MCP (web, code, company)
-- **`iterative-retrieval`** — Progressive context retrieval for subagent context problems
-- **`prompt-optimize`** — Analyze a draft prompt, output optimized version (advisory, doesn't execute)
+- **`research`** — Multi-source research (firecrawl + exa MCPs) with citations; scenario-based collection checklists for investor due diligence, competitor analysis, market sizing, and vendor evaluation
 - **`cost-aware-llm-pipeline`** — Model routing by complexity, budget tracking, prompt caching
 - **`regex-vs-llm-structured-text`** — Decision framework: start with regex, escalate to LLM only for low-confidence edges
 
@@ -271,30 +216,19 @@ Research and LLM engineering:
 
 ## skills
 
-Skill and instinct management system:
+Skill management:
 
-- **`skill-create`** — Extract patterns from git history, generate SKILL.md
-- **`skill-comply`** — Visualize whether skills/rules/agents are actually followed
 - **`skill-stocktake`** — Audit Claude skills/commands quality (Quick Scan + Full modes)
-- **`skill-health`** — Skill portfolio health dashboard
-- **`learn-eval`** — Extract reusable patterns from session, self-evaluate, decide save scope
-- **`promote`** — Promote project-scoped instincts to global
-- **`prune`** — Delete pending instincts older than 30 days
-- **`evolve`** — Analyze and suggest evolved instinct structures
-- **`projects`** — List projects with instinct statistics
+- **`skill-comply`** — Visualize whether skills/rules/agents are actually followed
 - **`rules-distill`** — Extract cross-cutting principles from skills into rules
-- **`instinct-status`** — Show learned instincts (project + global) with confidence
-- **`instinct-import`** / **`instinct-export`** — Sync instincts across machines
 
 ---
 
 ## business
 
-Fundraising and product evaluation:
+Fundraising:
 
-- **`investor-outreach`** — Cold emails, warm intros, follow-ups, monthly updates
-- **`investor-materials`** — Pitch decks, one-pagers, memos, accelerator apps, financial models
-- **`product-lens`** — Validate the "why" before building, product diagnostics, vague-idea-to-spec
+- **`investor-materials`** — Pitch decks, one-pagers, memos, accelerator apps, financial models; includes an Outreach section with a day 0 → day 4–5 → day 10–12 follow-up cadence
 
 ---
 
@@ -326,14 +260,14 @@ Then install plugins individually:
 ```bash
 claude plugin install dev-workflow@yifan-personal
 claude plugin install design@yifan-personal
-claude plugin install python@yifan-personal
+claude plugin install swift@yifan-personal
 # ... etc
 ```
 
-Or install all 14 at once:
+Or install all 15 at once:
 
 ```bash
-for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business codex session-summary; do
+for p in dev-workflow document work-tools writing design swift web data quality code-review research skills business codex session-summary; do
   claude plugin install "$p@yifan-personal"
 done
 ```
@@ -341,10 +275,7 @@ done
 ## Usage
 
 ```
-> /cpr                            # Push code through full PR pipeline
-> /cl                             # Review and fix Copilot lint comments
-> /impl                           # Multi-agent coordinated implementation
-> /docs react server components   # Look up current React docs
+> /cpr                            # Full PR pipeline incl. auto-merge ('cl' also triggers it)
 > write an article about...       # Triggers vibe-writing
 > create a cheatsheet for...      # Triggers cheatsheet
 > deep research on X              # Triggers research
@@ -356,7 +287,7 @@ Most skills auto-trigger from natural language matching their description.
 ## Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
-- GitHub CLI (`gh`) for cpr/cl workflows
+- GitHub CLI (`gh`) for the cpr workflow
 - Feishu MCP server for `feishu` skill
 - Various API keys depending on skill (Exa, firecrawl, Context7, etc.)
 

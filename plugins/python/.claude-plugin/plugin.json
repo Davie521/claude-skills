@@ -1,8 +1,0 @@
-{
-  "name": "python",
-  "version": "1.0.0",
-  "description": "General Python patterns and pytest testing (framework-agnostic)",
-  "author": {
-    "name": "Yifan"
-  }
-}

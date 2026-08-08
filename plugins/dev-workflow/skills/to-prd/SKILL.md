@@ -84,9 +84,8 @@ Any further notes about the feature.
 
 ## Use with
 
-- `grill-with-docs` — the *interview* counterpart to this skill. Run grill-with-docs first when the conversation hasn't established enough context; run `to-prd` to crystallise that context once it has.
-- `blueprint` — once the PRD is published, run `blueprint` to break it into a multi-PR construction plan.
-- `architecture-decision-records` — if the PRD's Implementation Decisions contain hard-to-reverse architectural choices, those should also become ADRs (use this skill to detect and write them).
+- `grill-with-docs` — the *interview* counterpart to this skill. Run grill-with-docs first when the conversation hasn't established enough context; run `to-prd` to crystallise that context once it has. If the PRD's Implementation Decisions contain hard-to-reverse architectural choices, those should also become ADRs (criteria and format in its `ADR-FORMAT.md`).
+- `deep-plan` — once the PRD is published, run `deep-plan` to turn it into a phased implementation plan.
 
 ## Origin
 

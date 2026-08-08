@@ -160,10 +160,8 @@ Verdict: <APPROVE | WARNING | BLOCK>
 ## Reference
 
 Companion skills in this repo's `swift` plugin:
-- `swiftui-patterns` — SwiftUI architecture and `@Observable` state management
+- `swiftui-patterns` — SwiftUI architecture, `@Observable` state management, actor-based persistence, and protocol-based dependency injection for testing
 - `swift-concurrency-6-2` — Swift 6.2 approachable concurrency
-- `swift-actor-persistence` — Actor-based thread-safe persistence
-- `swift-protocol-di-testing` — Protocol-based dependency injection
 - `liquid-glass-design` — iOS 26 Liquid Glass material
 - `foundation-models-on-device` — Apple FoundationModels framework
 

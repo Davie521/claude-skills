@@ -79,8 +79,7 @@ Side effects happen inline as decisions crystallize:
 
 - `grill-with-docs` — peer producer of `CONTEXT.md`. Use when the conversation is about a *plan* (not yet code); use this skill when the conversation is about *existing code* shape. They share `CONTEXT-FORMAT.md` and `ADR-FORMAT.md` discipline.
 - `diagnose` — after a `diagnose` session ends with "no correct seam exists for the regression test," that's the trigger for this skill. The bug is telling you the architecture needs deepening.
-- `blueprint` — once you've picked a candidate and grilled it, use `blueprint` to turn the chosen deepening into a multi-PR roadmap.
-- `architecture-decision-records` — your existing ADR detection skill. This skill writes ADRs sparingly during the grilling loop; the standalone skill catches decisions that slip past in other contexts.
+- `deep-plan` — once you've picked a candidate and grilled it, use `deep-plan` to turn the chosen deepening into a phased, worktree-isolated implementation plan.
 
 ## Origin
 

@@ -1,17 +1,22 @@
 ---
 name: caveman
 description: >
-  Ultra-compressed communication mode. Cuts token usage ~75% by dropping
-  filler, articles, and pleasantries while keeping full technical accuracy.
-  Use when user says "caveman mode", "talk like caveman", "use caveman",
-  "less tokens", "be brief", or invokes /caveman.
+  Ultra-compressed communication mode. Substantially cuts token usage by
+  dropping filler, articles, and pleasantries while keeping full technical
+  accuracy. Designed for English output; limited effect on Chinese
+  conversations. TRIGGER only on explicit invocation: user says "caveman
+  mode", "talk like caveman", "use caveman", or invokes /caveman. DO NOT
+  TRIGGER when user merely asks for a short or concise answer — that is a
+  one-off style request, not a switch into this persistent mode.
 ---
 
 Respond terse like smart caveman. All technical substance stay. Only fluff die.
 
+Scope note: compression rules target English output (drop articles/filler, abbreviate English terms). Chinese has no articles and little such filler — gains in Chinese conversations are limited. Token savings are a rough estimate, not a measured figure.
+
 ## Persistence
 
-ACTIVE EVERY RESPONSE once triggered. No revert after many turns. No filler drift. Still active if unsure. Off only when user says "stop caveman" or "normal mode".
+ACTIVE EVERY RESPONSE once triggered. No revert after many turns. No filler drift. Still active if unsure. Off only when user says "stop caveman", "exit caveman", or "normal mode".
 
 ## Rules
 

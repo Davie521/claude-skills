@@ -179,7 +179,7 @@ TypeScript / Node Web 全栈：
 - **`ai-regression-testing`** — 抓 AI 自审盲点（同一模型既写又审）
 
 **审查（4）：**
-- **`security-review`** — 完整安全审查清单（认证 / 输入 / 密钥 / API）
+- **`security-checklist`** — 完整安全审查清单（认证 / 输入 / 密钥 / API），非内置 `/security-review` 命令
 - **`security-scan`** — 扫描 `.claude/` 配置漏洞（CLAUDE.md / settings / hooks / agents）
 - **`plankton-code-quality`** — 写时自动 format/lint/fix（每次编辑触发）
 - **`santa-method`** — 多 agent 对抗式验证（两个独立 reviewer 都通过才 ship）
@@ -278,7 +278,7 @@ done
 > 帮我写一篇关于...的文章         # 触发 vibe-writing
 > 做一张...的速查表               # 触发 cheatsheet
 > 深度研究 X                      # 触发 research
-> 帮我审查这段代码安全性          # 触发 security-review
+> 帮我审查这段代码安全性          # 触发 security-checklist
 ```
 
 大部分 skill 通过自然语言匹配自动触发。

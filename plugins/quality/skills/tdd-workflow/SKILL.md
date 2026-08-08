@@ -27,6 +27,15 @@ ALWAYS write tests first, then implement code to make tests pass.
 - Error scenarios tested
 - Boundary conditions verified
 
+#### Scope note: how this relates to `ai-regression-testing`
+
+The 80% figure is a starting-point reference for **new code written under this workflow**, not a dogma to chase on existing code. Division of labor within this plugin:
+
+- **tdd-workflow (this skill)** governs test discipline while building new features or fixing bugs test-first: the coverage floor exists to catch new code that shipped without any test at all.
+- **ai-regression-testing** governs after-the-fact regression coverage of an existing codebase. It deliberately says "don't aim for a coverage percentage" — write tests where bugs were actually found, because regression prevention (not a number) is the goal there.
+
+These are complementary, not contradictory: apply the coverage floor to the vertical slices you are actively building; apply bug-driven, percentage-agnostic testing when hardening code that already exists. Never inflate the percentage with low-value tests just to satisfy the threshold.
+
 ### 3. Test Types
 
 #### Unit Tests
@@ -88,6 +97,8 @@ RIGHT (vertical):
 The TDD Workflow Steps below describe **one vertical slice**. Repeat the cycle for each behavior — don't unroll Step 2-5 into a parallel list of all tests at once.
 
 ## TDD Workflow Steps
+
+> **Note on examples**: the code samples in this skill (semantic market search, `/api/markets`, MarketCard, Supabase/Redis/OpenAI mocks) use a prediction-market app as a running example inherited from this skill's origin project. The patterns are what matter — substitute your own domain objects; the domain specifics carry no additional guidance.
 
 ### Step 1: Write User Journeys
 ```
@@ -383,7 +394,7 @@ npm run test:coverage
 ```json
 {
   "jest": {
-    "coverageThresholds": {
+    "coverageThreshold": {
       "global": {
         "branches": 80,
         "functions": 80,

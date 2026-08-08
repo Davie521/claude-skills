@@ -1,6 +1,6 @@
 ---
-name: security-review
-description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
+name: security-checklist
+description: Security review checklist reference — not the built-in /security-review command. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
 origin: ECC
 ---
 
@@ -339,20 +339,20 @@ catch (error) {
 
 #### Wallet Verification
 ```typescript
-import { verify } from '@solana/web3.js'
+import nacl from 'tweetnacl'
+import bs58 from 'bs58'
 
-async function verifyWalletOwnership(
+function verifyWalletOwnership(
   publicKey: string,
   signature: string,
   message: string
 ) {
   try {
-    const isValid = verify(
-      Buffer.from(message),
+    return nacl.sign.detached.verify(
+      new TextEncoder().encode(message),
       Buffer.from(signature, 'base64'),
-      Buffer.from(publicKey, 'base64')
+      bs58.decode(publicKey)  // Solana public keys are base58-encoded
     )
-    return isValid
   } catch (error) {
     return false
   }
@@ -485,6 +485,7 @@ Before ANY production deployment:
 
 ## Resources
 
+- `cloud-infrastructure-security.md` (in this skill's directory) — companion checklist for cloud platforms, IAM, CI/CD pipelines, and logging/monitoring
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Next.js Security](https://nextjs.org/docs/security)
 - [Supabase Security](https://supabase.com/docs/guides/auth)

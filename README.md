@@ -180,7 +180,7 @@ Code quality, testing, and review:
 - **`ai-regression-testing`** — Catch AI blind spots when same model writes and reviews
 
 **Review (4):**
-- **`security-review`** — Comprehensive security checklist for auth, input, secrets, APIs
+- **`security-checklist`** — Comprehensive security checklist for auth, input, secrets, APIs (not the built-in `/security-review` command)
 - **`security-scan`** — Scan `.claude/` config for vulnerabilities (CLAUDE.md, settings, hooks, agents)
 - **`plankton-code-quality`** — Write-time auto-format/lint/fix on every edit via hooks
 - **`santa-method`** — Multi-agent adversarial verification (two independent reviewers must both pass)
@@ -279,7 +279,7 @@ done
 > write an article about...       # Triggers vibe-writing
 > create a cheatsheet for...      # Triggers cheatsheet
 > deep research on X              # Triggers research
-> review this code for security   # Triggers security-review
+> review this code for security   # Triggers security-checklist
 ```
 
 Most skills auto-trigger from natural language matching their description.

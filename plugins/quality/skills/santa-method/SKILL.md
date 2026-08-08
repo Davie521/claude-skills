@@ -114,13 +114,7 @@ Be rigorous. Your job is to find problems, not to approve.
 """
 ```
 
-```python
-# Spawn reviewers in parallel (Claude Code subagents)
-review_b = Agent(prompt=REVIEWER_PROMPT.format(...), description="Santa Reviewer B")
-review_c = Agent(prompt=REVIEWER_PROMPT.format(...), description="Santa Reviewer C")
-
-# Both run concurrently — neither sees the other
-```
+Dispatch both reviewers in the same turn so they run concurrently. In Claude Code, that means two `Agent` tool calls in a single message (`subagent_type: "general-purpose"`, descriptions "Santa Reviewer B" and "Santa Reviewer C"), each receiving only its own filled-in `REVIEWER_PROMPT`. Each subagent starts from an empty context — neither knows the other exists.
 
 ### Rubric Design
 
@@ -192,8 +186,8 @@ for iteration in range(MAX_ITERATIONS):
     )
 
     # Re-run BOTH reviewers on fixed output (fresh agents, no memory of previous round)
-    review_b = Agent(prompt=REVIEWER_PROMPT.format(output=output, ...))
-    review_c = Agent(prompt=REVIEWER_PROMPT.format(output=output, ...))
+    review_b = spawn_fresh_reviewer("Santa Reviewer B", REVIEWER_PROMPT, output)
+    review_c = spawn_fresh_reviewer("Santa Reviewer C", REVIEWER_PROMPT, output)
 
 # Exhausted iterations — escalate
 log_santa_result(output, MAX_ITERATIONS, "escalated")
@@ -208,22 +202,12 @@ Critical: each review round uses **fresh agents**. Reviewers must not carry memo
 
 Subagents provide true context isolation. Each reviewer is a separate process with no shared state.
 
-```bash
-# In a Claude Code session, use the Agent tool to spawn reviewers
-# Both agents run in parallel for speed
-```
+How to run it with the `Agent` tool:
 
-```python
-# Pseudocode for Agent tool invocation
-reviewer_b = Agent(
-    description="Santa Review B",
-    prompt=f"Review this output for quality...\n\nRUBRIC:\n{rubric}\n\nOUTPUT:\n{output}"
-)
-reviewer_c = Agent(
-    description="Santa Review C",
-    prompt=f"Review this output for quality...\n\nRUBRIC:\n{rubric}\n\nOUTPUT:\n{output}"
-)
-```
+1. Issue two `Agent` tool calls **in a single message** so they run in parallel — `subagent_type: "general-purpose"`, with `description` set to "Santa Reviewer B" and "Santa Reviewer C".
+2. Each call's `prompt` contains the full filled-in reviewer prompt (task spec + rubric + output under review) and nothing else. A subagent starts with empty context, so neither reviewer knows the other exists.
+3. Collect both structured verdicts and apply the verdict gate: both must pass before the output ships.
+4. On every fix round, issue brand-new `Agent` calls — never message or reuse a previous reviewer. Fresh agents each round eliminate anchoring from earlier verdicts.
 
 ### Pattern B: Sequential Inline (Fallback)
 
@@ -279,10 +263,9 @@ def santa_batch(items, rubric, sample_rate=0.15):
 
 | Skill | Relationship |
 |-------|-------------|
-| Verification Loop | Use for deterministic checks (build, lint, test). Santa for semantic checks (accuracy, hallucinations). Run verification-loop first, Santa second. |
-| Eval Harness | Santa Method results feed eval metrics. Track pass@k across Santa runs to measure generator quality over time. |
-| Continuous Learning v2 | Santa findings become instincts. Repeated failures on the same criterion → learned behavior to avoid the pattern. |
-| Strategic Compact | Run Santa BEFORE compacting. Don't lose review context mid-verification. |
+| tdd-workflow | Use for deterministic checks (build, lint, test). Santa for semantic checks (accuracy, hallucinations). Run tests first, Santa second. |
+| codex-review | Single-reviewer code review via Codex (severity matrix, mandatory security pass). For code deliverables, its verdict can serve as one of Santa's two independent reviews. |
+| code-review | Multi-agent review dispatch (language specialists + mandatory security pass). Complements Santa on code: it finds code defects; Santa gates overall semantic quality with the dual-pass rule. |
 
 ## Metrics
 

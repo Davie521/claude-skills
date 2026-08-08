@@ -114,7 +114,7 @@ If you find a CRITICAL vulnerability:
 
 ## Reference
 
-For detailed vulnerability patterns, code examples, and PR review templates, see skill: `security-review` (in the `quality` plugin).
+For detailed vulnerability patterns, code examples, and PR review templates, see skill: `security-checklist` (in the `quality` plugin).
 
 ---
 

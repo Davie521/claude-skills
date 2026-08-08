@@ -35,7 +35,7 @@ struct GenerativeView: View {
         case .unavailable(.modelNotReady):
             Text("Model is downloading or not ready")
         case .unavailable(let other):
-            Text("Model unavailable: \(other)")
+            Text("Model unavailable: \(String(describing: other))")
         }
     }
 }
@@ -107,7 +107,9 @@ print("Profile: \(response.content.profile)")
 
 ## Core Pattern — Tool Calling
 
-Let the model invoke custom code for domain-specific tasks:
+Let the model invoke custom code for domain-specific tasks.
+
+The `Tool` protocol has two associated types: `Arguments` (a `@Generable` type the model fills in) and `Output` (anything conforming to `PromptRepresentable` — `String`, a `@Generable` type, or `GeneratedContent`). `call(arguments:)` returns `Output` directly. There is no `ToolOutput` type in the shipping SDK — it existed only in early iOS 26 seeds; `Transcript.ToolOutput` is an unrelated transcript-entry struct.
 
 ### 1. Define a Tool
 
@@ -122,12 +124,12 @@ struct RecipeSearchTool: Tool {
         var numberOfResults: Int
     }
 
-    func call(arguments: Arguments) async throws -> ToolOutput {
+    func call(arguments: Arguments) async throws -> String {
         let recipes = await searchRecipes(
             term: arguments.searchTerm,
             limit: arguments.numberOfResults
         )
-        return .string(recipes.map { "- \($0.name): \($0.description)" }.joined(separator: "\n"))
+        return recipes.map { "- \($0.name): \($0.description)" }.joined(separator: "\n")
     }
 }
 ```
@@ -154,7 +156,7 @@ do {
 
 ## Core Pattern — Snapshot Streaming
 
-Stream structured responses for real-time UI with `PartiallyGenerated` types:
+Stream structured responses for real-time UI with `PartiallyGenerated` types. The stream yields `ResponseStream<Content>.Snapshot` elements — the partial value lives in `snapshot.content` (with `snapshot.rawContent` holding the raw `GeneratedContent`):
 
 ```swift
 @Generable
@@ -168,9 +170,9 @@ let stream = session.streamResponse(
     generating: TripIdeas.self
 )
 
-for try await partial in stream {
-    // partial: TripIdeas.PartiallyGenerated (all properties Optional)
-    print(partial)
+for try await snapshot in stream {
+    // snapshot.content: TripIdeas.PartiallyGenerated (all properties Optional)
+    print(snapshot.content)
 }
 ```
 
@@ -192,8 +194,8 @@ var body: some View {
     .task {
         do {
             let stream = session.streamResponse(to: prompt, generating: TripIdeas.self)
-            for try await partial in stream {
-                partialResult = partial
+            for try await snapshot in stream {
+                partialResult = snapshot.content
             }
         } catch {
             errorMessage = error.localizedDescription

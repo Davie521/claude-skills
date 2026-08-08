@@ -10,6 +10,16 @@ license: Proprietary. LICENSE.txt has complete terms
 
 This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see reference.md. If you need to fill out a PDF form, read forms.md and follow its instructions.
 
+## Environment Setup (do this first)
+
+The bundled scripts and code examples require `pypdf` (and `pdf2image` for PDF-to-image conversion), which may not be installed on this machine. Install them into a virtual environment — in the project directory or your scratchpad directory. NEVER use `--break-system-packages`:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate && pip install pypdf pdf2image
+```
+
+Note: `pdf2image` also needs poppler at the system level (`brew install poppler` on macOS; check with `which pdftoppm`).
+
 ## Quick Start
 
 ```python

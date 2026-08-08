@@ -20,7 +20,7 @@ Produce thorough, cited research reports from multiple web sources using firecra
 
 At least one of:
 - **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
-- **exa** — `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
+- **exa** — `web_search_exa`, `web_fetch_exa` (the installed server exposes exactly these two; verified signatures live in the `search-routing` skill)
 
 Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
 
@@ -63,8 +63,12 @@ firecrawl_search(query: "<sub-question keywords>", limit: 8)
 **With exa:**
 ```
 web_search_exa(query: "<sub-question keywords>", numResults: 8)
-web_search_advanced_exa(query: "<keywords>", numResults: 5, startPublishedDate: "2025-01-01")
 ```
+
+Exa has no date-filter parameter. For recency-sensitive sub-questions, put the
+time constraint in the query text (e.g. "<keywords> 2025", "<keywords> latest"),
+or route to `firecrawl_search` with a date operator in the query
+(e.g. `<keywords> after:2025-01-01`).
 
 **Search strategy:**
 - Use 2-3 different keyword variations per sub-question
@@ -83,8 +87,11 @@ firecrawl_scrape(url: "<url>")
 
 **With exa:**
 ```
-crawling_exa(url: "<url>", tokensNum: 5000)
+web_fetch_exa(urls: ["<url>"], maxCharacters: 20000)
 ```
+
+`web_fetch_exa` handles static pages. For JS-heavy or paywalled pages, prefer
+`firecrawl_scrape`; to sweep a whole site section, use `firecrawl_crawl`.
 
 Read 3-5 key sources in full for depth. Do not rely only on search snippets.
 

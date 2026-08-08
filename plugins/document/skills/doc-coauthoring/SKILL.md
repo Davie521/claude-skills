@@ -131,23 +131,13 @@ Ask if this structure works, or if they want to adjust it.
 
 Create the initial document structure with placeholder text for all sections.
 
-**If access to artifacts is available:**
-Use `create_file` to create an artifact. This gives both Claude and the user a scaffold to work from.
+Use the Write tool to create a markdown file in the working directory. Name it appropriately (e.g., `decision-doc.md`, `technical-spec.md`). This gives both Claude and the user a scaffold to work from.
 
 Inform them that the initial structure with placeholders for all sections will be created.
 
-Create artifact with all section headers and brief placeholder text like "[To be written]" or "[Content here]".
+Create the file with all section headers and brief placeholder text like "[To be written]" or "[Content here]".
 
-Provide the scaffold link and indicate it's time to fill in each section.
-
-**If no access to artifacts:**
-Create a markdown file in the working directory. Name it appropriately (e.g., `decision-doc.md`, `technical-spec.md`).
-
-Inform them that the initial structure with placeholders for all sections will be created.
-
-Create file with all section headers and placeholder text.
-
-Confirm the filename has been created and indicate it's time to fill in each section.
+Confirm the file path and indicate it's time to fill in each section.
 
 **For each section:**
 
@@ -185,16 +175,10 @@ Based on what they've selected, ask if there's anything important missing for th
 
 ### Step 5: Drafting
 
-Use `str_replace` to replace the placeholder text for this section with the actual drafted content.
+Use the Edit tool to replace the placeholder text for this section with the actual drafted content.
 
 Announce the [SECTION NAME] section will be drafted now based on what they've selected.
 
-**If using artifacts:**
-After drafting, provide a link to the artifact.
-
-Ask them to read through it and indicate what to change. Note that being specific helps learning for the next sections.
-
-**If using a file (no artifacts):**
 After drafting, confirm completion.
 
 Inform them the [SECTION NAME] section has been drafted in [filename]. Ask them to read through it and indicate what to change. Note that being specific helps learning for the next sections.
@@ -205,10 +189,9 @@ Provide a note: Instead of editing the doc directly, ask them to indicate what t
 ### Step 6: Iterative Refinement
 
 As user provides feedback:
-- Use `str_replace` to make edits (never reprint the whole doc)
-- **If using artifacts:** Provide link to artifact after each edit
-- **If using files:** Just confirm edits are complete
-- If user edits doc directly and asks to read it: mentally note the changes they made and keep them in mind for future sections (this shows their preferences)
+- Use the Edit tool to make surgical edits (never rewrite the whole doc with Write)
+- Just confirm edits are complete after each change
+- If user edits the file directly and asks to read it: mentally note the changes they made and keep them in mind for future sections (this shows their preferences)
 
 **Continue iterating** until user is satisfied with the section.
 
@@ -363,11 +346,11 @@ Announce document completion. Provide a few final tips:
 - Throughout, if context is missing on something mentioned, proactively ask
 - Don't let gaps accumulate - address them as they come up
 
-**Artifact Management:**
-- Use `create_file` for drafting full sections
-- Use `str_replace` for all edits
-- Provide artifact link after every change
-- Never use artifacts for brainstorming lists - that's just conversation
+**Doc File Management:**
+- Use the Write tool once to create the doc scaffold; draft sections into it with the Edit tool
+- Use the Edit tool for all subsequent edits
+- Confirm the file path (and which section changed) after every change
+- Never put brainstorming lists in the doc file - that's just conversation
 
 **Quality over Speed:**
 - Don't rush through stages

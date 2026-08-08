@@ -39,7 +39,7 @@ Each layer has a specific job. Do not skip layers. Do not try to make one tool d
 Collect the source material:
 - **Screen Studio**: polished screen recordings for app demos, coding sessions, browser workflows
 - **Raw camera footage**: vlog footage, interviews, event recordings
-- **Desktop capture via VideoDB**: session recording with real-time context (see `videodb` skill)
+- **Desktop capture via VideoDB**: session recording with real-time context (VideoDB Python SDK, `pip install videodb`)
 
 Output: raw files ready for organization.
 
@@ -188,13 +188,14 @@ resp = requests.post(
         "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}
     }
 )
+resp.raise_for_status()  # fail loudly instead of writing an error body as mp3
 with open("voiceover.mp3", "wb") as f:
     f.write(resp.content)
 ```
 
 ### Music and SFX with fal.ai
 
-Use the `fal-ai-media` skill for:
+Call the fal.ai API directly (`pip install fal-client`, set `FAL_KEY`) for:
 - Background music generation
 - Sound effects (ThinkSound model for video-to-audio)
 - Transition sounds
@@ -202,11 +203,16 @@ Use the `fal-ai-media` skill for:
 ### Generated visuals with fal.ai
 
 Use for insert shots, thumbnails, or b-roll that doesn't exist:
-```
-generate(app_id: "fal-ai/nano-banana-pro", input_data: {
-  "prompt": "professional thumbnail for tech vlog, dark background, code on screen",
-  "image_size": "landscape_16_9"
-})
+```python
+import fal_client
+
+result = fal_client.subscribe(
+    "fal-ai/nano-banana-pro",
+    arguments={
+        "prompt": "professional thumbnail for tech vlog, dark background, code on screen",
+        "image_size": "landscape_16_9",
+    },
+)
 ```
 
 ### VideoDB generative audio
@@ -305,6 +311,4 @@ identify the 5 most engaging 30-second clips for social media."
 
 ## Related Skills
 
-- `fal-ai-media` — AI image, video, and audio generation
-- `videodb` — Server-side video processing, indexing, and streaming
 - `crosspost` — Platform-native content adaptation and distribution drafts

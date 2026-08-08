@@ -1,6 +1,6 @@
 {
   "name": "writing",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Writing tools: vibe writing (with voice capture + anti-AI-tone wordlist), multi-platform crosspost drafting (with repurposing cascade), video editing",
   "author": {
     "name": "Yifan"

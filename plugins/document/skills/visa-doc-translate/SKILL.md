@@ -15,22 +15,20 @@ When the user provides an image file path, AUTOMATICALLY execute the following s
    - Check EXIF orientation data
    - Automatically rotate the image based on EXIF data
    - If EXIF orientation is 6, rotate 90 degrees counterclockwise
-   - Apply additional rotation as needed (test 180 degrees if document appears upside down)
+   - View the image (Read tool) to verify it is upright; apply additional rotation if the document still appears sideways or upside down
 
-3. **OCR Text Extraction**:
-   - Try multiple OCR methods automatically:
-     - macOS Vision framework (preferred for macOS)
-     - EasyOCR (cross-platform, no tesseract required)
-     - Tesseract OCR (if available)
-   - Extract all text information from the document
+3. **Read the Document Directly** (no OCR tools needed):
+   - Open the image with the Read tool — Claude reads images natively, so do NOT install or invoke any OCR library
+   - Extract all text information from the document, including seals/stamps, headers, tables, and handwritten fields where legible
    - Identify document type (deposit certificate, employment certificate, retirement certificate, etc.)
+   - If any text is genuinely illegible, mark it as `[illegible]` in the translation rather than guessing
 
 4. **Translation**:
    - Translate all text content to English professionally
    - Maintain the original document structure and format
    - Use professional terminology appropriate for visa applications
    - Keep proper names in original language with English in parentheses
-   - For Chinese names, use pinyin format (e.g., WU Zhengye)
+   - For Chinese names, use pinyin format (e.g., ZHANG San)
    - Preserve all numbers, dates, and amounts accurately
 
 5. **PDF Generation**:
@@ -58,41 +56,26 @@ When the user provides an image file path, AUTOMATICALLY execute the following s
 
 ## Technical Implementation
 
-### OCR Methods (tried in order)
-
-1. **macOS Vision Framework** (macOS only):
-   ```python
-   import Vision
-   from Foundation import NSURL
-   ```
-
-2. **EasyOCR** (cross-platform):
-   ```bash
-   pip install easyocr
-   ```
-
-3. **Tesseract OCR** (if available):
-   ```bash
-   brew install tesseract tesseract-lang
-   pip install pytesseract
-   ```
-
 ### Required Python Libraries
 
+`pillow` and `reportlab` only. Check availability first:
+
 ```bash
-pip install pillow reportlab
+python3 -c "import PIL, reportlab; print('ok')"
 ```
 
-For macOS Vision framework:
+If missing, install them into a virtual environment (project directory or scratchpad). NEVER use `--break-system-packages`:
+
 ```bash
-pip install pyobjc-framework-Vision pyobjc-framework-Quartz
+python3 -m venv .venv && source .venv/bin/activate && pip install pillow reportlab
 ```
+
+Text extraction requires no libraries at all — the model reads the image directly via the Read tool.
 
 ## Important Guidelines
 
 - DO NOT ask for user confirmation at each step
 - Automatically determine the best rotation angle
-- Try multiple OCR methods if one fails
 - Ensure all numbers, dates, and amounts are accurately translated
 - Use clean, professional formatting
 - Complete the entire process and report the final PDF location
@@ -100,15 +83,15 @@ pip install pyobjc-framework-Vision pyobjc-framework-Quartz
 ## Example Usage
 
 ```bash
-/visa-doc-translate RetirementCertificate.PNG
-/visa-doc-translate BankStatement.HEIC
-/visa-doc-translate EmploymentLetter.jpg
+/document:visa-doc-translate RetirementCertificate.PNG
+/document:visa-doc-translate BankStatement.HEIC
+/document:visa-doc-translate EmploymentLetter.jpg
 ```
 
 ## Output Example
 
 The skill will:
-1. Extract text using available OCR method
+1. Read the document image directly and extract its text
 2. Translate to professional English
 3. Generate `<filename>_Translated.pdf` with:
    - Page 1: Original document image

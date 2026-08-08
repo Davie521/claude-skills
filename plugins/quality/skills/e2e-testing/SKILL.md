@@ -161,13 +161,15 @@ npx playwright test tests/search.spec.ts --retries=3
 
 ### Common Causes & Fixes
 
-**Race conditions:**
-```typescript
-// Bad: assumes element is ready
-await page.click('[data-testid="button"]')
+**Race conditions:** the race is a test-side check running before the UI has finished updating — not Playwright acting "too fast". Actions (`click()`, `fill()`, on both `page.*` and locators) already auto-wait for actionability; the gap is one-shot reads and assertions that don't retry:
 
-// Good: auto-wait locator
-await page.locator('[data-testid="button"]').click()
+```typescript
+// Bad: one-shot read — the value is captured before the UI stabilizes
+const text = await page.locator('[data-testid="status"]').textContent()
+expect(text).toBe('Done')
+
+// Good: web-first assertion — retries until the UI reaches the expected state
+await expect(page.locator('[data-testid="status"]')).toHaveText('Done')
 ```
 
 **Network timing:**
@@ -203,23 +205,29 @@ await page.locator('[data-testid="chart"]').screenshot({ path: 'artifacts/chart.
 ### Traces
 
 ```typescript
-await browser.startTracing(page, {
-  path: 'artifacts/trace.json',
-  screenshots: true,
-  snapshots: true,
-})
+// Manual tracing via the BrowserContext (viewable in Playwright Trace Viewer)
+await context.tracing.start({ screenshots: true, snapshots: true })
 // ... test actions ...
-await browser.stopTracing()
+await context.tracing.stop({ path: 'artifacts/trace.zip' })
 ```
+
+In Playwright Test, prefer the config option `use: { trace: 'on-first-retry' }` over manual `context.tracing` calls. (Note: `browser.startTracing()` is a different, low-level Chromium-only API that produces a Chrome DevTools performance trace — it is not the Trace Viewer API.)
 
 ### Video
 
 ```typescript
-// In playwright.config.ts
-use: {
-  video: 'retain-on-failure',
-  videosPath: 'artifacts/videos/'
-}
+// In playwright.config.ts — videos are written into each test's outputDir
+export default defineConfig({
+  outputDir: 'artifacts/test-results',
+  use: {
+    video: 'retain-on-failure', // or 'on' to keep every run's video
+  },
+})
+
+// Library mode (no test runner): configure the directory via recordVideo
+const context = await browser.newContext({
+  recordVideo: { dir: 'artifacts/videos/' },
+})
 ```
 
 ## CI/CD Integration

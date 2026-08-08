@@ -1,7 +1,7 @@
 {
   "name": "data",
-  "version": "1.1.0",
-  "description": "Data and ML: PostgreSQL patterns, zero-downtime migrations, scraping agent",
+  "version": "1.2.0",
+  "description": "Data engineering: zero-downtime migrations with PostgreSQL quick reference (indexes, query patterns, RLS, Alembic), scraping agent",
   "author": {
     "name": "Yifan"
   }

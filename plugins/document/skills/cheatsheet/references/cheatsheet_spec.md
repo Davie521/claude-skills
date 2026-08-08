@@ -190,6 +190,6 @@ python3 md2html.py input.md -o output.html
 | 文件 | 说明 |
 |------|------|
 | `md2html.py` | Markdown→HTML 转换脚本（独立运行，无依赖） |
-| `CHEATSHEET_SPEC.md` | 本文档，语法和排版规范 |
+| `cheatsheet_spec.md` | 本文档，语法和排版规范 |
 | `*.md` | 源内容文件 |
 | `*.html` | 生成的 cheatsheet（用浏览器打开 / Ctrl+P 打印） |

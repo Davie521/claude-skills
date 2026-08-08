@@ -13,7 +13,7 @@
     },
     {
       "name": "document",
-      "description": "Document tools: A4 cheatsheets, doc co-authoring, PDF, visa translation",
+      "description": "Document tools: A4 cheatsheets, doc co-authoring, PDF, visa translation, codebase-to-course interactive tutorials",
       "source": "./plugins/document",
       "category": "productivity"
     },
@@ -31,7 +31,7 @@
     },
     {
       "name": "design",
-      "description": "Design intelligence (styles/palettes/stacks), UX critique, codebase-to-course (3 skills)",
+      "description": "Design intelligence (styles/palettes/stacks) and UX critique",
       "source": "./plugins/design",
       "category": "design"
     },
@@ -49,7 +49,7 @@
     },
     {
       "name": "data",
-      "description": "Data and ML: PostgreSQL patterns, zero-downtime migrations, scraping agent",
+      "description": "Data engineering: zero-downtime migrations with PostgreSQL quick reference (indexes, query patterns, RLS, Alembic), scraping agent",
       "source": "./plugins/data",
       "category": "development"
     },
@@ -67,7 +67,7 @@
     },
     {
       "name": "research",
-      "description": "Research and LLM engineering: deep research with scenario checklists (investor/competitor/market/vendor), search routing across MCPs, LLM cost discipline",
+      "description": "Research and LLM engineering: deep research with scenario checklists, search routing across MCPs, LLM cost discipline (regex-first parsing + model routing)",
       "source": "./plugins/research",
       "category": "productivity"
     },

@@ -16,7 +16,7 @@ Content → Write .md (custom syntax) → Run md2html.py → .html → Export PD
 ## Quick Start
 
 1. Create a `.md` file with front matter and content (see Syntax below)
-2. Convert: `python3 scripts/md2html.py input.md -o output.html`
+2. Convert: `python3 "${CLAUDE_PLUGIN_ROOT}/skills/cheatsheet/scripts/md2html.py" input.md -o output.html`
 3. Export PDF: open HTML in browser → Ctrl+P → A4 Landscape, No margins, Background graphics ON → Save as PDF
 
 ## Markdown Syntax
@@ -113,10 +113,10 @@ Work one page at a time. Do NOT write all pages at once.
 
 ## HTML Generation
 
-The converter script (`scripts/md2html.py`) is zero-dependency Python:
+The converter script (`${CLAUDE_PLUGIN_ROOT}/skills/cheatsheet/scripts/md2html.py`) is zero-dependency Python:
 
 ```bash
-python3 scripts/md2html.py input.md -o output.html
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/cheatsheet/scripts/md2html.py" input.md -o output.html
 ```
 
 Open `output.html` in a browser to preview. The CSS renders the exact print layout on screen.

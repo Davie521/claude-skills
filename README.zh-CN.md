@@ -2,23 +2,23 @@
 
 [English](README.md) | **中文**
 
-Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 52 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
+Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
 
 ## Plugin 总览
 
 | Plugin | Skill 数 | 用途 |
 |--------|---------|------|
 | [`dev-workflow`](#dev-workflow) | 10 | Git PR 自动化（含自动合并）、深度规划、**拷问、调试纪律、架构深化、issue triage** |
-| [`document`](#document) | 4 | A4 速查表、文档协作、PDF、签证文档翻译 |
+| [`document`](#document) | 5 | A4 速查表、文档协作、PDF、签证文档翻译、codebase-to-course |
 | [`work-tools`](#work-tools) | 1 | 飞书集成 |
 | [`writing`](#writing) | 3 | Vibe 写作（含声音捕捉）、多平台分发、视频编辑 |
-| [`design`](#design) | 3 | UI/UX Pro Max、UX critique、codebase-to-course |
+| [`design`](#design) | 2 | UI/UX Pro Max、UX critique |
 | [`swift`](#swift) | 4 | Swift/iOS：SwiftUI + 架构模式、并发、Liquid Glass、端上 LLM |
 | [`web`](#web) | 6 | REST API、MCP server、Docker、部署、Bun、内容哈希缓存 |
-| [`data`](#data) | 3 | PostgreSQL、迁移、自动爬虫 |
+| [`data`](#data) | 2 | 迁移 + PostgreSQL 速查、自动爬虫 |
 | [`quality`](#quality) | 8 | TDD、E2E、安全审查/扫描、对抗式验证 |
 | [`code-review`](#code-review) | 5 agent + 1 命令 | `/code-review` 自动按语言分发到 Python/TypeScript/Swift 专家 + 强制 security 审查 |
-| [`research`](#research) | 4 | 深度研究（含市场调研）、搜索路由、成本感知 LLM 管道 |
+| [`research`](#research) | 3 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律 |
 | [`skills`](#skills) | 3 | Skill 管理 — 盘点、合规审计、规则蒸馏 |
 | [`business`](#business) | 1 | 投资人材料 + outreach 跟进节奏 |
 | [`codex`](#codex) | 2 | Codex MCP 第二意见 — 代码审查、方案质疑 |
@@ -72,6 +72,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 52 个 skill + 5 个
 - **`doc-coauthoring`** — 结构化协作写技术文档 / 提案 / 决策文档
 - **`pdf`** — PDF 提取 / 生成 / 表单 / OCR
 - **`visa-doc-translate`** — 签证文档（图片）翻译为中英双语 PDF
+- **`codebase-to-course`** — 把代码库变成给非技术读者的交互式 HTML 教程
 
 ---
 
@@ -115,7 +116,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 52 个 skill + 5 个
 
 ## design
 
-三个 skill。反 AI 味的纪律交给 [Hallmark](https://github.com/Nutlope/hallmark)，
+两个 skill。反 AI 味的纪律交给 [Hallmark](https://github.com/Nutlope/hallmark)，
 可测量的无障碍/性能审计交给 `chrome-devtools` MCP 的 `lighthouse_audit`。
 这个插件只覆盖那两者都不做的部分。
 
@@ -127,7 +128,6 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 52 个 skill + 5 个
 - **`critique`** — UX 体验评估：认知负荷、情绪旅程（峰终定律）、视觉层级、
   可发现性、persona 红旗。10 个维度 + 评分体系 + 5 个用户原型。
   回答"这个体验成不成立"，而不是"看起来像不像 AI 做的"。
-- **`codebase-to-course`** — 把代码库变成交互式 HTML 教程。
 
 那 20 个单动词 skill（`bolder` / `quieter` / `distill` / `audit` …）已于
 2026-08-08 移除：零调用，且它们的调度入口依赖一个被禁用的 `frontend-design`。
@@ -162,8 +162,7 @@ TypeScript / Node Web 全栈：
 
 数据工程：
 
-- **`postgres-patterns`** — 查询优化、schema 设计、索引、安全
-- **`database-migrations`** — 零停机 schema 变更（PostgreSQL / MySQL / Prisma / Drizzle / Django）
+- **`database-migrations`** — 零停机 schema 变更（PostgreSQL / Prisma / Drizzle / Alembic）+ PostgreSQL 速查附录（索引选型、查询模式、RLS）
 - **`data-scraper-agent`** — 100% 免费 GitHub Actions 数据采集 agent（Gemini Flash + Notion/Sheets/Supabase）
 
 ---
@@ -208,8 +207,7 @@ TypeScript / Node Web 全栈：
 
 - **`search-routing`** — 按查询特征在 exa / firecrawl / linkup 里选一个搜索 MCP；自动挑最便宜够用的，deep 模式需确认
 - **`research`** — 多源研究（firecrawl + exa MCPs）+ 引用；按场景的采集清单：投资人尽调 / 竞品 / 市场规模 / 供应商
-- **`cost-aware-llm-pipeline`** — 按复杂度路由模型、预算追踪、prompt cache
-- **`regex-vs-llm-structured-text`** — 解析决策框架：先正则，低置信度才上 LLM
+- **`llm-cost-discipline`** — 两层 LLM 成本控制：先正则解析（只把检出的低置信项升级给 LLM），再按体量路由模型；定价一律现查不硬编码
 
 ---
 

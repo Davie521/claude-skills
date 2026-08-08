@@ -1,6 +1,6 @@
 ---
 name: database-migrations
-description: Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments across PostgreSQL, MySQL, and common ORMs (Prisma, Drizzle, Kysely, Django, TypeORM, golang-migrate).
+description: Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments in PostgreSQL with Prisma, Drizzle, Kysely, and Alembic — plus a PostgreSQL quick reference for query optimization, indexing, schema design, and Row Level Security. Use when writing SQL queries or migrations, designing Postgres schemas or indexes, troubleshooting slow queries, implementing RLS, or planning zero-downtime schema changes.
 origin: ECC
 ---
 
@@ -15,6 +15,9 @@ Safe, reversible database schema changes for production systems.
 - Running data migrations (backfill, transform)
 - Planning zero-downtime schema changes
 - Setting up migration tooling for a new project
+- Writing SQL queries or designing PostgreSQL schemas
+- Troubleshooting slow queries
+- Implementing Row Level Security
 
 ## Core Principles
 
@@ -90,9 +93,6 @@ ALTER TABLE users DROP COLUMN username;
 -- Step 2: Deploy application without the column reference
 -- Step 3: Drop column in next migration
 ALTER TABLE orders DROP COLUMN legacy_status;
-
--- For Django: use SeparateDatabaseAndState to remove from model
--- without generating DROP COLUMN (then drop in next migration)
 ```
 
 ### Large Data Migrations
@@ -298,95 +298,60 @@ if (error) {
 }
 ```
 
-## Django (Python)
+## Alembic (Python)
 
 ### Workflow
 
 ```bash
-# Generate migration from model changes
-python manage.py makemigrations
+# Generate migration from SQLAlchemy model changes
+alembic revision --autogenerate -m "add user avatar"
 
-# Apply migrations
-python manage.py migrate
+# Handwritten migration (custom SQL, data backfill)
+alembic revision -m "backfill display names"
 
-# Show migration status
-python manage.py showmigrations
+# Apply pending migrations
+alembic upgrade head
 
-# Generate empty migration for custom SQL
-python manage.py makemigrations --empty app_name -n description
+# Inspect state
+alembic current
+alembic history
+
+# Rollback last migration (dev only — production rollbacks are new forward migrations)
+alembic downgrade -1
 ```
 
-### Data Migration
+### Autogenerate Pitfalls
+
+Autogenerate diffs SQLAlchemy metadata against the live database — always review the generated file. It misses several change types:
+
+- **Renames**: a renamed table or column is emitted as drop + add, which destroys data if applied blindly. Rewrite by hand as `op.rename_table(...)` / `op.alter_column(..., new_column_name=...)`.
+- **Server defaults**: not compared unless `compare_server_default=True` is set in `context.configure()` (in `env.py`).
+- **Postgres ENUM value changes**: adding a member to an existing enum type is not detected — write `op.execute("ALTER TYPE ... ADD VALUE ...")` manually.
+- **Objects outside table metadata**: views, triggers, functions, and stored procedures are invisible to autogenerate.
+
+### CREATE INDEX CONCURRENTLY
+
+`CONCURRENTLY` cannot run inside a transaction, but Alembic wraps each migration in one. Use an autocommit block:
 
 ```python
-from django.db import migrations
+def upgrade():
+    with op.get_context().autocommit_block():
+        op.execute(
+            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_email ON users (email)"
+        )
 
-def backfill_display_names(apps, schema_editor):
-    User = apps.get_model("accounts", "User")
-    batch_size = 5000
-    users = User.objects.filter(display_name="")
-    while users.exists():
-        batch = list(users[:batch_size])
-        for user in batch:
-            user.display_name = user.username
-        User.objects.bulk_update(batch, ["display_name"], batch_size=batch_size)
-
-def reverse_backfill(apps, schema_editor):
-    pass  # Data migration, no reverse needed
-
-class Migration(migrations.Migration):
-    dependencies = [("accounts", "0015_add_display_name")]
-
-    operations = [
-        migrations.RunPython(backfill_display_names, reverse_backfill),
-    ]
+def downgrade():
+    with op.get_context().autocommit_block():
+        op.execute("DROP INDEX CONCURRENTLY IF EXISTS idx_users_email")
 ```
 
-### SeparateDatabaseAndState
+### down_revision Discipline
 
-Remove a column from the Django model without dropping it from the database immediately:
+Migrations form a chain via `down_revision`. Two branches that each add a migration produce multiple heads, and `alembic upgrade head` refuses to run until resolved.
 
-```python
-class Migration(migrations.Migration):
-    operations = [
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(model_name="user", name="legacy_field"),
-            ],
-            database_operations=[],  # Don't touch the DB yet
-        ),
-    ]
-```
-
-## golang-migrate (Go)
-
-### Workflow
-
-```bash
-# Create migration pair
-migrate create -ext sql -dir migrations -seq add_user_avatar
-
-# Apply all pending migrations
-migrate -path migrations -database "$DATABASE_URL" up
-
-# Rollback last migration
-migrate -path migrations -database "$DATABASE_URL" down 1
-
-# Force version (fix dirty state)
-migrate -path migrations -database "$DATABASE_URL" force VERSION
-```
-
-### Migration Files
-
-```sql
--- migrations/000003_add_user_avatar.up.sql
-ALTER TABLE users ADD COLUMN avatar_url TEXT;
-CREATE INDEX CONCURRENTLY idx_users_avatar ON users (avatar_url) WHERE avatar_url IS NOT NULL;
-
--- migrations/000003_add_user_avatar.down.sql
-DROP INDEX IF EXISTS idx_users_avatar;
-ALTER TABLE users DROP COLUMN IF EXISTS avatar_url;
-```
+- After every merge/rebase, check `alembic heads` — expect exactly one head.
+- Resolve divergence with a merge revision: `alembic merge heads -m "merge branches"`.
+- Never edit the `down_revision` of a migration that has run in production — create new revisions instead.
 
 ## Zero-Downtime Migration Strategy
 
@@ -427,3 +392,104 @@ Day 7: Migration drops old status column
 | Inline index on large table | Blocks writes during build | CREATE INDEX CONCURRENTLY |
 | Schema + data in one migration | Hard to rollback, long transactions | Separate migrations |
 | Dropping column before removing code | Application errors on missing column | Remove code first, drop column next deploy |
+
+## Appendix: PostgreSQL Quick Reference
+
+Query optimization, schema design, and security patterns for day-to-day PostgreSQL work.
+
+### Index Selection
+
+| Query Pattern | Index Type | Example |
+|--------------|------------|---------|
+| `WHERE col = value` / `WHERE col > value` | B-tree (default) | `CREATE INDEX idx ON t (col)` |
+| `WHERE a = x AND b > y` | Composite — equality columns first, then range | `CREATE INDEX idx ON t (a, b)` |
+| `WHERE jsonb @> '{}'` / full-text `tsv @@ query` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
+| Time-series ranges | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
+
+```sql
+-- Covering index: avoids table lookup for SELECT email, name, created_at
+CREATE INDEX idx ON users (email) INCLUDE (name, created_at);
+
+-- Partial index: smaller, only indexes active rows
+CREATE INDEX idx ON users (email) WHERE deleted_at IS NULL;
+```
+
+### Data Types
+
+| Use Case | Correct Type | Avoid |
+|----------|-------------|-------|
+| IDs | `bigint` | `int`, random UUID |
+| Strings | `text` | `varchar(255)` |
+| Timestamps | `timestamptz` | `timestamp` |
+| Money | `numeric(10,2)` | `float` |
+| Flags | `boolean` | `varchar`, `int` |
+
+### Query Patterns
+
+```sql
+-- UPSERT
+INSERT INTO settings (user_id, key, value)
+VALUES (123, 'theme', 'dark')
+ON CONFLICT (user_id, key) DO UPDATE SET value = EXCLUDED.value;
+
+-- Cursor pagination: O(1) vs OFFSET's O(n)
+SELECT * FROM products WHERE id > $last_id ORDER BY id LIMIT 20;
+
+-- Queue processing without lock contention
+UPDATE jobs SET status = 'processing'
+WHERE id = (
+  SELECT id FROM jobs WHERE status = 'pending'
+  ORDER BY created_at LIMIT 1
+  FOR UPDATE SKIP LOCKED
+) RETURNING *;
+```
+
+### Row Level Security
+
+```sql
+-- Wrap the auth function in SELECT so it's evaluated once, not per row
+CREATE POLICY policy ON orders
+  USING ((SELECT auth.uid()) = user_id);
+```
+
+### Diagnostics
+
+```sql
+-- Slow queries (requires pg_stat_statements)
+SELECT query, mean_exec_time, calls
+FROM pg_stat_statements
+WHERE mean_exec_time > 100
+ORDER BY mean_exec_time DESC;
+
+-- Table bloat
+SELECT relname, n_dead_tup, last_vacuum
+FROM pg_stat_user_tables
+WHERE n_dead_tup > 1000
+ORDER BY n_dead_tup DESC;
+
+-- Unindexed foreign keys
+SELECT conrelid::regclass, a.attname
+FROM pg_constraint c
+JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey)
+WHERE c.contype = 'f'
+  AND NOT EXISTS (
+    SELECT 1 FROM pg_index i
+    WHERE i.indrelid = c.conrelid AND a.attnum = ANY(i.indkey)
+  );
+```
+
+### Configuration and Security Defaults
+
+```sql
+ALTER SYSTEM SET max_connections = 100;         -- adjust for RAM
+ALTER SYSTEM SET work_mem = '8MB';
+ALTER SYSTEM SET idle_in_transaction_session_timeout = '30s';
+ALTER SYSTEM SET statement_timeout = '30s';
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+REVOKE ALL ON SCHEMA public FROM public;        -- lock down public schema
+SELECT pg_reload_conf();
+```
+
+---
+
+*Appendix based on Supabase Agent Skills (credit: Supabase team) (MIT License)*

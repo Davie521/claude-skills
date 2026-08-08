@@ -17,8 +17,8 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 
 ## Supported Targets
 
-- **Skills** (`skills/*/SKILL.md`): Workflow skills like search-routing, TDD guides
-- **Rules** (`rules/common/*.md`): Mandatory rules like testing.md, security.md, git-workflow.md
+- **Skills** (`plugins/*/skills/*/SKILL.md`): Workflow skills like search-routing, tdd-workflow
+- **Rules** (only if you maintain a `~/.claude/rules/` directory — none exists by default): mandatory rules like testing.md, security.md, git-workflow.md
 - **Agent definitions** (`agents/*.md`): Whether an agent gets invoked when expected (internal workflow verification not yet supported)
 
 ## When to Activate
@@ -30,12 +30,19 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 
 ## Usage
 
+Run from this skill's directory (where `pyproject.toml` lives):
+
 ```bash
-# Full run
-uv run python -m scripts.run ~/.claude/rules/common/testing.md
+cd "${CLAUDE_PLUGIN_ROOT}/skills/skill-comply"
+
+# Full run (target: any skill/rule .md — here a real skill from this marketplace repo)
+uv run python -m scripts.run "${CLAUDE_PLUGIN_ROOT}/../quality/skills/tdd-workflow/SKILL.md"
 
 # Dry run (no cost, spec + scenarios only)
-uv run python -m scripts.run --dry-run plugins/research/skills/search-routing/SKILL.md
+uv run python -m scripts.run --dry-run "${CLAUDE_PLUGIN_ROOT}/../research/skills/search-routing/SKILL.md"
+
+# Rules work the same way, if you maintain a rules directory
+# (e.g. uv run python -m scripts.run ~/.claude/rules/common/testing.md)
 
 # Custom models
 uv run python -m scripts.run --gen-model haiku --model sonnet <path>

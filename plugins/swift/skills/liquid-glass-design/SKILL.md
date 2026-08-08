@@ -1,6 +1,6 @@
 ---
 name: liquid-glass-design
-description: iOS 26 Liquid Glass design system — dynamic glass material with blur, reflection, and interactive morphing for SwiftUI, UIKit, and WidgetKit.
+description: Apple native iOS 26 (SwiftUI/UIKit/WidgetKit) — NOT web CSS glassmorphism/backdrop-filter. iOS 26 Liquid Glass design system — dynamic glass material with blur, reflection, and interactive morphing via glassEffect/UIGlassEffect. Use when building or migrating native Apple apps to the iOS 26 glass design language; for glassmorphism on web pages use ui-ux-pro-max instead.
 ---
 
 # Liquid Glass Design System (iOS 26)
@@ -14,6 +14,8 @@ Patterns for implementing Apple's Liquid Glass — a dynamic material that blurs
 - Creating morphing transitions between glass elements
 - Applying Liquid Glass effects to widgets
 - Migrating existing blur/material effects to the new Liquid Glass API
+
+**NOT for web.** CSS glassmorphism / `backdrop-filter` on HTML pages is a different technique entirely — route those requests to `ui-ux-pro-max`.
 
 ## Core Pattern — SwiftUI
 

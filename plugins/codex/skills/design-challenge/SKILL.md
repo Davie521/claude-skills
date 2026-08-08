@@ -1,6 +1,6 @@
 ---
 name: design-challenge
-description: Challenge an implementation approach or design choice via Codex MCP. Read-only, asks "is this the right path?" — not "are there bugs?". Trigger when the user says "质疑这个方案" / "这个设计靠不靠谱" / "challenge this design" / "design review" / "second-guess this approach" / "考虑过 X 吗" / "is this the right approach" / "stress-test the design" / "punch holes in this". Returns assumptions / failure modes / alternatives — NOT a bug list, NOT a severity matrix.
+description: Challenge an implementation approach or design choice via Codex MCP. Read-only, asks "is this the right path?" — not "are there bugs?". Trigger when the user says "质疑这个方案" / "这个设计靠不靠谱" / "challenge this design" / "design review" / "second-guess this approach" / "考虑过 X 吗" / "is this the right approach" / "stress-test the design" / "punch holes in this". Returns assumptions / failure modes / alternatives — NOT a bug list, NOT a severity matrix. Division of labor with grill-with-docs — user wants to be interactively grilled question-by-question → dev-workflow:grill-with-docs; user wants a fully-formed proposal attacked by an external model in one pass → this skill.
 ---
 
 # Design Challenge (MCP)
@@ -16,6 +16,7 @@ The companion to `codex:codex-review`. Where codex-review asks **"is this code c
 ## When NOT to use
 
 - Plain defect hunting → `codex:codex-review` instead.
+- User wants to be interactively grilled question-by-question until shared understanding → `dev-workflow:grill-with-docs` (or `grill-me`). This skill hands an already-formed proposal to an external model for a single adversarial pass.
 - Refactor / rename / mechanical change → no design surface to challenge; skip both.
 - Drafting code from scratch → premature; do it after a real proposal exists.
 

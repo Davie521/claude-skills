@@ -2,23 +2,23 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **15 plugins, 52 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **15 plugins, 50 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
 | [`dev-workflow`](#dev-workflow) | 10 | Git PR automation with auto-merge, deep planning, **grilling, diagnosis, codebase deepening, triage** |
-| [`document`](#document) | 4 | A4 cheatsheets, doc co-authoring, PDF, visa doc translation |
+| [`document`](#document) | 5 | A4 cheatsheets, doc co-authoring, PDF, visa doc translation, codebase-to-course |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 3 | Vibe writing with voice capture, multi-platform crosspost, video editing |
-| [`design`](#design) | 3 | UI/UX Pro Max, UX critique, codebase-to-course |
+| [`design`](#design) | 2 | UI/UX Pro Max, UX critique |
 | [`swift`](#swift) | 4 | Swift/iOS: SwiftUI + architecture patterns, concurrency, Liquid Glass, on-device LLM |
 | [`web`](#web) | 6 | REST APIs, MCP servers, Docker, deployment, Bun, content-hash caching |
-| [`data`](#data) | 3 | PostgreSQL, migrations, automated scraping |
+| [`data`](#data) | 2 | Migrations + PostgreSQL quick reference, automated scraping |
 | [`quality`](#quality) | 8 | TDD, E2E, security review/scan, adversarial verification |
 | [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
-| [`research`](#research) | 4 | Deep research incl. market research, search routing, cost-aware LLM pipelines |
+| [`research`](#research) | 3 | Deep research incl. market research, search routing, LLM cost discipline |
 | [`skills`](#skills) | 3 | Skill management — stocktake, compliance audit, rules distillation |
 | [`business`](#business) | 1 | Investor materials with outreach cadence |
 | [`codex`](#codex) | 2 | Codex MCP second opinion — code review, design challenge |
@@ -72,6 +72,7 @@ Creates dense, exam-ready cheatsheets from Markdown:
 - **`doc-coauthoring`** — Structured workflow for co-authoring proposals, specs, decision docs
 - **`pdf`** — PDF extraction, generation, forms, OCR
 - **`visa-doc-translate`** — Translate visa application documents (images) to English bilingual PDF
+- **`codebase-to-course`** — Turn a codebase into an interactive HTML course for non-technical learners
 
 ---
 
@@ -115,7 +116,7 @@ Also owns long-form voice: a five-dimension voice-capture checklist plus a banne
 
 ## design
 
-Three skills. Anti-slop discipline lives in [Hallmark](https://github.com/Nutlope/hallmark);
+Two skills. Anti-slop discipline lives in [Hallmark](https://github.com/Nutlope/hallmark);
 measured a11y/perf auditing lives in the `chrome-devtools` MCP (`lighthouse_audit`).
 This plugin covers what neither of those does.
 
@@ -127,7 +128,6 @@ This plugin covers what neither of those does.
 - **`critique`** — UX evaluation: cognitive load, emotional journey (peak-end),
   visual hierarchy, discoverability, persona red flags. 10 dimensions + scoring
   + 5 user archetypes. Answers "does this experience work", not "does this look AI-made".
-- **`codebase-to-course`** — turn a codebase into an interactive HTML course.
 
 The 20 single-verb skills (`bolder`, `quieter`, `distill`, `audit`, …) were removed
 2026-08-08: zero invocations, and their dispatcher depended on a disabled
@@ -163,8 +163,7 @@ TypeScript/Node web stack:
 
 Data engineering:
 
-- **`postgres-patterns`** — Query optimization, schema design, indexing, security
-- **`database-migrations`** — Zero-downtime schema changes (PostgreSQL, MySQL, Prisma, Drizzle, Django)
+- **`database-migrations`** — Zero-downtime schema changes (PostgreSQL, Prisma, Drizzle, Alembic) + PostgreSQL quick reference appendix (indexes, query patterns, RLS)
 - **`data-scraper-agent`** — 100% free GitHub Actions data collection agent (Gemini Flash + Notion/Sheets/Supabase)
 
 ---
@@ -209,8 +208,7 @@ Research and LLM engineering:
 
 - **`search-routing`** — Pick one search MCP (exa / firecrawl / linkup) by query shape; cheapest sufficient tool, deep modes need confirmation
 - **`research`** — Multi-source research (firecrawl + exa MCPs) with citations; scenario-based collection checklists for investor due diligence, competitor analysis, market sizing, and vendor evaluation
-- **`cost-aware-llm-pipeline`** — Model routing by complexity, budget tracking, prompt caching
-- **`regex-vs-llm-structured-text`** — Decision framework: start with regex, escalate to LLM only for low-confidence edges
+- **`llm-cost-discipline`** — Two-layer LLM cost control: regex-first parsing (escalate only detected low-confidence items), then size-based model routing; pricing always looked up, never hardcoded
 
 ---
 

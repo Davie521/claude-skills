@@ -1,6 +1,6 @@
 ---
 name: codex-review
-description: Default code review route — runs Codex via MCP with the multi-language code-review methodology (severity matrix, file:line, scope triage, mandatory security pass). Read-only, no edits. Trigger when the user says "code review" / "审一下" / "review 一下" / "审这个 diff" / "用 codex 审" / "second opinion" / "复审" / "看看这次改动" or asks for any code review on a diff, file, or PR. This is the preferred entry point — only fall back to the Claude-subagent dispatcher (code-review:code-review) when the user explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review" or wants automatic in-scope fix application.
+description: Default code review route — runs Codex via MCP with the multi-language code-review methodology (severity matrix, file:line, scope triage, mandatory security pass). Read-only, no edits. Trigger when the user says "code review" / "审一下" / "review 一下" / "审这个 diff" / "用 codex 审" / "second opinion" / "复审" / "看看这次改动" or asks for any code review on a diff, file, or PR. This is the preferred entry point — route to the built-in /code-review skill when the user wants inline PR comments (--comment) or the findings auto-applied (--fix), and to the Claude-subagent dispatcher (code-review:code-review) only when the user explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review".
 ---
 
 # Codex Review (MCP)
@@ -12,11 +12,18 @@ The **default** code review route for this user. Codex sees the code without Cla
 - User says any of: "code review" / "审一下" / "review 一下" / "审这个 diff" / "复审" / "看看这次改动" / "用 codex 审" / "second opinion" → run this skill.
 - You just wrote something non-trivial and want an independent pass before declaring done — **ask the user first**, don't auto-trigger.
 
-## Routing vs. `code-review:code-review`
+## Routing — three review skills, one default
 
-The Claude-subagent dispatcher (`/code-review`) still exists, but is **not** the default. Use it only when:
+Three review routes coexist; this skill is the default. Pick by what the user needs:
 
-- User explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review".
+| Route | Use when |
+|---|---|
+| **`codex-review` (this skill)** | Default for any "code review" request — external second opinion from a non-Claude model, read-only |
+| **Built-in `code-review` skill** | User wants findings posted as **inline PR comments** (`--comment`) or **auto-applied to the working tree** (`--fix`) — the only route of the three that can do either |
+| **`code-review:code-review` (plugin dispatcher)** | User explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review" — Claude language-expert subagents (python/swift/typescript/security) |
+
+Additional reasons to pick the plugin dispatcher (`code-review:code-review`):
+
 - User wants automatic in-scope fix application (this skill never edits).
 - User wants the artifact written to `.claude/PRPs/reviews/` or auto-posted via `gh pr review`.
 

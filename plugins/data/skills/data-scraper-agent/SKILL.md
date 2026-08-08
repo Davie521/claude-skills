@@ -40,7 +40,7 @@ schedule   summarises Sheets /
 |---|---|---|
 | **Scraping** | `requests` + `BeautifulSoup` | No cost, covers 80% of public sites |
 | **JS-rendered sites** | `playwright` (free) | When HTML scraping fails |
-| **AI enrichment** | Gemini Flash via REST API | 500 req/day, 1M tokens/day — free |
+| **AI enrichment** | Gemini Flash via REST API | Free tier; per-model limits shown in your AI Studio rate-limit dashboard |
 | **Storage** | Notion API | Free tier, great UI for review |
 | **Schedule** | GitHub Actions cron | Free for public repos |
 | **Learning** | JSON feedback file in repo | Zero infra, persists in git |
@@ -50,11 +50,16 @@ schedule   summarises Sheets /
 Build agents to auto-fallback across Gemini models on quota exhaustion:
 
 ```
-gemini-2.0-flash-lite (30 RPM) →
-gemini-2.0-flash (15 RPM) →
-gemini-2.5-flash (10 RPM) →
-gemini-flash-lite-latest (fallback)
+gemini-2.5-flash-lite   (flash-lite tier — highest free-tier throughput) →
+gemini-3.5-flash-lite   (newer flash-lite) →
+gemini-2.5-flash        (flash tier — lower free-tier throughput) →
+gemini-flash-latest     (auto-updating alias — final catch-all)
 ```
+
+> Google no longer publishes fixed per-model free-tier RPM/RPD numbers in the docs —
+> they vary by usage tier and are shown in your AI Studio rate-limit dashboard.
+> Model IDs change over time (the 2.0 flash models are already shut down):
+> verify the chain against the current model list at ai.google.dev/gemini-api/docs/models.
 
 ### Batch API Calls for Efficiency
 
@@ -210,11 +215,13 @@ import os, json, time, requests
 
 _last_call = 0.0
 
+# Highest free-tier throughput first; verify IDs against
+# ai.google.dev/gemini-api/docs/models (2.0 flash models are shut down).
 MODEL_FALLBACK = [
-    "gemini-2.0-flash-lite",
-    "gemini-2.0-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-3.5-flash-lite",
     "gemini-2.5-flash",
-    "gemini-flash-lite-latest",
+    "gemini-flash-latest",  # auto-updating alias — final catch-all
 ]
 
 
@@ -699,9 +706,8 @@ soup = BeautifulSoup(html, "lxml")
 
 | Service | Free Limit | Typical Usage |
 |---|---|---|
-| Gemini Flash Lite | 30 RPM, 1500 RPD | ~56 req/day at 3-hr intervals |
-| Gemini 2.0 Flash | 15 RPM, 1500 RPD | Good fallback |
-| Gemini 2.5 Flash | 10 RPM, 500 RPD | Use sparingly |
+| Gemini (flash-lite models) | Highest free-tier throughput; exact RPM/RPD shown in AI Studio dashboard | Primary — ~56 req/day at 3-hr intervals fits comfortably |
+| Gemini (flash models) | Lower free-tier throughput than flash-lite | Fallback |
 | GitHub Actions | Unlimited (public repos) | ~20 min/day |
 | Notion API | Unlimited | ~200 writes/day |
 | Supabase | 500MB DB, 2GB transfer | Fine for most agents |

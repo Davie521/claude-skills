@@ -1,6 +1,6 @@
 ---
 name: swift-concurrency-6-2
-description: Swift 6.2 Approachable Concurrency — single-threaded by default, @concurrent for explicit background offloading, isolated conformances for main actor types.
+description: Swift 6.2 Approachable Concurrency — single-threaded by default, @concurrent for explicit background offloading, isolated conformances for main actor types. Use when migrating a project to Swift 6.2 concurrency, adopting @concurrent or MainActor-default inference, or resolving data-race safety compiler errors ("sending X risks causing data races").
 ---
 
 # Swift 6.2 Approachable Concurrency

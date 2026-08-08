@@ -5,7 +5,7 @@ description: "Restate requirements, assess risks, create a step-by-step implemen
 
 # deep-plan — 规划 + worktree 隔离 + 实现后交接
 
-写任何代码前先复述需求、评估风险、出分阶段计划，等你明确确认；批准后第一步强制开独立 git worktree（绝不在 main 工作树改动），实现完再交接给 cpr / code review。完整保留原 `commands/plan.md` 的全部内容。
+写任何代码前先复述需求、评估风险、出分阶段计划，等你明确确认；批准后第一步强制开独立 git worktree（绝不在 main 工作树改动），实现完再交接给 cpr / code review。吸收自原 `commands/plan.md`（已移除）。
 
 > 背景：内置 `/plan` 是只读 plan mode 但不建 worktree；原 `commands/plan.md` 未被加载从未生效。本 skill 二者合一并补强。
 
@@ -47,12 +47,12 @@ description: "Restate requirements, assess risks, create a step-by-step implemen
 1. 先 `git rev-parse --show-toplevel` 确认**不在 main 工作树**；在的话必须先建树。
 2. slug：请求 → `plan-<slug>`（非 ASCII → 短英文 slug）；若非 git 仓库则 `git init`。
 3. 有 remote 则 `git fetch origin`；默认分支 `git symbolic-ref --short refs/remotes/origin/HEAD`。
-4. 优先 `EnterWorktree`（off 最新 main）；否则 `git worktree add ../<repo>_<slug> -b <branch> origin/<default-branch>` 并 `cd` 进去。（原 plan.md 通用写法 `git worktree add ../<name> -b <name>`，此处按本仓约定本地化为 `../<repo>_<slug>`。）
+4. 默认 `git worktree add ../<repo>_<slug> -b <branch> origin/<default-branch>` 建兄弟目录并 `cd` 进去（`EnterWorktree` 建在主仓 `.claude/worktrees/` 内的嵌套树，docker bind-mount 源码树的 dev stack 用不了，LOCAL_DEV.md §4 也约定兄弟目录）；无 docker 依赖的简单仓库可退而用 `EnterWorktree`（off 最新 main）。（原 plan.md 通用写法 `git worktree add ../<name> -b <name>`，此处按本仓约定本地化为 `../<repo>_<slug>`。）
 5. 播报路径 + base ref（如 "worktree: `../moneytalk_add-podcast` off `origin/main`"）。一切代码改动都在树内。
 
 ### 本仓特化（MoneyTalk web_new）
 - 仓库有 `bin/init-worktree.sh` + `Justfile` → 建树后 `just dev` 自动 bootstrap 隔离栈（端口 3000/8000/5433+slot、软链 `backend/.env`）；收尾 `just wipe` → `git worktree remove`。以上见 `infra/LOCAL_DEV.md` §4「Multi-worktree dev」。
-- 运维经验（实战所得，非 §4 文档记载）：并发多 worktree 时 Meili 固定 7700 会冲突 → 该 worktree `infra/dev/.env` 加 `MEILI_PORT`；删 worktree 目录前先拆它的 docker stack（`restart:unless-stopped` 会不断重建空壳目录），别直接删目录。
+- 运维经验：删 worktree 目录前先拆它的 docker stack（`restart:unless-stopped` 会不断重建空壳目录），别直接删目录——即按 §4「Tearing down」的 `just wipe` → `git worktree remove` 顺序走。
 
 ## Phase C · 实现
 仅在该 worktree 内实现；绝不在 main 工作树落代码。

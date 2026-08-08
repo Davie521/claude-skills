@@ -10,11 +10,17 @@
 #   SKILL_STOCKTAKE_GLOBAL_DIR   Override ~/.claude/skills (for testing only;
 #                                do not set in production — intended for bats tests)
 #   SKILL_STOCKTAKE_PROJECT_DIR  Override project dir detection (for testing only)
+#   SKILL_STOCKTAKE_PLUGINS_DIR  Override plugins dir detection (for testing only)
 
 set -euo pipefail
 
 GLOBAL_DIR="${SKILL_STOCKTAKE_GLOBAL_DIR:-$HOME/.claude/skills}"
 CWD_SKILLS_DIR="${SKILL_STOCKTAKE_PROJECT_DIR:-${1:-$PWD/.claude/skills}}"
+# Plugin skills (plugins/*/skills/*/SKILL.md) in the repository containing this
+# script; repo root is derived from the script's own location, not from $PWD.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+PLUGINS_DIR="${SKILL_STOCKTAKE_PLUGINS_DIR:-$REPO_ROOT/plugins}"
 # Path to JSONL file containing tool-use observations (optional; used for usage frequency counts).
 # Override via SKILL_STOCKTAKE_OBSERVATIONS env var if your setup uses a different path.
 OBSERVATIONS="${SKILL_STOCKTAKE_OBSERVATIONS:-$HOME/.claude/observations.jsonl}"
@@ -65,9 +71,21 @@ count_obs() {
     "$OBSERVATIONS" 2>/dev/null | wc -l | tr -d ' '
 }
 
+# List skill files in a directory.
+# mode "plugin-skills": only plugins/*/skills/*/SKILL.md (depth-anchored);
+# any other mode (default): every *.md recursively.
+list_skill_files() {
+  local dir="$1" mode="${2:-all-md}"
+  if [[ "$mode" == "plugin-skills" ]]; then
+    find "$dir" -mindepth 4 -maxdepth 4 -type f -name "SKILL.md" -path "*/skills/*" 2>/dev/null | sort
+  else
+    find "$dir" -name "*.md" -type f 2>/dev/null | sort
+  fi
+}
+
 # Scan a directory and produce a JSON array of skill objects
 scan_dir_to_json() {
-  local dir="$1"
+  local dir="$1" mode="${2:-all-md}"
   local c7 c30
   c7=$(date_ago 7)
   c30=$(date_ago 30)
@@ -118,7 +136,7 @@ scan_dir_to_json() {
       '{path:$path,name:$name,description:$description,use_7d:$use_7d,use_30d:$use_30d,mtime:$mtime}' \
       > "$tmpdir/$i.json"
     i=$((i+1))
-  done < <(find "$dir" -name "*.md" -type f 2>/dev/null | sort)
+  done < <(list_skill_files "$dir" "$mode")
 
   if [[ $i -eq 0 ]]; then
     echo "[]"
@@ -139,6 +157,16 @@ if [[ -d "$GLOBAL_DIR" ]]; then
   global_count=$(echo "$global_skills" | jq 'length')
 fi
 
+plugins_found="false"
+plugins_count=0
+plugin_skills="[]"
+
+if [[ -d "$PLUGINS_DIR" ]]; then
+  plugins_found="true"
+  plugin_skills=$(scan_dir_to_json "$PLUGINS_DIR" plugin-skills)
+  plugins_count=$(echo "$plugin_skills" | jq 'length')
+fi
+
 project_found="false"
 project_path=""
 project_count=0
@@ -151,12 +179,15 @@ if [[ -n "$CWD_SKILLS_DIR" && -d "$CWD_SKILLS_DIR" ]]; then
   project_count=$(echo "$project_skills" | jq 'length')
 fi
 
-# Merge global + project skills into one array
-all_skills=$(jq -s 'add' <(echo "$global_skills") <(echo "$project_skills"))
+# Merge global + plugin + project skills into one array
+all_skills=$(jq -s 'add' <(echo "$global_skills") <(echo "$plugin_skills") <(echo "$project_skills"))
 
 jq -n \
   --arg global_found "$global_found" \
   --argjson global_count "$global_count" \
+  --arg plugins_found "$plugins_found" \
+  --arg plugins_path "$PLUGINS_DIR" \
+  --argjson plugins_count "$plugins_count" \
   --arg project_found "$project_found" \
   --arg project_path "$project_path" \
   --argjson project_count "$project_count" \
@@ -164,6 +195,7 @@ jq -n \
   '{
     scan_summary: {
       global: { found: ($global_found == "true"), count: $global_count },
+      plugins: { found: ($plugins_found == "true"), path: $plugins_path, count: $plugins_count },
       project: { found: ($project_found == "true"), path: $project_path, count: $project_count }
     },
     skills: $skills

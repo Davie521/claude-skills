@@ -72,6 +72,9 @@ npx ecc-agentshield scan --format markdown
 
 # HTML — self-contained dark-theme report
 npx ecc-agentshield scan --format html > security-report.html
+
+# SARIF (v1.4.0+) — for GitHub code scanning upload
+npx ecc-agentshield scan --format sarif --output agentshield.sarif
 ```
 
 ### Auto-Fix
@@ -86,6 +89,52 @@ This will:
 - Replace hardcoded secrets with environment variable references
 - Tighten wildcard permissions to scoped alternatives
 - Never modify manual-only suggestions
+
+### Baseline Comparison & PR Gate (v1.4.0+)
+
+Snapshot an accepted state, then fail CI only on regressions:
+
+```bash
+# Write an accepted baseline snapshot (stores hashed fingerprints, not raw evidence)
+npx ecc-agentshield baseline write --path .claude --output .github/agentshield-baseline.json
+
+# Compare a scan against the baseline; --gate fails on new critical/high findings or a score drop
+npx ecc-agentshield scan --baseline .github/agentshield-baseline.json --gate
+
+# Or save the current scan as the new baseline
+npx ecc-agentshield scan --save-baseline .github/agentshield-baseline.json
+```
+
+### Supply-Chain Verification (v1.4.0+)
+
+Verify the provenance of MCP package references (plus root `package.json` /
+`package-lock.json` dependency evidence): npm vs git, pinned vs unpinned,
+known-good and known-malicious packages.
+
+```bash
+# Offline provenance checks
+npx ecc-agentshield scan --supply-chain
+
+# Also query the npm registry: downloads, maintainers, postinstall scripts,
+# deprecation, and package age
+npx ecc-agentshield scan --supply-chain --supply-chain-online
+```
+
+### Runtime Monitor (v1.4.0+)
+
+Install a PreToolUse hook that intercepts tool calls in real time, beyond
+static config scanning:
+
+```bash
+# Install the PreToolUse runtime monitor
+npx ecc-agentshield runtime install
+
+# Check whether the hook, policy, and log path are healthy
+npx ecc-agentshield runtime status --check
+
+# Back up invalid runtime files and restore a healthy install
+npx ecc-agentshield runtime repair
+```
 
 ### Opus 4.6 Deep Analysis
 

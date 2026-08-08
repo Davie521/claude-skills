@@ -2,13 +2,13 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **16 plugins, 94 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
 ## Plugins Overview
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| [`dev-workflow`](#dev-workflow) | 17 | Git PR automation, multi-agent impl, blueprints, browser routing, **grilling, diagnosis, codebase deepening, triage** |
+| [`dev-workflow`](#dev-workflow) | 16 | Git PR automation, multi-agent impl, blueprints, **grilling, diagnosis, codebase deepening, triage** |
 | [`document`](#document) | 7 | A4 cheatsheets, doc co-authoring, PDF, docs lookup, codebase onboarding |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 5 | Vibe writing, articles, content engine, crosspost, video editing |
@@ -19,9 +19,11 @@ Yifan's personal Claude Code plugin marketplace — **14 plugins, 115 skills + 5
 | [`data`](#data) | 4 | PostgreSQL, migrations, PyTorch, automated scraping |
 | [`quality`](#quality) | 14 | Testing, E2E, benchmarks, security review, coding standards |
 | [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
-| [`research`](#research) | 8 | Deep research, prompt optimization, cost-aware LLM pipelines |
+| [`research`](#research) | 9 | Deep research, search routing, prompt optimization, cost-aware LLM pipelines |
 | [`skills`](#skills) | 13 | Skill management — create, audit, evolve, promote |
 | [`business`](#business) | 3 | Investor outreach, pitch materials, product evaluation |
+| [`codex`](#codex) | 2 | Codex MCP second opinion — code review, design challenge |
+| [`session-summary`](#session-summary) | hooks only | Session summary hooks and scripts (no skills) |
 
 ---
 
@@ -255,6 +257,7 @@ Multi-language code review with auto-dispatch. Single command (`/code-review`) d
 
 Research and LLM engineering:
 
+- **`search-routing`** — Pick one search MCP (exa / firecrawl / linkup) by query shape; cheapest sufficient tool, deep modes need confirmation
 - **`research`** — Multi-source research (firecrawl + exa MCPs) with citations
 - **`market-research`** — Competitive analysis, investor due diligence
 - **`search-first`** — Search for existing tools/libs/patterns before writing custom code
@@ -295,6 +298,21 @@ Fundraising and product evaluation:
 
 ---
 
+## codex
+
+Second opinion via Codex MCP — read-only, never edits:
+
+- **`codex-review`** — Default code review route. Codex runs the multi-language review methodology (severity matrix, `file:line`, mandatory security pass). Fall back to `code-review` only when you explicitly want Claude subagents or auto-applied fixes.
+- **`design-challenge`** — Challenges the approach, not the code. Returns assumptions / failure modes / alternatives instead of a bug list.
+
+---
+
+## session-summary
+
+Hooks and scripts only — no skills. Session analytics dashboard printed when a session ends (15 configurable sections). Vendored from [FlorianBruniaux/claude-code-plugins](https://github.com/FlorianBruniaux/claude-code-plugins), MIT.
+
+---
+
 ## Installation
 
 Add this marketplace to Claude Code:
@@ -315,7 +333,7 @@ claude plugin install python@yifan-personal
 Or install all 14 at once:
 
 ```bash
-for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business; do
+for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business codex session-summary; do
   claude plugin install "$p@yifan-personal"
 done
 ```

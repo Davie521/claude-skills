@@ -73,7 +73,7 @@
     },
     {
       "name": "research",
-      "description": "Research and LLM engineering: deep research, prompt optimization, cost-aware pipelines",
+      "description": "Research and LLM engineering: deep research, search routing, prompt optimization, cost-aware pipelines",
       "source": "./plugins/research",
       "category": "productivity"
     },
@@ -100,12 +100,6 @@
       "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
       "source": "./plugins/codex",
       "category": "testing"
-    },
-    {
-      "name": "xhs",
-      "description": "Xiaohongshu (小红书) automation: keyword search via local Spider_XHS",
-      "source": "./plugins/xhs",
-      "category": "productivity"
     }
   ]
 }

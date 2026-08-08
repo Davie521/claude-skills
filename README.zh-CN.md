@@ -2,13 +2,13 @@
 
 [English](README.md) | **中文**
 
-Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
+Yifan 个人 Claude Code 插件市场 — **16 个 plugin / 94 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
 
 ## Plugin 总览
 
 | Plugin | Skill 数 | 用途 |
 |--------|---------|------|
-| [`dev-workflow`](#dev-workflow) | 17 | Git PR 自动化、多 Agent 实现、蓝图、浏览器路由、**拷问、调试纪律、架构深化、issue triage** |
+| [`dev-workflow`](#dev-workflow) | 16 | Git PR 自动化、多 Agent 实现、蓝图、**拷问、调试纪律、架构深化、issue triage** |
 | [`document`](#document) | 7 | A4 速查表、文档协作、PDF、文档查询、代码库 onboarding |
 | [`work-tools`](#work-tools) | 1 | 飞书集成 |
 | [`writing`](#writing) | 5 | Vibe 写作、文章、内容引擎、跨平台发布、视频编辑 |
@@ -19,9 +19,11 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 | [`data`](#data) | 4 | PostgreSQL、迁移、PyTorch、自动爬虫 |
 | [`quality`](#quality) | 14 | 测试、E2E、性能基准、安全审查、编码规范 |
 | [`code-review`](#code-review) | 5 agent + 1 命令 | `/code-review` 自动按语言分发到 Python/TypeScript/Swift 专家 + 强制 security 审查 |
-| [`research`](#research) | 8 | 深度研究、Prompt 优化、成本感知 LLM 管道 |
+| [`research`](#research) | 9 | 深度研究、搜索路由、Prompt 优化、成本感知 LLM 管道 |
 | [`skills`](#skills) | 13 | Skill 管理 — 创建、审计、演进、升级 |
 | [`business`](#business) | 3 | 投资人沟通、Pitch 材料、产品评估 |
+| [`codex`](#codex) | 2 | Codex MCP 第二意见 — 代码审查、方案质疑 |
+| [`session-summary`](#session-summary) | 仅 hooks | 会话总结 hooks 和脚本（无 skill） |
 
 ---
 
@@ -254,6 +256,7 @@ TypeScript / Node Web 全栈：
 
 研究和 LLM 工程：
 
+- **`search-routing`** — 按查询特征在 exa / firecrawl / linkup 里选一个搜索 MCP；自动挑最便宜够用的，deep 模式需确认
 - **`research`** — 多源研究（firecrawl + exa MCPs）+ 引用
 - **`market-research`** — 竞品分析、投资人尽调
 - **`search-first`** — 写代码前先搜现成方案
@@ -294,6 +297,21 @@ Skill 和 instinct 管理系统：
 
 ---
 
+## codex
+
+通过 Codex MCP 拿第二意见 — 只读，不改代码：
+
+- **`codex-review`** — 默认代码审查入口。Codex 按多语言审查方法论跑（严重度矩阵、`file:line`、强制安全检查）。只有明确要 Claude subagent 或要自动改 in-scope 问题时才退回 `code-review`。
+- **`design-challenge`** — 质疑方案本身而非代码。返回假设 / 失败模式 / 备选方案，不是 bug 列表。
+
+---
+
+## session-summary
+
+只有 hooks 和脚本，没有 skill。会话结束时打印会话分析面板（15 个可配置区块）。Vendored 自 [FlorianBruniaux/claude-code-plugins](https://github.com/FlorianBruniaux/claude-code-plugins)，MIT 协议。
+
+---
+
 ## 安装
 
 把这个 marketplace 加进 Claude Code：
@@ -314,7 +332,7 @@ claude plugin install python@yifan-personal
 或一次装 14 个：
 
 ```bash
-for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business; do
+for p in dev-workflow document work-tools writing design python swift web data quality code-review research skills business codex session-summary; do
   claude plugin install "$p@yifan-personal"
 done
 ```

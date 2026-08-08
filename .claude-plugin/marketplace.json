@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "dev-workflow",
-      "description": "Dev workflow: Git PR, Copilot lint, multi-agent impl, browser MCP, git patterns, repo audit, blueprints",
+      "description": "Dev workflow: Git PR, Copilot lint, multi-agent impl, git patterns, repo audit, blueprints",
       "source": "./plugins/dev-workflow",
       "category": "productivity"
     },
@@ -31,13 +31,13 @@
     },
     {
       "name": "design",
-      "description": "UI/UX design family: design systems, styling, animation, accessibility, audits (23 skills)",
+      "description": "Design intelligence (styles/palettes/stacks), UX critique, codebase-to-course (3 skills)",
       "source": "./plugins/design",
       "category": "design"
     },
     {
       "name": "python",
-      "description": "Python and Django: patterns, testing, security, verification",
+      "description": "General Python: patterns, pytest testing",
       "source": "./plugins/python",
       "category": "development"
     },
@@ -55,7 +55,7 @@
     },
     {
       "name": "data",
-      "description": "Data and ML: PostgreSQL, ClickHouse, migrations, PyTorch, automated scraping",
+      "description": "Data and ML: PostgreSQL, migrations, PyTorch, automated scraping",
       "source": "./plugins/data",
       "category": "development"
     },

@@ -1,7 +1,7 @@
 {
   "name": "data",
   "version": "1.0.0",
-  "description": "Data and ML: PostgreSQL, ClickHouse, migrations, PyTorch, scraping",
+  "description": "Data and ML: PostgreSQL, migrations, PyTorch, scraping",
   "author": {
     "name": "Yifan"
   }

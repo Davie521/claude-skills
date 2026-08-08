@@ -12,11 +12,11 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 | [`document`](#document) | 7 | A4 速查表、文档协作、PDF、文档查询、代码库 onboarding |
 | [`work-tools`](#work-tools) | 1 | 飞书集成 |
 | [`writing`](#writing) | 5 | Vibe 写作、文章、内容引擎、跨平台发布、视频编辑 |
-| [`design`](#design) | 23 | UI/UX Pro Max 设计家族 — 设计系统、样式、动效、审计 |
-| [`python`](#python) | 6 | Python + Django：模式、测试、安全、验证 |
+| [`design`](#design) | 3 | UI/UX Pro Max、UX critique、codebase-to-course |
+| [`python`](#python) | 2 | 通用 Python：模式、测试 |
 | [`swift`](#swift) | 6 | Swift/iOS：SwiftUI、并发、持久化、端上 LLM |
 | [`web`](#web) | 9 | TS 前端、Node 后端、MCP server、Docker、部署 |
-| [`data`](#data) | 5 | PostgreSQL、ClickHouse、迁移、PyTorch、自动爬虫 |
+| [`data`](#data) | 4 | PostgreSQL、迁移、PyTorch、自动爬虫 |
 | [`quality`](#quality) | 14 | 测试、E2E、性能基准、安全审查、编码规范 |
 | [`code-review`](#code-review) | 5 agent + 1 命令 | `/code-review` 自动按语言分发到 Python/TypeScript/Swift 专家 + 强制 security 审查 |
 | [`research`](#research) | 8 | 深度研究、Prompt 优化、成本感知 LLM 管道 |
@@ -62,16 +62,6 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 | 3 | **Tester** | 运行测试、Playwright 截图、当场修 bug |
 | 4 | **Reviewer** | 最终审查测试修复 |
 | 5 | **收尾** | 整理 commit 历史、建分支、建 PR |
-
-#### `browser` — 浏览器 MCP 路由
-
-根据意图自动选浏览器工具：
-
-| 意图 | MCP |
-|------|-----|
-| 浏览、填表、打开页面 | **browser-use** |
-| 性能、调试、网络、console | **Chrome DevTools** |
-| E2E 测试 | **Playwright** |
 
 #### 其他 dev-workflow skills
 
@@ -152,30 +142,31 @@ Yifan 个人 Claude Code 插件市场 — **14 个 plugin / 115 个 skill + 5 �
 
 ## design
 
-UI/UX Pro Max 设计家族 — 23 个 skill 覆盖完整设计生命周期：
+三个 skill。反 AI 味的纪律交给 [Hallmark](https://github.com/Nutlope/hallmark)，
+可测量的无障碍/性能审计交给 `chrome-devtools` MCP 的 `lighthouse_audit`。
+这个插件只覆盖那两者都不做的部分。
 
-**基础（5）：** `ui-ux-pro-max`（路由器，67 styles / 96 palettes / 13 stacks）, `ui-styling`（shadcn/ui + Tailwind）, `design-system`（token 架构）, `brand`, `teach-impeccable`
+- **`ui-ux-pro-max`** — 设计智能库：67 风格 / 96 配色 / 57 字体搭配 / 13 技术栈，
+  可搜索数据库。产出 `design-system/MASTER.md` 以及项目根的 `design.md` 指针，
+  让 Hallmark 识别为"系统托管"项目。
+  官方设计系统路由表见 `reference/design-system-map.md`
+  （Fluent / Material 3 / Carbon / Polaris / Atlaskit / Primer / govuk-frontend / USWDS）。
+- **`critique`** — UX 体验评估：认知负荷、情绪旅程（峰终定律）、视觉层级、
+  可发现性、persona 红旗。10 个维度 + 评分体系 + 5 个用户原型。
+  回答"这个体验成不成立"，而不是"看起来像不像 AI 做的"。
+- **`codebase-to-course`** — 把代码库变成交互式 HTML 教程。
 
-**增强（4）：** `delight`, `bolder`, `colorize`, `overdrive`
-
-**克制（4）：** `quieter`, `distill`, `normalize`, `harden`
-
-**专项（7）：** `optimize`, `adapt`, `arrange`, `typeset`, `clarify`, `onboard`, `extract`
-
-**评估（3）：** `audit`, `critique`, `codebase-to-course`
+那 20 个单动词 skill（`bolder` / `quieter` / `distill` / `audit` …）已于
+2026-08-08 移除：零调用，且它们的调度入口依赖一个被禁用的 `frontend-design`。
 
 ---
 
 ## python
 
-Python 和 Django 模式：
+通用 Python 模式（框架无关）：
 
 - **`python-patterns`** — Pythonic 惯用法、PEP 8、类型注解
 - **`python-testing`** — pytest、TDD、fixture、mock、覆盖率
-- **`django-patterns`** — Django 架构、DRF、ORM、缓存
-- **`django-security`** — 认证授权、CSRF、SQL 注入、XSS、安全部署
-- **`django-tdd`** — pytest-django、factory_boy、DRF 测试
-- **`django-verification`** — 迁移、lint、测试、安全扫描、部署就绪
 
 ---
 
@@ -213,7 +204,6 @@ TypeScript / Node Web 全栈：
 数据工程和 ML：
 
 - **`postgres-patterns`** — 查询优化、schema 设计、索引、安全
-- **`clickhouse-io`** — 分析数据库模式和查询优化
 - **`database-migrations`** — 零停机 schema 变更（PostgreSQL / MySQL / Prisma / Drizzle / Django）
 - **`pytorch-patterns`** — 训练管道、模型架构、数据加载
 - **`data-scraper-agent`** — 100% 免费 GitHub Actions 数据采集 agent（Gemini Flash + Notion/Sheets/Supabase）
@@ -348,7 +338,6 @@ done
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) — cpr/cl 工作流需要
-- 浏览器 MCP server — `browser` skill 需要
 - 飞书 MCP server — `feishu` skill 需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / Context7 等）
 

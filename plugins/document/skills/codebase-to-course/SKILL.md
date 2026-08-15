@@ -212,6 +212,12 @@ The goal of learning is practical application — being able to *do something* w
 - Never punitive, never score-focused. No "You got 3/5!" — the quiz is a thinking exercise, not an exam
 - Wrong answer explanations should teach something new, not just say "wrong, the answer was B"
 
+**Never leak the answer — all options must look identical until checked:**
+- **No emphasis markup inside option text. Ever.** No `<strong>`, `<b>`, `<em>`, `<mark>`, `<u>`, or inline `style="font-weight..."` anywhere inside a `.quiz-option`. Option text is plain text. Bolding the key phrase of the correct answer hands it over before the learner has thought about anything — and the urge to bold lands on the correct option almost every time, because that's the option whose wording you care about. If a phrase feels important enough to bold, that is exactly why it must stay unbolded.
+- **No correctness markers in visible text** — no "(correct)", no ✓, no "recommended". Correctness lives only in the `data-correct` attribute.
+- **Match the distractors in shape.** The correct option must not be noticeably longer, more detailed, more hedged, or more precisely worded than the wrong ones. "Pick the longest, most qualified answer" is a test-taking trick that lets a learner score without understanding a thing. Write all options to roughly the same length and specificity.
+- Emphasis belongs in the **feedback** shown after checking, never in the options themselves.
+
 **How many quizzes:** One per module, placed at the end after the learner has seen all the content. 3-5 questions per quiz. Each question should make the learner pause and *think*, not just pick the obvious answer.
 
 **Deciding what concepts are worth quizzing:** Quiz the things that would actually help someone in practice — architecture understanding ("where does this logic live and why?"), debugging intuition ("what would cause this symptom?"), and decision-making ("what's the tradeoff here?"). If a concept won't help someone debug a problem, steer an AI assistant, or make an architectural decision, it's not worth quizzing.
@@ -253,6 +259,9 @@ Trimming, simplifying, or "cleaning up" code snippets from the codebase. The lea
 
 ### Quiz Questions That Test Memory
 Asking "What does API stand for?" or "Which file handles X?" — those test recall, not understanding. Every quiz question should present a new scenario the learner hasn't seen and ask them to *apply* what they learned.
+
+### Answer Leaking Through Formatting
+The correct option is bolded (`<strong>` wrapped around its key phrase), labeled "(correct)", or simply written longer and more specifically than the distractors — so the learner picks it by looking, not by thinking. The quiz then measures nothing. This is a near-automatic failure: when writing the correct answer you naturally want to emphasize the part that makes it correct. Don't. **Fix:** option text stays plain text, all options get comparable length and specificity, and the `.quiz-option` CSS in `interactive-elements.md` flattens any stray emphasis as a backstop. Before shipping, grep the generated file for `<strong>`, `<b>`, `<em>`, and `<mark>` inside `quiz-option` blocks — there should be zero hits.
 
 ### Scroll-Snap Mandatory
 Using `scroll-snap-type: y mandatory` traps users inside long modules. Always use `proximity`.

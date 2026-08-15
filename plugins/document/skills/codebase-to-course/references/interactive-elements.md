@@ -115,9 +115,13 @@ The most important teaching element. Shows real code from the project on the lef
 
 For testing understanding with instant feedback. Each question has options, one correct answer, and per-question explanations.
 
+> **Options must be plain text — no exceptions.** Never put `<strong>`, `<b>`, `<em>`, `<mark>`, `<u>`, or inline `font-weight`/`font-style` inside a `.quiz-option`, and never write "(correct)", "✓", or any other marker into the visible text. Correctness is carried *only* by `data-correct` on the question block. Bolding the key phrase of the right answer — which is the phrase you'll instinctively want to emphasize — makes the answer obvious at a glance and the question worthless. Keep all options within a similar length and level of specificity for the same reason. Save emphasis for the feedback that appears after checking.
+
 **HTML:**
 ```html
 <div class="quiz-container">
+  <!-- The correct answer is option-b, declared ONLY here in data-correct.
+       Nothing in the visible option text may hint at it. -->
   <div class="quiz-question-block" data-question="q1" data-correct="option-b">
     <h3 class="quiz-question">Question text here?</h3>
     <div class="quiz-options">
@@ -127,7 +131,7 @@ For testing understanding with instant feedback. Each question has options, one 
       </button>
       <button class="quiz-option" data-value="option-b" onclick="selectOption(this)">
         <div class="quiz-option-radio"></div>
-        <span>Answer B (correct)</span>
+        <span>Answer B</span>
       </button>
       <button class="quiz-option" data-value="option-c" onclick="selectOption(this)">
         <div class="quiz-option-radio"></div>
@@ -198,6 +202,10 @@ window.checkQuiz = function(sectionId) {
   cursor: pointer; width: 100%;
   transition: border-color var(--duration-fast), background var(--duration-fast);
 }
+/* Answer-leak backstop: every option renders with identical weight and style,
+   even if stray <strong>/<b>/<em> markup ends up in the text. Keep this rule. */
+.quiz-option, .quiz-option span { font-weight: 500; font-style: normal; }
+.quiz-option span * { font-weight: inherit !important; font-style: inherit !important; }
 .quiz-option:hover { border-color: var(--color-accent-muted); }
 .quiz-option.selected { border-color: var(--color-accent); background: var(--color-accent-light); }
 .quiz-option.correct { border-color: var(--color-success); background: var(--color-success-light); }

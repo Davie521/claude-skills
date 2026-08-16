@@ -4,7 +4,7 @@
 
 Yifan's personal Claude Code plugin marketplace — **15 plugins, 50 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
-Every skill below states three things: what it's **for**, how it's **triggered**, and how it actually **works** inside.
+Every skill below names what it's for in its heading, then states how it's **triggered** and how it actually **works** inside. Where the heading isn't enough, an explicit **For** line spells the purpose out.
 
 ## Plugins Overview
 

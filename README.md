@@ -44,9 +44,9 @@ It resumes from wherever you already are — `gh pr view --json number,state`, `
 1. **Branch check** — if you're on `main`, cut a branch first
 2. **Commit** — `git add` + `git commit`
 3. **Push + create PR** — `git push -u` + `gh pr create`
-4. **Watch CI** — `gh pr checks --watch`
+4. **Watch CI** — `gh pr checks --watch`; `no checks reported` means the repo has no CI at all, so skip to step 6
 5. **On failure** — `gh run view <id> --log-failed` → fix → push
-6. **Copilot comments** — `gh pr view --comments` *and* `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments`; if no comments have landed yet, wait 30s and re-query → judge each one → fix only what's necessary → push
+6. **Copilot comments** — request the review first if it didn't fire on its own, then read both `gh pr view --comments` *and* `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments` → judge each one → fix only what's necessary → push
 7. **Loop 4–6** until everything is green
 8. **Auto-merge** — `gh pr merge --merge --delete-branch` once all checks pass and no review is outstanding; if a review requested changes or hasn't passed, pause the merge and notify you
 
@@ -62,7 +62,7 @@ Step 6 is the opinionated part — **don't blindly apply every Copilot suggestio
 
 The test is: is this a real problem *in this context*, does fixing it actually gain anything, does it fit the project? Each comment gets an explicit `fix: [reason]` / `ignore: [reason]` verdict.
 
-> **Why it queries both comment endpoints**: Copilot's inline review comments only exist in the REST response at `repos/{owner}/{repo}/pulls/<n>/comments`. `gh pr view --comments` returns conversation-level comments only — checking just that misses **every** code comment. Copilot also posts asynchronously, hence the 30-second re-query.
+> **Three traps it encodes.** *Comments live in two places*: Copilot's inline review comments only exist in the REST response at `repos/{owner}/{repo}/pulls/<n>/comments` — `gh pr view --comments` returns conversation-level comments only, so checking just that misses **every** code comment. *Exit 1 is ambiguous*: `gh pr checks` exits non-zero both when checks fail and when the repo has none (`no checks reported`) — the second is not a failure and must not block the merge. *Review often needs asking*: Copilot doesn't always auto-trigger, and only the `copilot-pull-request-reviewer[bot]` slug can request it (plain `Copilot` gives "not found", the bare slug 422s); comments then take 2–3 minutes, so poll instead of checking once.
 
 ### `deep-plan` — The planning gate before any code
 

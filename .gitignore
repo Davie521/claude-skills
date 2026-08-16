@@ -1,6 +1,10 @@
 # local heavy runtime tool — built/installed per machine
 Spider_XHS/
 
+# local-only skill reference (its own footer says 不入库; contains machine-specific
+# config observations and private project details that must not go to a public repo)
+skills-reference.html
+
 # editor / OS
 .DS_Store
 *.swp

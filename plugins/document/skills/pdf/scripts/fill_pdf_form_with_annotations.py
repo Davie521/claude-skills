@@ -8,21 +8,33 @@ from pypdf.annotations import FreeText
 # Fills a PDF by adding text annotations defined in `fields.json`. See forms.md.
 
 
-def transform_coordinates(bbox, image_width, image_height, pdf_width, pdf_height):
-    """Transform bounding box from image coordinates to PDF coordinates"""
+def transform_from_image_coords(bbox, image_width, image_height, pdf_width, pdf_height):
+    """Transform bounding box from image (pixel) coordinates to PDF coordinates"""
     # Image coordinates: origin at top-left, y increases downward
     # PDF coordinates: origin at bottom-left, y increases upward
     x_scale = pdf_width / image_width
     y_scale = pdf_height / image_height
-    
+
     left = bbox[0] * x_scale
     right = bbox[2] * x_scale
-    
+
     # Flip Y coordinates for PDF
     top = pdf_height - (bbox[1] * y_scale)
     bottom = pdf_height - (bbox[3] * y_scale)
-    
+
     return left, bottom, right, top
+
+
+def transform_from_pdf_coords(bbox, pdf_height):
+    """Transform bounding box from pdfplumber-style PDF points (y=0 at top) to
+    pypdf's PDF coordinates (y=0 at bottom). No scaling needed, only a Y flip."""
+    left = bbox[0]
+    right = bbox[2]
+
+    pypdf_top = pdf_height - bbox[1]
+    pypdf_bottom = pdf_height - bbox[3]
+
+    return left, pypdf_bottom, right, pypdf_top
 
 
 def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path):
@@ -50,18 +62,27 @@ def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path):
     for field in fields_data["form_fields"]:
         page_num = field["page_number"]
         
-        # Get page dimensions and transform coordinates.
+        # Get page dimensions and transform coordinates. The coordinate system is
+        # auto-detected: `pdf_width`/`pdf_height` in the page entry means the bounding
+        # boxes are already in PDF points (from extract_form_structure.py), while
+        # `image_width`/`image_height` means they are pixels from a rendered page image.
         page_info = next(p for p in fields_data["pages"] if p["page_number"] == page_num)
-        image_width = page_info["image_width"]
-        image_height = page_info["image_height"]
         pdf_width, pdf_height = pdf_dimensions[page_num]
-        
-        transformed_entry_box = transform_coordinates(
-            field["entry_bounding_box"],
-            image_width, image_height,
-            pdf_width, pdf_height
-        )
-        
+
+        if "pdf_width" in page_info:
+            transformed_entry_box = transform_from_pdf_coords(
+                field["entry_bounding_box"],
+                float(pdf_height)
+            )
+        else:
+            image_width = page_info["image_width"]
+            image_height = page_info["image_height"]
+            transformed_entry_box = transform_from_image_coords(
+                field["entry_bounding_box"],
+                image_width, image_height,
+                float(pdf_width), float(pdf_height)
+            )
+
         # Skip empty fields
         if "entry_text" not in field or "text" not in field["entry_text"]:
             continue

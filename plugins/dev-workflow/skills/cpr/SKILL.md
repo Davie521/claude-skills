@@ -28,20 +28,29 @@ git status                                   # 未提交更改
 | CI 运行中 | 等待完成 |
 | CI 失败 | 查看错误日志 → 修复 → 推送 |
 | CI 通过 | 检查 Copilot 评论 |
-| **仓库没有 CI** | **跳过第 4-5 步，直接进第 6 步** |
+| **确认无 CI**（见下） | **跳过第 4-5 步，直接进第 6 步** |
 | 全绿且评论已处理 | 自动合并 |
 
 **先分清「CI 失败」和「没有 CI」**：`gh pr checks` 在两种情况下都返回**退出码 1**——
 有检查但失败时列出失败项；仓库没配 workflow 时输出 `no checks reported on the '<branch>' branch`。
 后者不是失败，别拿它去 `gh run view --log-failed` 捞日志（也捞不到），更不能因此阻塞合并。
-用 `ls .github/workflows/` 一眼就能确认这个仓库到底有没有 CI。
+
+不过 `no checks reported` 只说明**这个 head commit 没有 check run**，不等于仓库没有 CI——
+也可能 workflow 存在但没配到这个分支/事件上。所以要落实一下再决定跳不跳：
+
+```bash
+[ -d .github/workflows ] && echo "有 workflow 目录，属于配置问题" || echo "确实没有 CI，可跳过第 4-5 步"
+```
+
+（别用 `ls .github/workflows/`：目录不存在时它自己就非零退出并往 stderr 打错误，
+在状态机里又变成一个假的「步骤失败」——正是这一步想避免的毛病。）
 
 ## 流程
 
 1. **检查分支** — 在 main 上则先创建新分支
 2. **提交更改** — `git add` + `git commit`
 3. **推送 + 创建 PR** — `git push -u` + `gh pr create`
-4. **等待 CI** — `gh pr checks --watch`；输出 `no checks reported` 即本仓库无 CI，跳到第 6 步
+4. **等待 CI** — `gh pr checks --watch`；输出 `no checks reported` 时按上面的办法确认无 CI，是则跳到第 6 步
 5. **CI 失败时** — `gh run view <id> --log-failed` → 修复 → 推送
 6. **Copilot 评论** — 先确认审查已被请求（见下），再拉评论：`gh pr view --comments` + `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments` → 按下表评估 → 只修必要问题 → 推送
 7. **循环 4-6** 直到全部通过
@@ -60,7 +69,10 @@ gh api repos/{owner}/{repo}/pulls/<N>/requested_reviewers -X POST \
 **只有带 `[bot]` 后缀的 slug 能成**：`gh pr edit --add-reviewer Copilot`（或 `@copilot`）报 `'Copilot' not found`；
 不带 `[bot]` 的裸 slug 报 422 `Reviews may only be requested from collaborators`。
 
-请求后评论要 **2-3 分钟**才出现。按 20 秒一轮询、上限 10 次；
+**POST 返回 200 但 `requested_reviewers` 是空数组属正常**——GitHub 立刻把请求转成进行中的审查，
+这个字段随即清空。别据此判定失败又重发，以评论是否出现为准。
+
+请求后评论要 **2-3 分钟**才出现（本仓库实测约 100 秒）。按 20 秒一轮询、上限 10 次；
 别只等一次 30 秒就断定「没有评论」——那是把还没写完的审查当成没有审查。
 
 **回复行内评论**走 `.../comments/<comment_id>/replies`。body 里带反引号或引号时，

@@ -44,7 +44,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 1. **检查分支** —— 在 `main` 上则先切一个新分支
 2. **提交更改** —— `git add` + `git commit`
 3. **推送 + 建 PR** —— `git push -u` + `gh pr create`
-4. **等待 CI** —— `gh pr checks --watch`；输出 `no checks reported` 说明这仓库根本没有 CI，直接跳到第 6 步
+4. **等待 CI** —— `gh pr checks --watch`；出现 `no checks reported` 时用 `[ -d .github/workflows ]` 落实一下是不是真没 CI，是就跳到第 6 步
 5. **CI 失败时** —— `gh run view <id> --log-failed` 读日志 → 修复 → 推送
 6. **Copilot 评论** —— 审查没自动触发就先手动请求，再拉 `gh pr view --comments` **加上** `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments` → 逐条评估 → 只修必要的 → 推送
 7. **循环 4–6** 直到全部通过
@@ -62,7 +62,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 
 判断标准：当前上下文是否真有问题？修改有实际收益？符合项目需求？每条评论输出显式决策 —— `需要修改: [原因]` / `忽略: [原因]`。
 
-> **它固化了三个坑**。*评论分两处*：Copilot 的行内 review 评论只存在于 REST 的 `repos/{owner}/{repo}/pulls/<n>/comments` 响应里，`gh pr view --comments` 只返回会话级评论 —— 只查后者会漏掉**全部**代码评论。*退出码 1 有歧义*：`gh pr checks` 在「检查失败」和「仓库压根没有检查」（`no checks reported`）两种情况下都非零，后者不是失败，不能拿它阻塞合并。*审查常要主动请求*：Copilot 不一定自动触发，而且只有 `copilot-pull-request-reviewer[bot]` 这个带后缀的 slug 请求得动（写 `Copilot` 报 not found，裸 slug 报 422）；请求后评论要 2–3 分钟才出，得轮询而不是查一次就下结论。
+> **它固化了三个坑**。*评论分两处*：Copilot 的行内 review 评论只存在于 REST 的 `repos/{owner}/{repo}/pulls/<n>/comments` 响应里，`gh pr view --comments` 只返回会话级评论 —— 只查后者会漏掉**全部**代码评论。*退出码 1 有歧义*：`gh pr checks` 在「检查失败」和「这个 commit 没有任何 check」（`no checks reported`）两种情况下都非零，后者不是失败、不能拿它阻塞合并；但它只证明「没跑过检查」，要断定仓库没有 CI 还得对着 `.github/workflows` 落实一次。*审查常要主动请求*：Copilot 不一定自动触发，而且只有 `copilot-pull-request-reviewer[bot]` 这个带后缀的 slug 请求得动（写 `Copilot` 报 not found，裸 slug 报 422）；请求后评论要 2–3 分钟才出，得轮询而不是查一次就下结论。
 
 ### `deep-plan` — 写码前的强制规划闸门
 

@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "dev-workflow",
-      "description": "Dev workflow: Git PR pipeline with Copilot review triage + auto-merge (cpr), deep-plan (restate/risk/phase + mandatory worktree), diagnosis loop, plan grilling (grill-with-docs: lite mode + ADR format), codebase deepening, throwaway prototype, conversation-to-PRD, issue triage state machine, caveman compressed-comms, cleanup (end-of-session teardown + memory persistence)",
+      "description": "Dev workflow: Git PR pipeline with Copilot review triage + auto-merge, no-CI detection and explicit review requesting (cpr), deep-plan (restate/risk/phase + mandatory worktree), diagnosis loop, plan grilling (grill-with-docs: lite mode + ADR format), codebase deepening, throwaway prototype, conversation-to-PRD, issue triage state machine, caveman compressed-comms, cleanup (end-of-session teardown + memory persistence)",
       "source": "./plugins/dev-workflow",
       "category": "productivity"
     },
@@ -19,7 +19,7 @@
     },
     {
       "name": "work-tools",
-      "description": "Work integrations: Feishu/Lark messaging and document operations",
+      "description": "Work integrations: Feishu/Lark MCP for messaging, groups, documents, and file operations",
       "source": "./plugins/work-tools",
       "category": "productivity"
     },
@@ -61,7 +61,7 @@
     },
     {
       "name": "code-review",
-      "description": "Multi-language code review: /code-review auto-dispatches to language specialist (Python/TypeScript/Swift) plus mandatory security review",
+      "description": "Multi-language code review: /code-review dispatches to language-specific reviewer (Python, TypeScript, Swift) plus mandatory security-reviewer. General code-reviewer fallback.",
       "source": "./plugins/code-review",
       "category": "testing"
     },
@@ -85,7 +85,7 @@
     },
     {
       "name": "session-summary",
-      "description": "Session analytics — 15-section summary on session end (tools, files, git diff, cost, models). Vendored from FlorianBruniaux/claude-code-plugins (MIT)",
+      "description": "Session analytics hook for Claude Code — 15 configurable sections (models, cost, cache, tools, files, git diff, RTK savings). Vendored from FlorianBruniaux/claude-code-plugins (MIT)",
       "source": "./plugins/session-summary",
       "category": "productivity"
     },

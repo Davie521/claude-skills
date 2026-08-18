@@ -1,6 +1,6 @@
 {
   "name": "session-summary",
-  "description": "Session analytics hook for Claude Code — 15 configurable sections (models, cost, cache, tools, files, git diff, RTK savings...)",
+  "description": "Session analytics hook for Claude Code — 15 configurable sections (models, cost, cache, tools, files, git diff, RTK savings). Vendored from FlorianBruniaux/claude-code-plugins (MIT)",
   "version": "3.0.0",
   "author": { "name": "Florian Bruniaux" }
 }

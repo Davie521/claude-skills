@@ -38,7 +38,12 @@ description: "End-of-session cleanup: shut down every process the session starte
 4. 例外：若怀疑是**代码错了**（文档记的才是本意），不动手改任何一边——列为遗留项进报告，交用户裁决。cleanup 阶段绝不顺手改实现。
 5. 查悬空引用：文档里提到的文件/命令/端口是否还存在（重命名和删除最容易漏）。
 6. **对话遗言扫描**：回扫本次对话里「把 README 更新一下」「加到 CLAUDE.md」「改一下 spec」这类明确指令，以及讨论过、用户认可过但没执行的计划/清单——核对对应文件是否**真的改了**。意图和改法都无歧义的当场补上；有歧义的进报告遗留项，不许猜。用户已否决或被后续讨论取代的项不算遗留。
-7. 本仓库特化：改了 skill 必须同步该 plugin 的 `plugin.json`（version bump + description）；新增/改名 skill 检查 `README*` 的 skill 清单。
+7. 本仓库特化：改了 skill 必须同步该 plugin 的 `plugin.json`（version bump + description），**描述改动还要同步根目录 `.claude-plugin/marketplace.json` 里的同名条目**——同一段描述存了两份，marketplace 那份才是别人 `claude plugin marketplace add` 时看到的，只改 plugin.json 等于对外仍展示旧文案；新增/改名 skill 检查 `README*` 的 skill 清单。
+   一条命令查全量偏差：
+   ```bash
+   python3 -c "import json,os;m=json.load(open('.claude-plugin/marketplace.json'));\
+print([p['name'] for p in m['plugins'] if json.load(open(os.path.join(p['source'].lstrip('./'),'.claude-plugin','plugin.json')))['description']!=p['description']])"
+   ```
 
 ## Phase 3 · 任务清零
 

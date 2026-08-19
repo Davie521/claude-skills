@@ -65,9 +65,13 @@ print([p['name'] for p in m['plugins'] if json.load(open(os.path.join(p['source'
    - 踩过的坑和实战解法——**仅限代码/git 历史里查不到的**（repo 已记录的不重复存）
 2. **持久/临时二分**：只沉淀「跨会话仍然成立」的知识（约束、决策、反馈、坑）；「本次改到哪了」这类会话态描述不进记忆——那是 handoff 的事，不是 memory 的事。
 3. **机密禁写**：密钥、token、密码、原始对话记录绝不写入记忆或任何文档；需要引用密钥时写 `op://` 引用。
-4. **放置判断（Global vs Project）**：问「换个项目还用得上吗？」——跨 2+ 项目通用的（bash 兼容性、LLM API 行为、调试技巧）放 Global（`~/.claude/skills/learned/`），只对本项目成立的（特定配置怪癖、架构决策）放本项目 memory。**拿不准就选 Global**——Global 降级成 Project 容易，反向难。
-5. **优先并入已有文件，不轻易新建**：写之前先 grep 已有记忆 / learned skills 并查 `MEMORY.md` 索引——已有文件覆盖同一主题就**追加进去**，而不是另开新文件（模型天然倾向新建，这条要逆着来）。琐碎修复（拼写、简单语法错）和一次性问题（某次 API 故障）不值得沉淀。
-6. 按 memory 规范写入持久记忆（一事一文件，frontmatter + Why/How to apply），并在 `MEMORY.md` 加索引行。**路径**：memory 是 per-project 的，位于 `~/.claude-b/projects/<project-slug>/memory/`（slug 为项目绝对路径的连字符化，如 `-Users-yifan-Desktop-claude-skills-local`），索引 `MEMORY.md` 在同一目录；`~/.claude/memories`、`~/.claude-b/memories` 均不存在，别往那写。
+4. **放置判断（判据 = 「我会不会知道要去查它」）**：
+   - **不会知道** —— 坑的特性就是让你以为没事（工具静默返回空、命令悄悄回显密钥）。按需加载救不了你，因为你不会去查一个你不知道存在的问题。写进全局 `CLAUDE.md` 对应小节，**只留一两行触发线**，细节留给 skill。注意有 `~/.claude` 和 `~/.claude-b` 两个配置目录，要**两边都写**。
+   - **会知道** —— 你清楚何时用得上（「我在搬文件」「我在写 Vue 组件」）。建成正经 skill：`~/.claude/skills/<名字>/SKILL.md`。**必须是这一层** —— 多套一层目录（如旧的 `skills/learned/<名字>/`）加载器扫不到，写了等于没写。
+   - **只对本项目成立**（特定配置怪癖、架构决策）—— 放本项目 memory。
+   - 拿不准全局还是项目就选全局；全局降级成项目容易，反向难。旧的 `~/.claude/skills/learned/` 已废弃（2026-08-19），别再往那写。
+5. **优先并入已有文件，不轻易新建**：写之前先 grep 已有记忆、`~/.claude/skills/` 下已有的 skill，并查 `MEMORY.md` 索引——已有文件覆盖同一主题就**追加进去**，而不是另开新文件（模型天然倾向新建，这条要逆着来）。琐碎修复（拼写、简单语法错）和一次性问题（某次 API 故障）不值得沉淀。
+6. 按 memory 规范写入持久记忆（一事一文件，frontmatter + Why/How to apply），并在 `MEMORY.md` 加索引行。**路径**：memory 是 per-project 的，位于**本次会话所用配置目录**下的 `projects/<project-slug>/memory/`（`~/.claude` 或 `~/.claude-b`，两个都在用，别跨目录写；slug 为项目绝对路径的连字符化，如 `-Users-yifan-Desktop-claude-skills-local`），索引 `MEMORY.md` 在同一目录；`~/.claude/memories`、`~/.claude-b/memories` 均不存在，别往那写。
 7. 顺手核对已有记忆：本次会话证明已过时/错误的旧记忆，当场修正或删除。
 8. 没有值得沉淀的就明确说「本次无新增记忆」——这也是一个合法结论，但要说出来。
 

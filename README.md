@@ -70,7 +70,8 @@ The test is: is this a real problem *in this context*, does fixing it actually g
 **Trigger**: automatic on new features, architectural changes, complex refactors, multi-file changes, or unclear requirements; or say deep-plan
 
 - **Phase A (read-only)**: restate requirements and dependencies → assess risk and complexity → propose a phased plan → **hard-wait** for explicit approval. `modify:`, `different approach:`, `skip phase 2` steer the plan instead of restarting it.
-- **Phase B (first action after approval)**: create an isolated worktree — a sibling `git worktree add ../<repo>_<slug>`. Nested trees can't run docker bind-mounts, so they're only a fallback for simple docker-free repos.
+- **Phase B (first action after approval)**: create an isolated worktree — a sibling `git worktree add ../<repo>_<slug>` on branch `plan-<slug>` (directory and branch are bound, not chosen independently). Nested trees can't run docker bind-mounts, so they're only a fallback for simple docker-free repos.
+  - Three checks that look right and aren't: `git rev-parse --show-toplevel` cannot tell a main worktree from a linked one (both return a path); comparing `--git-dir` against `--git-common-dir` **also fails unless you add `--path-format=absolute`**, because from a subdirectory git returns one absolute and one relative path and the main worktree reads as linked; and `git symbolic-ref refs/remotes/origin/HEAD` is **fatal**, not empty, when origin/HEAD is unset — `git remote set-head origin -a` first.
 - **Phase C**: implement inside the tree, then hand off to `/cpr` or code review.
 
 > **Note**: never editing the main worktree is a hard precondition of this skill, not a suggestion.
@@ -478,6 +479,8 @@ Decomposes the research question, then follows a scenario-specific collection ch
 - **Vendor evaluation** — trade-offs, lock-in, compliance
 
 Searches with `web_search_exa`, deep-reads with `web_fetch_exa` or `firecrawl_scrape` (JS-heavy / paywalled), and synthesizes a cited report under explicit quality rules.
+
+> **Check the backends exist before planning around them.** MCP servers are scoped per config directory, so `exa` / `firecrawl` / `linkup` can be present in one session and absent in another. The skill now verifies first and falls back to the bundled `/deep-research` workflow or built-in `WebSearch` — naming which backend it used — instead of running searches with nothing to call.
 
 ### `llm-cost-discipline` — Two layers of LLM cost control
 

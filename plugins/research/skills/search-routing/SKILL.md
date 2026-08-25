@@ -10,6 +10,12 @@ Three search MCPs are typically available: **exa**, **firecrawl**, **linkup**.
 This skill picks one — never run multiple by default.
 Deep modes (10× cost) require explicit user confirmation.
 
+> **First check they exist in this session.** MCP servers are scoped per config
+> directory, so a server added under one is absent under another — verify, don't assume.
+> If none of the three are present, routes 1/2/3/5 have nothing to route to: use the
+> built-in `WebSearch` for those. **Route 4 (Context7) is unaffected** — it is a separate
+> MCP and stays the correct choice for library/API docs regardless.
+
 ## Decision Order (apply top-down, stop at first match)
 
 ### 0. Known URL → direct fetch, no search

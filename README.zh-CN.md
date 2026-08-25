@@ -70,7 +70,8 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 **触发**：开新功能、架构改动、复杂重构、多文件改动或需求不清时自动；也可直接说 deep-plan
 
 - **Phase A（只读）**：复述需求和依赖 → 评估风险与复杂度 → 给分阶段计划 → **硬性等待**明确批准（yes / proceed / 确认）。支持 `modify:`、`different approach:`、`skip phase 2` 这类指令改计划，而不是推倒重来。
-- **Phase B（批准后第一动作）**：建隔离 worktree，默认 `git worktree add ../<repo>_<slug>` 兄弟目录 —— 嵌套树跑不了 docker bind-mount，只在无 docker 的简单仓库里才作为备选。
+- **Phase B（批准后第一动作）**：建隔离 worktree，默认 `git worktree add ../<repo>_<slug>` 兄弟目录、分支 `plan-<slug>`（目录与分支绑定，不各起各的）—— 嵌套树跑不了 docker bind-mount，只在无 docker 的简单仓库里才作为备选。
+  - 三个「看着对其实不对」的检查：`git rev-parse --show-toplevel` 分不出主树和链接树（两种都只返回一个路径）；改比 `--git-dir` 和 `--git-common-dir` **也得加 `--path-format=absolute`**，否则在子目录里一个绝对一个相对，主树会被误判成链接树；`git symbolic-ref refs/remotes/origin/HEAD` 在 origin/HEAD 未设时是 **fatal 不是空输出**，要先 `git remote set-head origin -a`。
 - **Phase C**：树内实现，完成后交接 `/cpr` 或 code review。
 
 > **注**：绝不在主 worktree 上直接改 —— 这是这个 skill 的硬性前提，不是建议。
@@ -482,6 +483,8 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 - **供应商评估** —— trade-offs / lock-in / 合规
 
 搜索用 `web_search_exa`，深读用 `web_fetch_exa` 或 `firecrawl_scrape`（JS 重 / 付费墙），最后综合成带来源引用的报告，有质量规则把关。
+
+> **先确认后端在不在，再照着它规划。** MCP server 是按配置目录隔离的，`exa` / `firecrawl` / `linkup` 可能这个会话有、那个会话没有。现在 skill 会先检查，不在就退到内置 `/deep-research` workflow 或内置 `WebSearch`，并说明这次用的是哪条路——而不是拿着调不动的工具硬跑。
 
 ### `llm-cost-discipline` — 两层 LLM 成本控制
 

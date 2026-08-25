@@ -1,12 +1,12 @@
 ---
 name: research
-description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
+description: Multi-source deep research. Prefers firecrawl/exa MCPs, falls back to the bundled /deep-research workflow or built-in WebSearch when they are absent. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
 origin: ECC
 ---
 
 # Research
 
-Produce thorough, cited research reports from multiple web sources using firecrawl and exa MCP tools.
+Produce thorough, cited research reports from multiple web sources — using firecrawl/exa MCP tools when available, otherwise the fallbacks below.
 
 ## When to Activate
 
@@ -16,13 +16,21 @@ Produce thorough, cited research reports from multiple web sources using firecra
 - Any question requiring synthesis from multiple sources
 - User says "research", "deep dive", "investigate", or "what's the current state of"
 
-## MCP Requirements
+## Backends — check availability before planning, not mid-run
 
-At least one of:
+Preferred, at least one of:
 - **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
 - **exa** — `web_search_exa`, `web_fetch_exa` (the installed server exposes exactly these two; verified signatures live in the `search-routing` skill)
 
-Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
+Both together give the best coverage. Configure them as MCP servers (`claude mcp add`, or the `mcpServers` block of your Claude Code config / `~/.codex/config.toml` for Codex). MCP servers are scoped **per config directory** — if you run more than one, a server added under one is absent under the other, so verify from the session you actually intend to research in.
+
+**Check first: are the tools present in this session?** If neither backend is, do NOT plan a workflow around tools that will not answer. Fall back in this order:
+
+1. **`/deep-research`** — the bundled dynamic workflow. It already does fan-out → fetch → cross-check → cited report on top of the built-in `WebSearch`, which is closer to this skill's output contract than anything you would improvise. Prefer it whenever the ask is a full multi-source report.
+2. **Built-in `WebSearch` / `WebFetch`** — always available, no configuration. Use for narrower questions, and run the workflow below by hand: same sub-questions, same deep-read step, same citation rules, substituting `WebSearch` for `*_search` and `WebFetch` for `*_scrape` / `web_fetch_exa`.
+3. **Any search CLI or skill your environment provides** — if one is installed and covers more sources than `WebSearch`, use it and say which.
+
+Whichever you land on, **name it before searching** and record it in the report's Methodology section — coverage is not interpretable without it.
 
 ## Workflow
 
@@ -138,7 +146,7 @@ Sub-questions investigated: [list]
 
 ## Parallel Research with Subagents
 
-For broad topics, use Claude Code's Task tool to parallelize:
+For broad topics, use the Agent tool to parallelize:
 
 ```
 Launch 3 research agents in parallel:

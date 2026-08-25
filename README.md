@@ -171,7 +171,7 @@ Three phases: ① gather context (clarifying questions → brainstorm → materi
 
 **Trigger**: translating visa application materials (images) into English
 
-HEIC→PNG via `sips` → EXIF rotation correction → the model reads and translates the images directly → bilingual PDF laid out with PIL + reportlab.
+HEIC→PNG via `sips` → EXIF rotation correction → the model reads and translates the images directly → bilingual PDF laid out with PIL + reportlab. Output is an **uncertified draft** for a human translator to review and certify — it carries that disclaimer in its footer and filename, and must not be filed as-is.
 
 > **Note**: no OCR library — in practice Claude reading the image directly beat three OCR backends that weren't even installed. Anything unreadable is marked `[illegible]`, never guessed; on visa paperwork a guessed character is a real problem.
 
@@ -336,7 +336,7 @@ Maturity and fit for each of Bun's four roles (runtime, package manager, bundler
 
 **Trigger**: caching expensive file-processing results (PDF parsing, OCR, text extraction, image analysis)
 
-Key on the SHA-256 of file content rather than the path: the cache survives moves and renames, and invalidates itself the moment content changes. A service-layer split keeps it invisible to calling code. Fits recurring heavy processing across runs.
+Key on the SHA-256 of file content rather than the path, composed with the processor version and its config: the cache survives moves and renames, and invalidates itself both when content changes and when the extractor does. A service-layer split keeps it invisible to calling code. Fits recurring heavy processing across runs.
 
 ---
 

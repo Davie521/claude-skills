@@ -32,8 +32,9 @@ Safe, reversible database schema changes for production systems.
 Before applying any migration:
 
 - [ ] Migration has both UP and DOWN (or is explicitly marked irreversible)
-- [ ] No full table locks on large tables (use concurrent operations)
-- [ ] New columns have defaults or are nullable (never add NOT NULL without default)
+- [ ] Long-held full table locks avoided on large tables (use concurrent operations)
+- [ ] Every `ALTER TABLE` runs under a `lock_timeout` with retry — an ACCESS EXCLUSIVE subform waiting in the queue blocks all traffic behind it
+- [ ] New columns are nullable or have a *non-volatile* default (a volatile default rewrites the table)
 - [ ] Indexes created concurrently (not inline with CREATE TABLE for existing tables)
 - [ ] Data backfill is a separate migration from schema change
 - [ ] Tested against a copy of production data
@@ -43,16 +44,71 @@ Before applying any migration:
 
 ### Adding a Column Safely
 
+**`ADD COLUMN` takes an ACCESS EXCLUSIVE lock, even the "instant" ones.**
+No rewrite ≠ no lock. The risk is not the ALTER's own duration — it is the lock
+queue: the ALTER waits for existing transactions on the table to finish, and
+every new query queues *behind the ALTER* while it waits. One long-running
+`SELECT` turns a millisecond DDL into a full table stall.
+
+Most `ALTER TABLE` subforms take ACCESS EXCLUSIVE, but not all — the docs note
+each exception explicitly. `VALIDATE CONSTRAINT` and `SET STATISTICS` take only
+SHARE UPDATE EXCLUSIVE; `ADD FOREIGN KEY` and `ENABLE`/`DISABLE TRIGGER` take
+SHARE ROW EXCLUSIVE. Look up the specific subform rather than assuming either
+extreme — that difference is what makes the three-step `NOT NULL` recipe below
+safe. Note some subforms take *different* levels on different tables, e.g.
+`ATTACH PARTITION` takes SHARE UPDATE EXCLUSIVE on the parent but ACCESS
+EXCLUSIVE on the partition being attached.
+
+Always bound the wait and retry instead of blocking indefinitely:
+
 ```sql
--- GOOD: Nullable column, no lock
+SET lock_timeout = '3s';  -- fail fast rather than pile up the queue
+ALTER TABLE users ADD COLUMN avatar_url TEXT;
+-- On "canceling statement due to lock timeout", retry with backoff.
+```
+
+```sql
+-- GOOD: nullable column — catalog-only change, no rewrite (still ACCESS EXCLUSIVE)
 ALTER TABLE users ADD COLUMN avatar_url TEXT;
 
--- GOOD: Column with default (Postgres 11+ is instant, no rewrite)
+-- GOOD: non-volatile default — Postgres 11+ stores it in the catalog, no rewrite
 ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true;
 
--- BAD: NOT NULL without default on existing table (requires full rewrite)
+-- BAD: volatile default (gen_random_uuid/random/clock_timestamp) — DOES rewrite
+-- the whole table, holding the lock throughout.
+-- Note now() and current_timestamp are STABLE, not volatile: they do NOT rewrite,
+-- but they do stamp every existing row with one identical timestamp.
+ALTER TABLE users ADD COLUMN public_id UUID NOT NULL DEFAULT gen_random_uuid();
+
+-- BAD: NOT NULL without a default on a non-empty table.
+-- This does NOT rewrite — it fails outright:
+--   ERROR: column "role" of relation "users" contains null values
 ALTER TABLE users ADD COLUMN role TEXT NOT NULL;
--- This locks the table and rewrites every row
+```
+
+### Making an Existing Column NOT NULL
+
+**Precondition: application code must already write the column on every insert
+and update.** A `NOT VALID` constraint skips the scan of existing rows but is
+enforced on new writes immediately — including updates that don't touch the
+column. Add it while a writer can still produce NULL and ordinary traffic starts
+failing for the entire backfill window. Deploy the writing code first, then:
+
+```sql
+-- 1. Add the constraint as NOT VALID (cheap: no full-table scan, brief lock)
+ALTER TABLE users ADD CONSTRAINT users_role_not_null
+  CHECK (role IS NOT NULL) NOT VALID;
+
+-- 2. Backfill the existing NULL rows (batched — see Large Data Migrations),
+--    then validate. The scan takes only SHARE UPDATE EXCLUSIVE, so reads and
+--    writes continue.
+ALTER TABLE users VALIDATE CONSTRAINT users_role_not_null;
+
+-- 3. Postgres 12+ skips the scan when a VALIDATED CHECK proves the column is
+--    non-null. It must literally test `IS NOT NULL`; CHECK (role <> '') does not
+--    qualify.
+ALTER TABLE users ALTER COLUMN role SET NOT NULL;
+ALTER TABLE users DROP CONSTRAINT users_role_not_null;
 ```
 
 ### Adding an Index Without Downtime
@@ -98,31 +154,94 @@ ALTER TABLE orders DROP COLUMN legacy_status;
 ### Large Data Migrations
 
 ```sql
--- BAD: Updates all rows in one transaction (locks table)
+-- BAD: Updates all rows in one transaction (locks table, bloats WAL,
+-- and holds a snapshot open for the whole run)
 UPDATE users SET normalized_email = LOWER(email);
+```
 
--- GOOD: Batch update with progress
-DO $$
-DECLARE
-  batch_size INT := 10000;
-  rows_updated INT;
-BEGIN
-  LOOP
-    UPDATE users
-    SET normalized_email = LOWER(email)
-    WHERE id IN (
+**`COMMIT` inside `DO $$ ... $$` is only legal when the `DO` runs at the top
+level.** If anything has already opened a transaction, it fails with
+`ERROR: invalid transaction termination`. Whether that bites you depends on the
+runner, and they differ — check yours rather than assuming:
+
+| Runner | In a transaction? | Opt-out |
+|---|---|---|
+| Alembic | Yes — by default one transaction for the *whole run*, not per migration (`transaction_per_migration=False`) | `with op.get_context().autocommit_block():` |
+| Rails | Yes, per migration | `disable_ddl_transaction!` |
+| Flyway | Yes, per migration | A sidecar config file next to the migration — `V2__x.sql.conf` containing `executeInTransaction=false`. There is no in-SQL `-- flyway:` directive for this; a comment claiming to set it is silently ignored |
+| Prisma (PostgreSQL) | No — Migrate does not wrap by default | n/a. Through 7.3.x a *multi-statement* file still got one implicit transaction from Postgres, so `CREATE INDEX CONCURRENTLY` had to be alone in its file; 7.4.0+ splits statements, which removes that constraint but also means such a migration is no longer atomic. Check your version |
+
+Even where an opt-out exists, driving the loop from outside is usually better:
+you get progress reporting, resumability after a failure, and pacing between
+batches — none of which a single in-migration `DO` block gives you.
+
+First give the batch predicate an index, or each batch re-scans a growing prefix
+and the backfill degrades to O(n²) on exactly the large tables this is for:
+
+```sql
+CREATE INDEX CONCURRENTLY idx_users_backfill_pending
+  ON users (id) WHERE normalized_email IS NULL;
+-- Drop it when the backfill is done.
+```
+
+```bash
+#!/usr/bin/env bash
+set -uo pipefail
+OUT=$(mktemp)                      # not a fixed path: concurrent backfills would clobber it
+trap 'rm -f "$OUT"' EXIT
+# Each psql invocation is its own transaction.
+while :; do
+  # Capture to a file: piping straight into wc discards psql's exit status,
+  # which is how a failed batch gets mistaken for a finished one.
+  psql "$DATABASE_URL" -qtAX -v ON_ERROR_STOP=1 -c "
+    SET lock_timeout = '3s';
+    WITH batch AS (
       SELECT id FROM users
       WHERE normalized_email IS NULL
-      LIMIT batch_size
+      ORDER BY id
+      LIMIT 10000
       FOR UPDATE SKIP LOCKED
-    );
-    GET DIAGNOSTICS rows_updated = ROW_COUNT;
-    RAISE NOTICE 'Updated % rows', rows_updated;
-    EXIT WHEN rows_updated = 0;
-    COMMIT;
-  END LOOP;
-END $$;
+    )
+    UPDATE users u SET normalized_email = LOWER(u.email)
+    FROM batch WHERE u.id = batch.id
+    RETURNING 1;" > "$OUT"
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    # Lock timeout, deadlock, connection drop — NOT completion. Made likely by
+    # the lock_timeout above, which is the point: fail loudly, then retry.
+    echo "batch failed (exit $rc) — backfill is INCOMPLETE" >&2
+    exit "$rc"
+  fi
+  n=$(wc -l < "$OUT" | tr -d ' ')
+  echo "updated $n"
+  [ "$n" -eq 0 ] && break
+  sleep 0.5   # let replicas and autovacuum catch up
+done
+
+# SKIP LOCKED can return an empty batch while rows remain. Verify, don't assume.
+# Same discipline as above: check psql's status before trusting its output.
+psql "$DATABASE_URL" -qtAX -v ON_ERROR_STOP=1 \
+  -c "SELECT count(*) FROM users WHERE normalized_email IS NULL;" > "$OUT" || {
+    echo "verification query failed — backfill state unknown" >&2; exit 1; }
+remaining=$(tr -d ' ' < "$OUT")
+[ "$remaining" -eq 0 ] || { echo "still $remaining rows pending" >&2; exit 1; }
 ```
+
+Three things this has to get right, and the naive version doesn't:
+
+- **An error is not a completion.** `psql | wc -l` throws away psql's exit
+  status: a lock timeout writes to stderr, leaves stdout empty, and `wc -l`
+  dutifully reports 0 — so the loop breaks and declares success mid-backfill.
+  Capture the output, check `$?`, and abort loudly.
+- **`SKIP LOCKED` can make a batch return 0 while rows remain** (every remaining
+  candidate happens to be locked). Treating 0 as "done" exits early. That is why
+  the loop ends with a `count(*)` verification instead of trusting the counter.
+- **Pause between batches.** Back-to-back batches on a large table outrun
+  replication and autovacuum. The `sleep` is what keeps replica lag bounded.
+
+If you must keep it in SQL, use a procedure and `CALL` it from a top-level
+session — that permits `COMMIT`. Inside a runner that has already opened a
+transaction it still does not, regardless of `CALL` vs `DO`.
 
 ## Prisma (TypeScript/Node.js)
 
@@ -331,7 +450,7 @@ Autogenerate diffs SQLAlchemy metadata against the live database — always revi
 
 ### CREATE INDEX CONCURRENTLY
 
-`CONCURRENTLY` cannot run inside a transaction, but Alembic wraps each migration in one. Use an autocommit block:
+`CONCURRENTLY` cannot run inside a transaction, and Alembic runs the whole upgrade in one by default. Use an autocommit block:
 
 ```python
 def upgrade():
@@ -388,7 +507,10 @@ Day 7: Migration drops old status column
 |-------------|-------------|-----------------|
 | Manual SQL in production | No audit trail, unrepeatable | Always use migration files |
 | Editing deployed migrations | Causes drift between environments | Create new migration instead |
-| NOT NULL without default | Locks table, rewrites all rows | Add nullable, backfill, then add constraint |
+| NOT NULL without default | Fails outright on a non-empty table | Add nullable, backfill, then NOT VALID → VALIDATE → SET NOT NULL |
+| Volatile default (`gen_random_uuid()`, `random()`, `clock_timestamp()`) | Rewrites the whole table under ACCESS EXCLUSIVE | Add nullable, backfill in batches, then set the default |
+| `DEFAULT now()` on an existing table | `now()` is STABLE, so there is no rewrite — but every existing row is stamped with the *same* backfill timestamp | Fine if that is what you want; otherwise add nullable and backfill from a real event time |
+| `ALTER TABLE` with no `lock_timeout` | Lock queue stalls all traffic behind one long query | `SET lock_timeout` and retry with backoff |
 | Inline index on large table | Blocks writes during build | CREATE INDEX CONCURRENTLY |
 | Schema + data in one migration | Hard to rollback, long transactions | Separate migrations |
 | Dropping column before removing code | Application errors on missing column | Remove code first, drop column next deploy |

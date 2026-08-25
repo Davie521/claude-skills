@@ -97,12 +97,128 @@ Complete CSS design tokens for the course. Copy this entire `:root` block into t
 }
 ```
 
-**Google Fonts link (put in `<head>`):**
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+**Fonts: embed them, never `<link>` to a CDN.**
+
+A `<link href="https://fonts.googleapis.com/...">` breaks the one property this
+deliverable is supposed to have — it dies offline, degrades the moment the file
+is emailed or moved to a machine behind a different network, and pings Google on
+every open. Inline the woff2 as base64 `@font-face` instead.
+
+**Do not hand-write the `@font-face` blocks.** Google's stylesheet already
+carries the right `unicode-range` per subset, and the subsets are disjoint — the
+latin file has no `ā`, no `ế`. Derive the blocks from Google's own CSS instead.
+
+Two things the naive version gets wrong, both measured on the URL below:
+
+- **Emitting one block per family drops glyphs.** The families here do not all
+  ship the same subsets (measured: 38 blocks over 11 distinct woff2 files).
+  Preserve whatever `unicode-range` Google returns rather than assuming a set.
+- **Substituting the base64 into every block inflates the file 3.8×.** These are
+  variable fonts, so all weights of one family+subset share a *single* file; a
+  naive rewrite embeds that same payload once per block. Group by
+  (family, style, unicode-range, url) and emit one block with a weight range.
+  Measured on the URL below: **1375 KB naive vs 365 KB grouped**. Re-measure if
+  you change the URL — these figures move with it.
+
+Generate the HTML with a `<!--FONTS-->` placeholder in `<head>`, save this as
+`inline_fonts.py`, and run it as the final build step:
+
+```python
+#!/usr/bin/env python3
+"""Inline Google Fonts into a single self-contained HTML file."""
+import base64, re, sys, urllib.request
+
+CSS = ("https://fonts.googleapis.com/css2?"
+       "family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800"
+       "&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700"
+       "&family=JetBrains+Mono:wght@400;500;600&display=swap")
+UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+def fetch(url):
+    return urllib.request.urlopen(
+        urllib.request.Request(url, headers={"User-Agent": UA})).read()
+
+css = fetch(CSS).decode("utf-8")
+blocks = re.findall(r"@font-face\s*\{[^}]*\}", css)
+if not blocks:
+    sys.exit("no @font-face blocks — check the URL")
+
+def field(block, name):
+    m = re.search(rf"{name}:\s*([^;]+);", block)
+    return m.group(1).strip() if m else None
+
+groups, order = {}, []
+for b in blocks:
+    url = re.search(r"url\((https://[^)]+\.woff2)\)", b)
+    if not url:
+        sys.exit("a block has no .woff2 url — Google served a legacy format; "
+                 "check the User-Agent")
+    key = (field(b, "font-family"), field(b, "font-style"),
+           field(b, "unicode-range"), url.group(1))
+    if key not in groups:
+        groups[key] = []
+        order.append(key)
+    w = field(b, "font-weight")
+    groups[key].append(int(w) if w and w.isdigit() else 400)
+
+payload, out = {}, []
+for key in order:
+    family, style, urange, url = key
+    weights = sorted(groups[key])
+    if url not in payload:
+        payload[url] = base64.b64encode(fetch(url)).decode("ascii")
+    lo, hi = weights[0], weights[-1]
+    out.append("@font-face{\n"
+               f"  font-family:{family};\n"
+               f"  font-style:{style or 'normal'};\n"
+               f"  font-weight:{lo if lo==hi else f'{lo} {hi}'};\n"
+               "  font-display:swap;\n"
+               + (f"  unicode-range:{urange};\n" if urange else "")
+               + f"  src:url(data:font/woff2;base64,{payload[url]}) format('woff2');\n}}")
+
+style_block = "\n".join(out)
+if "https://" in style_block:
+    sys.exit("a CDN URL survived — refusing to write a non-self-contained file")
+
+html = sys.argv[1]
+doc = open(html, encoding="utf-8").read()
+if "<!--FONTS-->" not in doc:
+    sys.exit("no <!--FONTS--> placeholder in the generated HTML")
+open(html, "w", encoding="utf-8").write(
+    doc.replace("<!--FONTS-->", f"<style>\n{style_block}\n</style>"))
+print(f"inlined {len(payload)} files into {len(out)} @font-face blocks, "
+      f"+{len(style_block)//1024} KB")
 ```
+
+`python3 inline_fonts.py course.html`
+
+Every failure path exits non-zero without touching the HTML — verified for a
+stale User-Agent (Google serves a non-woff2 legacy format, which the naive
+version silently passes through as live CDN URLs), a missing placeholder, and a
+surviving `https://` in the output. Do not remove those guards: a font step that
+"succeeds" while leaving CDN links produces exactly the dependency this skill
+exists to avoid, with no error to notice.
+
+To shrink further, drop whole `@font-face` blocks for subsets the course text
+never uses. Do it by editing the emitted CSS or by filtering `order` on its
+`unicode-range` — never by removing just the `url()`, which leaves a malformed
+`src:` descriptor with the block still present. Note the regex keeps the
+descriptors but not Google's `/* latin */` comments, so match on the range
+itself (latin starts `U+0000-00FF`). For Chinese text do not embed a full CJK
+face (megabytes); subset it with
+`pyftsubset font.otf --text-file=course.txt --flavor=woff2`.
+
+**Keep the weight list in sync with what the page uses.** The URL requests
+Bricolage 400/600/700/800 (600 is required by the Rules section below) and
+JetBrains Mono 400/500/600 (600 is required by
+[interactive-elements.md](./interactive-elements.md)). Because weights share one
+file per subset, trimming a weight saves no bytes — trim subsets instead.
+
+Always keep a real fallback chain in `font-family` so the page stays readable if
+a face fails to decode — that is what `Georgia, serif` and `-apple-system` are
+doing in the tokens above. If embedding is genuinely impractical for a given
+job, drop to the system stack and *say so* in the handoff; do not silently
+re-add a CDN link.
 
 **Rules:**
 - Module numbers: `--text-6xl`, font-display, weight 800, `--color-accent` with 15% opacity

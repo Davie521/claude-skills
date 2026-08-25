@@ -1,6 +1,6 @@
 {
   "name": "data",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Data engineering: zero-downtime migrations with PostgreSQL quick reference (indexes, query patterns, RLS, Alembic), scraping agent",
   "author": {
     "name": "Yifan"

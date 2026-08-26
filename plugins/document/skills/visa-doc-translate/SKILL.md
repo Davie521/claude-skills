@@ -14,18 +14,26 @@ and must never claim to be one.
 "Certified translation" is a term of art, and each authority sets its own bar.
 Roughly:
 
-- **US / USCIS** — a certification by a competent translator attesting both to
-  the accuracy of the translation and to their own competence. No credential and
-  no notarisation required. Summaries are not accepted.
-- **Canada / IRCC** — either a Canadian certified translator, or *any* person
-  fluent in both languages who swears an affidavit before a commissioner of
-  oaths. Never the applicant, a family member, or their representative.
-- **UK** — a certified translation carrying the translator's confirmation that
-  it is accurate, the date, and the translator's name and contact details. Some
-  in-country routes additionally require a qualified translator and their
-  credentials.
-- **Australia** — onshore, a NAATI-certified translator; offshore, a translator
-  who states their qualifications and experience.
+- **US / USCIS** — a *full* translation (summaries not accepted) with the
+  translator's certification that it is complete and accurate AND that they are
+  competent to translate. No credential, no notarisation
+  (8 CFR 103.2(b)(3)).
+- **Canada / IRCC** — either a Canadian certified translator (member in good
+  standing of a provincial or territorial body — certification from elsewhere
+  does not waive this), or *any* person fluent in both languages who swears an
+  affidavit before someone authorised to administer oaths in the country where
+  the translator lives; that officer must themselves understand English or
+  French. Never the applicant, a family member, or their representative.
+- **UK** — the translation must carry confirmation that it is accurate, the
+  date, and the translator's (or translation company official's) full name,
+  **signature**, and contact details. Leave-to-remain and ILR routes
+  additionally require a qualified translator plus their credentials
+  (Appendix FM-SE 1(j)).
+- **Australia** — translations done in Australia need a NAATI-credentialled
+  translator (include their NAATI practitioner number). Translators outside
+  Australia need no NAATI credential, but their full name, address, telephone
+  number, and qualifications/experience must be endorsed on the translation,
+  in English.
 
 Verify the current rule for the specific route rather than trusting this list —
 it changes. What does not change: every one of them attaches to a named human

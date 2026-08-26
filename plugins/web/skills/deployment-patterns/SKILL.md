@@ -281,8 +281,9 @@ kubectl rollout undo deployment/app
 # Vercel: promote previous deployment
 vercel rollback
 
-# Railway: redeploy previous commit
-railway up --commit <previous-sha>
+# Railway: pick a previous deployment and redeploy it
+railway deployment list
+railway redeploy   # redeploys the latest; use the dashboard to restore older ones
 ```
 
 Application rollback is instant. **Schema rollback is not** — see below.

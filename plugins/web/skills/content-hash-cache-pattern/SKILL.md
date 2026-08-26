@@ -174,6 +174,10 @@ def read_cache(cache_dir: Path, cache_key: str) -> CacheEntry | None:
 Keep the processing function pure. Add caching as a separate service layer.
 
 ```python
+import logging
+
+logger = logging.getLogger(__name__)
+
 def extract_with_cache(
     file_path: Path,
     *,
@@ -271,7 +275,7 @@ data = dataclasses.asdict(entry)  # Use manual serialization instead
 - Data that must always be fresh (real-time feeds)
 - Cache entries that would be extremely large (consider streaming instead)
 - Data that is sensitive enough that a plaintext `.json` on disk is unacceptable — extracted documents often contain PII; scope the cache directory's permissions and give it a retention/pruning policy
-- Caches that would grow unbounded — `{key}.json` never expires on its own, so add size- or age-based pruning
+- Caches that would grow unbounded — `{key}.json` never expires on its own, so add size- or age-based pruning. Include `*.tmp` files in the sweep: the except-handler cleans them up on error, but a hard kill (SIGKILL, OOM) between `mkstemp` and `os.replace` leaves one behind that nothing else collects
 
 Results that depend on parameters beyond file content are *not* an exception —
 fold those parameters into the key (see 1b) rather than abandoning the pattern.

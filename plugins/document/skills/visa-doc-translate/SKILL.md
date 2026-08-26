@@ -21,19 +21,22 @@ Roughly:
 - **Canada / IRCC** — either a Canadian certified translator (member in good
   standing of a provincial or territorial body — certification from elsewhere
   does not waive this), or *any* person fluent in both languages who swears an
-  affidavit before someone authorised to administer oaths in the country where
-  the translator lives; that officer must themselves understand English or
-  French. Never the applicant, a family member, or their representative.
+  affidavit. The affidavit must be sworn before **a notary public, commissioner
+  of oaths, or commissioner for taking affidavits if inside Canada — but a
+  notary public if outside Canada** (so an applicant in China goes to a
+  公证处, not a "commissioner of oaths"). Never the applicant, a family member,
+  or their representative.
 - **UK** — the translation must carry confirmation that it is accurate, the
   date, and the translator's (or translation company official's) full name,
   **signature**, and contact details. Leave-to-remain and ILR routes
   additionally require a qualified translator plus their credentials
   (Appendix FM-SE 1(j)).
-- **Australia** — translations done in Australia need a NAATI-credentialled
-  translator (include their NAATI practitioner number). Translators outside
-  Australia need no NAATI credential, but their full name, address, telephone
-  number, and qualifications/experience must be endorsed on the translation,
-  in English.
+- **Australia** — **every** translation must carry the translator's full name,
+  address, telephone number, and qualifications/experience in the language,
+  written in English. That is not the offshore alternative to NAATI: it applies
+  to NAATI translations too. On top of it, translations done *in* Australia must
+  use a NAATI-credentialled translator (include the practitioner number);
+  translators outside Australia need no NAATI credential.
 
 Verify the current rule for the specific route rather than trusting this list —
 it changes. What does not change: every one of them attaches to a named human

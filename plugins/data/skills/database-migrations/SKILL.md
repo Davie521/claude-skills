@@ -65,7 +65,10 @@ insufficient on its own — both measured on PostgreSQL 18.6:
   `ATTACH PARTITION` takes SHARE UPDATE EXCLUSIVE on the parent but ACCESS
   EXCLUSIVE on *both* the partition being attached and any existing DEFAULT
   partition — so attaching to a partitioned table that has a default partition
-  blocks that default partition completely.
+  blocks that default partition completely. `DETACH PARTITION ... FINALIZE`
+  behaves the same way (SHARE UPDATE EXCLUSIVE on the parent, ACCESS EXCLUSIVE
+  on the partition) and the docs do not spell this one out — which is why the
+  "unless explicitly noted" rule is not a reliable substitute for measuring.
 
 When it matters, measure with `pg_locks` on your own version rather than
 reasoning from the docs' "unless explicitly noted" rule.
@@ -232,7 +235,7 @@ runner, and they differ — check yours rather than assuming:
 | Alembic | Yes — by default one transaction for the *whole run*, not per migration (`transaction_per_migration=False`) | `with op.get_context().autocommit_block():` |
 | Rails | Yes, per migration | `disable_ddl_transaction!` |
 | Flyway | Yes, per migration | A sidecar config file next to the migration — `V2__x.sql.conf` containing `executeInTransaction=false`. There is no in-SQL `-- flyway:` directive for this; a comment claiming to set it is silently ignored |
-| Prisma (PostgreSQL) | No — Migrate does not wrap by default | n/a. Statement splitting changed across 7.x, and it still falls back to sending the whole file at once (which Postgres then wraps implicitly) when its parser hits syntax it does not handle. **Regardless of version, give `CREATE INDEX CONCURRENTLY` a migration file of its own** — that rule holds on every version and needs no version check |
+| Prisma (PostgreSQL) | No — Migrate does not wrap by default | n/a. 7.4.0+ splits scripts with `sqlparser`, but only in the **native** connector — the driver-adapter (wasm) path has no equivalent — and the splitter falls back to submitting the whole file when it cannot parse the SQL, at which point Postgres wraps it implicitly again. **Regardless of version or adapter, give `CREATE INDEX CONCURRENTLY` a migration file of its own** — that rule holds everywhere and needs no version check |
 
 Even where an opt-out exists, driving the loop from outside is usually better:
 you get progress reporting, resumability after a failure, and pacing between

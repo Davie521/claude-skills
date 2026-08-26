@@ -35,6 +35,8 @@ git status                                   # 未提交更改
 有检查但失败时列出失败项；仓库没配 workflow 时输出 `no checks reported on the '<branch>' branch`。
 后者不是失败，别拿它去 `gh run view --log-failed` 捞日志（也捞不到），更不能因此阻塞合并。
 
+**退出码 8 是「检查进行中」**，和失败的 1 不是一回事——别把还在跑的 CI 当成挂了就去改代码。
+
 不过 `no checks reported` 只说明**这个 head commit 没有 check run**，不等于仓库没有 CI——
 也可能 workflow 存在但没配到这个分支/事件上。所以要落实一下再决定跳不跳：
 
@@ -61,19 +63,30 @@ git status                                   # 未提交更改
 **别假设审查会自动触发**——很多仓库不会，同一个仓库也可能时有时无（本仓库 PR #1 有、#2/#3 没有）。
 先看是否已请求或已审：`gh pr view <N> --json reviewRequests,reviews`。没有就手动请求：
 
+**gh ≥ 2.88.0（2026-03-11）起有官方支持**，优先用它：
+
+```bash
+gh pr edit <N> --add-reviewer @copilot     # 或建 PR 时 gh pr create --reviewer @copilot
+```
+
+先确认版本：`gh --version`。低于 2.88.0 时这条会报 `'Copilot' not found`——
+那不是语法写错，是 CLI 太旧，走 API 兜底：
+
 ```bash
 gh api repos/{owner}/{repo}/pulls/<N>/requested_reviewers -X POST \
   -f 'reviewers[]=copilot-pull-request-reviewer[bot]'
 ```
 
-**只有带 `[bot]` 后缀的 slug 能成**：`gh pr edit --add-reviewer Copilot`（或 `@copilot`）报 `'Copilot' not found`；
-不带 `[bot]` 的裸 slug 报 422 `Reviews may only be requested from collaborators`。
+**走 API 时只有带 `[bot]` 后缀的 slug 能成**：不带 `[bot]` 的裸 slug 报 422
+`Reviews may only be requested from collaborators`。
 
 **POST 返回 200 但 `requested_reviewers` 是空数组属正常**——GitHub 立刻把请求转成进行中的审查，
 这个字段随即清空。别据此判定失败又重发，以评论是否出现为准。
 
-请求后评论要 **2-3 分钟**才出现（本仓库实测约 100 秒）。按 20 秒一轮询、上限 10 次；
-别只等一次 30 秒就断定「没有评论」——那是把还没写完的审查当成没有审查。
+**别给耗时写死一个数**。Copilot 有 Lite / Balanced 两档 effort，Balanced 会路由到高推理模型
+做更长的分析，两档的实际耗时差一个量级（本仓库 Lite 实测约 100 秒）。做有上限的轮询即可：
+20 秒一轮、上限 15 次（约 5 分钟）。别只等一次 30 秒就断定「没有评论」——
+那是把还没写完的审查当成没有审查。
 
 **回复行内评论**走 `.../comments/<comment_id>/replies`。body 里带反引号或引号时，
 `-f body=...` 会被 shell 转义炸成 EOF 错误；写进 JSON 文件用 `--input` 才稳。

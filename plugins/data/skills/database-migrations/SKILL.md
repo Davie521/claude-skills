@@ -50,22 +50,46 @@ queue: the ALTER waits for existing transactions on the table to finish, and
 every new query queues *behind the ALTER* while it waits. One long-running
 `SELECT` turns a millisecond DDL into a full table stall.
 
-Most `ALTER TABLE` subforms take ACCESS EXCLUSIVE, but not all — the docs note
-each exception explicitly. `VALIDATE CONSTRAINT` and `SET STATISTICS` take only
-SHARE UPDATE EXCLUSIVE; `ADD FOREIGN KEY` and `ENABLE`/`DISABLE TRIGGER` take
-SHARE ROW EXCLUSIVE. Look up the specific subform rather than assuming either
-extreme — that difference is what makes the three-step `NOT NULL` recipe below
-safe. Note some subforms take *different* levels on different tables, e.g.
-`ATTACH PARTITION` takes SHARE UPDATE EXCLUSIVE on the parent but ACCESS
-EXCLUSIVE on the partition being attached.
+Most `ALTER TABLE` subforms take ACCESS EXCLUSIVE, but not all — and the docs
+note *most*, not every, exception. `VALIDATE CONSTRAINT` and `SET STATISTICS`
+take only SHARE UPDATE EXCLUSIVE; `ADD FOREIGN KEY` and `ENABLE`/`DISABLE
+TRIGGER` take SHARE ROW EXCLUSIVE. Two traps make "look up the subform"
+insufficient on its own — both measured on PostgreSQL 18.6:
 
-Always bound the wait and retry instead of blocking indefinitely:
+- **The level can depend on the parameter, not just the subform.**
+  `SET (fillfactor=80)` takes SHARE UPDATE EXCLUSIVE, but
+  `SET (user_catalog_table=true)` takes ACCESS EXCLUSIVE. Only the fillfactor,
+  TOAST, autovacuum and `parallel_workers` parameters are documented as weaker;
+  the rest fall back to the default.
+- **One statement can lock several tables at different levels.**
+  `ATTACH PARTITION` takes SHARE UPDATE EXCLUSIVE on the parent but ACCESS
+  EXCLUSIVE on *both* the partition being attached and any existing DEFAULT
+  partition — so attaching to a partitioned table that has a default partition
+  blocks that default partition completely.
+
+When it matters, measure with `pg_locks` on your own version rather than
+reasoning from the docs' "unless explicitly noted" rule.
+
+### The DDL Execution Envelope
+
+Every `ALTER TABLE` in this file assumes this wrapper. It is not repeated in
+each example — apply it every time:
 
 ```sql
-SET lock_timeout = '3s';  -- fail fast rather than pile up the queue
-ALTER TABLE users ADD COLUMN avatar_url TEXT;
--- On "canceling statement due to lock timeout", retry with backoff.
+BEGIN;
+SET LOCAL lock_timeout = '3s';   -- SET LOCAL is a no-op outside a transaction:
+ALTER TABLE users ADD COLUMN avatar_url TEXT;   -- it only warns, and the
+COMMIT;                                         -- timeout silently stays 0
 ```
+
+On `canceling statement due to lock timeout`, retry the whole transaction with
+backoff. The timeout is what bounds how long the ALTER sits at the head of the
+lock queue with all other traffic stacked behind it.
+
+**Non-transactional DDL cannot use this envelope.** `CREATE INDEX CONCURRENTLY`
+must run outside a transaction, so set `lock_timeout` at session level on a
+dedicated connection, and `RESET` it or close that connection afterwards rather
+than leaking the setting into pooled traffic.
 
 ```sql
 -- GOOD: nullable column — catalog-only change, no rewrite (still ACCESS EXCLUSIVE)
@@ -76,8 +100,10 @@ ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true;
 
 -- BAD: volatile default (gen_random_uuid/random/clock_timestamp) — DOES rewrite
 -- the whole table, holding the lock throughout.
--- Note now() and current_timestamp are STABLE, not volatile: they do NOT rewrite,
--- but they do stamp every existing row with one identical timestamp.
+-- Note now() and current_timestamp are STABLE, not volatile: they do NOT
+-- rewrite. But every existing row gets one identical value — the transaction's
+-- START time, not the moment this statement ran. Under a runner that wraps the
+-- whole migration run in one transaction, that can be minutes earlier.
 ALTER TABLE users ADD COLUMN public_id UUID NOT NULL DEFAULT gen_random_uuid();
 
 -- BAD: NOT NULL without a default on a non-empty table.
@@ -105,11 +131,28 @@ ALTER TABLE users ADD CONSTRAINT users_role_not_null
 ALTER TABLE users VALIDATE CONSTRAINT users_role_not_null;
 
 -- 3. Postgres 12+ skips the scan when a VALIDATED CHECK proves the column is
---    non-null. It must literally test `IS NOT NULL`; CHECK (role <> '') does not
---    qualify.
+--    non-null. It must literally test `IS NOT NULL`. CHECK (role <> '') not
+--    only fails to qualify, it does not enforce non-null at all: NULL <> ''
+--    evaluates to UNKNOWN, and a CHECK constraint passes on UNKNOWN.
 ALTER TABLE users ALTER COLUMN role SET NOT NULL;
 ALTER TABLE users DROP CONSTRAINT users_role_not_null;
 ```
+
+The CHECK above is a *bridge* for PostgreSQL 12–17. **PostgreSQL 18 supports an
+invalid NOT NULL constraint directly**, which removes the bridge entirely:
+
+```sql
+-- PG 18+ only. Note the syntax: ADD CONSTRAINT ... NOT NULL <column> NOT VALID.
+-- (There is no `ALTER COLUMN ... SET NOT NULL NOT VALID` form — that is a
+-- syntax error.)
+ALTER TABLE users ADD CONSTRAINT users_role_nn NOT NULL role NOT VALID;
+-- ... backfill ...
+ALTER TABLE users VALIDATE CONSTRAINT users_role_nn;
+ALTER TABLE users ALTER COLUMN role SET NOT NULL;
+```
+
+Same precondition applies: the invalid NOT NULL constraint rejects new NULLs
+immediately, so the writing code must be deployed first.
 
 ### Adding an Index Without Downtime
 
@@ -122,6 +165,17 @@ CREATE INDEX CONCURRENTLY idx_users_email ON users (email);
 
 -- Note: CONCURRENTLY cannot run inside a transaction block
 -- Most migration tools need special handling for this
+```
+
+**A failed `CREATE INDEX CONCURRENTLY` leaves an invalid index behind.** It is
+not rolled back and not cleaned up for you: the leftover index costs write
+overhead on every insert and update while serving no reads. Check before you
+retry, or you accumulate one per attempt:
+
+```sql
+SELECT indisvalid FROM pg_index WHERE indexrelid = 'idx_users_email'::regclass;
+-- false  ->  DROP INDEX CONCURRENTLY idx_users_email;   then retry
+--            or  REINDEX INDEX CONCURRENTLY idx_users_email;
 ```
 
 ### Renaming a Column (Zero-Downtime)
@@ -154,8 +208,10 @@ ALTER TABLE orders DROP COLUMN legacy_status;
 ### Large Data Migrations
 
 ```sql
--- BAD: Updates all rows in one transaction (locks table, bloats WAL,
--- and holds a snapshot open for the whole run)
+-- BAD: Updates all rows in one transaction. It does NOT block reads — an
+-- UPDATE takes only ROW EXCLUSIVE on the table — but it holds a row lock on
+-- every affected row until commit, bloats WAL, and keeps one snapshot open for
+-- the whole run, which stalls vacuum.
 UPDATE users SET normalized_email = LOWER(email);
 ```
 
@@ -169,7 +225,7 @@ runner, and they differ — check yours rather than assuming:
 | Alembic | Yes — by default one transaction for the *whole run*, not per migration (`transaction_per_migration=False`) | `with op.get_context().autocommit_block():` |
 | Rails | Yes, per migration | `disable_ddl_transaction!` |
 | Flyway | Yes, per migration | A sidecar config file next to the migration — `V2__x.sql.conf` containing `executeInTransaction=false`. There is no in-SQL `-- flyway:` directive for this; a comment claiming to set it is silently ignored |
-| Prisma (PostgreSQL) | No — Migrate does not wrap by default | n/a. Through 7.3.x a *multi-statement* file still got one implicit transaction from Postgres, so `CREATE INDEX CONCURRENTLY` had to be alone in its file; 7.4.0+ splits statements, which removes that constraint but also means such a migration is no longer atomic. Check your version |
+| Prisma (PostgreSQL) | No — Migrate does not wrap by default | n/a. Statement splitting changed across 7.x, and it still falls back to sending the whole file at once (which Postgres then wraps implicitly) when its parser hits syntax it does not handle. **Regardless of version, give `CREATE INDEX CONCURRENTLY` a migration file of its own** — that rule holds on every version and needs no version check |
 
 Even where an opt-out exists, driving the loop from outside is usually better:
 you get progress reporting, resumability after a failure, and pacing between

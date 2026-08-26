@@ -148,7 +148,9 @@ invalid NOT NULL constraint directly**, which removes the bridge entirely:
 ALTER TABLE users ADD CONSTRAINT users_role_nn NOT NULL role NOT VALID;
 -- ... backfill ...
 ALTER TABLE users VALIDATE CONSTRAINT users_role_nn;
-ALTER TABLE users ALTER COLUMN role SET NOT NULL;
+-- Done. VALIDATE takes only SHARE UPDATE EXCLUSIVE, and the validated
+-- constraint IS the column's NOT NULL (attnotnull is already true) — there is
+-- no separate SET NOT NULL step, and no bridge constraint to drop.
 ```
 
 Same precondition applies: the invalid NOT NULL constraint rejects new NULLs
@@ -177,6 +179,11 @@ SELECT indisvalid FROM pg_index WHERE indexrelid = 'idx_users_email'::regclass;
 -- false  ->  DROP INDEX CONCURRENTLY idx_users_email;   then retry
 --            or  REINDEX INDEX CONCURRENTLY idx_users_email;
 ```
+
+Fix the underlying cause (usually duplicate rows for a unique index) *before*
+either path: a `REINDEX INDEX CONCURRENTLY` that fails again leaves a second
+invalid index with a `_ccnew` suffix next to the first — each failed attempt
+adds one more.
 
 ### Renaming a Column (Zero-Downtime)
 

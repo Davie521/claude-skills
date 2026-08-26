@@ -185,7 +185,7 @@ struct RootView: View {
 
 ### Actor-Based Local Persistence
 
-For local storage behind a ViewModel, use an actor: compiler-enforced thread safety (no locks or `DispatchQueue`), an in-memory dictionary cache for O(1) reads, and atomic file writes for durability.
+For local storage behind a ViewModel, use an actor: compiler-enforced thread safety (no locks or `DispatchQueue`), an in-memory dictionary cache for O(1) reads, and atomic file writes so a crash never leaves a half-written file. (Atomicity, not durability: `.atomic` does not fsync, so the last write can still be lost on power failure — acceptable for a local cache, not for a ledger.)
 
 ```swift
 public actor LocalRepository<T: Codable & Identifiable & Sendable> where T.ID == String {
@@ -325,7 +325,8 @@ import Foundation
 func loadData() async throws {
     let url = URL(filePath: "/data.json")
     let mock = MockFileAccessor()
-    mock.files[url] = Data("hello".utf8)
+    mock.mutate { $0[url] = Data("hello".utf8) }   // not mock.files[url] = —
+    // subscript-through-property is the get-then-set the mock's comment warns about
 
     let manager = SyncManager(fileAccessor: mock, dataURL: url)
     let result = try await manager.loadData()
@@ -386,7 +387,11 @@ For views with expensive bodies, conform to `Equatable` to skip unnecessary re-r
 struct ExpensiveChartView: View, Equatable {
     let dataPoints: [DataPoint] // DataPoint must conform to Equatable
 
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    // nonisolated is required: View makes the struct MainActor-isolated, and a
+    // MainActor-isolated == breaks the nonisolated Equatable conformance —
+    // without it this fails to compile under Swift 6 strict concurrency
+    // ("conformance ... crosses into main actor-isolated code").
+    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.dataPoints == rhs.dataPoints
     }
 

@@ -125,7 +125,7 @@ Forced branch decision: logic / state / data-model questions → a runnable term
 **For**: converting an existing discussion into a document without re-interviewing you.
 **Trigger**: after the requirements discussion, say to-prd
 
-Extracts goals, scope, decisions and constraints from conversation context and produces a PRD — published to a GitHub issue or saved to `docs/prds/`. The key behavioural constraint is **no second interview**: it assumes the questions were already asked.
+Extracts goals, scope, decisions and constraints from conversation context and produces a PRD — saved to `docs/prds/` by default, published to a GitHub issue only on request. The key behavioural constraint is **no second interview**: it assumes the questions were already asked.
 
 ### `triage` — Issue triage state machine
 
@@ -187,8 +187,8 @@ The target reader is a **vibe coder** — someone who directs AI to write code b
 
 ### `feishu` — Feishu/Lark integration
 
-**For**: sending messages, creating groups and docs, uploading files, looking up users.
-**Trigger**: Feishu/Lark is mentioned, or you want to message a Feishu group / create a Feishu doc / find a contact
+**For**: sending messages, creating groups, importing/reading docs, looking up users. No file upload/download and no direct cloud-doc editing — official lark-mcp limitations.
+**Trigger**: Feishu/Lark is mentioned, or you want to message a Feishu group / import or read a Feishu doc / find a contact
 
 Runs on the official lark-mcp CLI MCP server (tools look like `mcp__feishu__im_v1_message_create`), covering IM, docx, drive and wiki APIs.
 

@@ -12,7 +12,7 @@ import yaml
 
 from scripts.grader import grade
 from scripts.report import generate_report
-from scripts.runner import run_scenario
+from scripts.runner import SandboxSetupError, run_scenario
 from scripts.scenario_generator import generate_scenarios
 from scripts.spec_generator import generate_spec
 
@@ -94,7 +94,14 @@ def main() -> None:
 
     for scenario in scenarios:
         logger.info("       Running %s...", scenario.level_name)
-        run = run_scenario(scenario, model=args.model)
+        try:
+            run = run_scenario(scenario, model=args.model)
+        except SandboxSetupError as exc:
+            logger.warning(
+                "       %s: sandbox setup failed, scenario skipped — %s",
+                scenario.level_name, exc,
+            )
+            continue
         result = grade(spec, list(run.observations))
         graded_results.append((scenario.level_name, result, list(run.observations)))
         logger.info("       %s: %.0f%%", scenario.level_name, result.compliance_rate * 100)

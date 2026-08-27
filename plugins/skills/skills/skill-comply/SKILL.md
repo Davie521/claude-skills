@@ -15,6 +15,11 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 5. Checking temporal ordering deterministically
 6. Generating self-contained reports with spec, prompts, and timelines
 
+Generated `setup_commands` never run blindly: an allowlist admits only benign
+file/dir/git commands with no path outside the sandbox (blocked commands are
+skipped with a warning), and a failing setup command aborts that scenario
+instead of grading it in a half-built sandbox.
+
 ## Supported Targets
 
 - **Skills** (`plugins/*/skills/*/SKILL.md`): Workflow skills like search-routing, tdd-workflow

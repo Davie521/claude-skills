@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import shlex
 import shutil
@@ -13,8 +14,49 @@ from pathlib import Path
 from scripts.parser import ObservationEvent
 from scripts.scenario_generator import Scenario
 
+logger = logging.getLogger(__name__)
+
 SANDBOX_BASE = Path("/tmp/skill-comply-sandbox")
 ALLOWED_MODELS = frozenset({"haiku", "sonnet", "opus"})
+
+# setup_commands come from an LLM (scenario_generator) — never execute them
+# blindly. shlex + no shell already keeps pipes and redirection inert; the
+# allowlist below closes what remains: bad command names, paths that reach
+# outside the sandbox, and git subcommands that touch the network or global
+# config.
+SETUP_COMMAND_ALLOWLIST = frozenset(
+    {"mkdir", "touch", "git", "cp", "mv", "ln", "cat", "echo", "printf", "tee"}
+)
+GIT_SAFE_SUBCOMMANDS = frozenset(
+    {"init", "add", "commit", "status", "branch", "checkout", "switch", "tag", "config", "rm", "mv"}
+)
+
+
+class SandboxSetupError(RuntimeError):
+    """Sandbox setup failed — the scenario must not run in a half-built sandbox."""
+
+
+def _reject_setup_command(parts: list[str], sandbox_dir: Path) -> str | None:
+    """Return the reason a generated setup command may not run, or None to allow it."""
+    if not parts:
+        return "empty command"
+    if parts[0] not in SETUP_COMMAND_ALLOWLIST:
+        return f"{parts[0]!r} is not an allowlisted setup command"
+    if parts[0] == "git":
+        sub = next((a for a in parts[1:] if not a.startswith("-")), "")
+        if sub not in GIT_SAFE_SUBCOMMANDS:
+            return f"git subcommand {sub!r} is not allowed during setup"
+        if "--global" in parts or "--system" in parts:
+            return "git --global/--system writes outside the sandbox"
+    base = sandbox_dir.resolve()
+    for arg in parts[1:]:
+        if arg.startswith("-"):
+            continue
+        if ".." in Path(arg).parts:
+            return f"path traversal in {arg!r}"
+        if arg.startswith("/") and not Path(arg).resolve().is_relative_to(base):
+            return f"absolute path outside sandbox: {arg!r}"
+    return None
 
 
 @dataclass(frozen=True)
@@ -82,11 +124,24 @@ def _setup_sandbox(sandbox_dir: Path, scenario: Scenario) -> None:
         shutil.rmtree(sandbox_dir)
     sandbox_dir.mkdir(parents=True)
 
-    subprocess.run(["git", "init"], cwd=sandbox_dir, capture_output=True)
+    result = subprocess.run(["git", "init"], cwd=sandbox_dir, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise SandboxSetupError(
+            f"git init failed (rc={result.returncode}): {result.stderr.strip()[:500]}"
+        )
 
     for cmd in scenario.setup_commands:
         parts = shlex.split(cmd)
-        subprocess.run(parts, cwd=sandbox_dir, capture_output=True)
+        reason = _reject_setup_command(parts, sandbox_dir)
+        if reason is not None:
+            logger.warning("setup command blocked (%s): %s", reason, cmd)
+            continue
+        result = subprocess.run(parts, cwd=sandbox_dir, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise SandboxSetupError(
+                f"setup command failed (rc={result.returncode}): {cmd}\n"
+                f"{result.stderr.strip()[:500]}"
+            )
 
 
 def _parse_stream_json(stdout: str) -> list[ObservationEvent]:

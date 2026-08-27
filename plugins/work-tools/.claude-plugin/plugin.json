@@ -1,7 +1,7 @@
 {
   "name": "work-tools",
-  "version": "1.0.1",
-  "description": "Work integrations: Feishu/Lark MCP for messaging, groups, documents, and file operations",
+  "version": "1.0.2",
+  "description": "Work integrations: Feishu/Lark MCP for messaging, groups, and document import/read (no file upload/download — official lark-mcp limitation)",
   "author": {
     "name": "Yifan"
   }

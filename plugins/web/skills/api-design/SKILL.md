@@ -83,7 +83,7 @@ POST   /api/v1/auth/refresh
 403 Forbidden             — Authenticated but not authorized
 404 Not Found             — Resource doesn't exist
 409 Conflict              — Duplicate entry, state conflict
-422 Unprocessable Entity  — Semantically invalid (valid JSON, bad data)
+422 Unprocessable Content — Semantically invalid (valid JSON, bad data); RFC 9110 renamed it from "Unprocessable Entity"
 429 Too Many Requests     — Rate limit exceeded
 
 # Server Errors
@@ -149,6 +149,33 @@ Location: /api/v1/users/abc-123
 ```
 
 ### Error Response
+
+There is a standard for this: **RFC 9457 `application/problem+json`** (obsoletes
+RFC 7807). Prefer it for public APIs — clients, gateways, and frameworks already
+understand it, and it saves you designing a bespoke envelope:
+
+```http
+HTTP/1.1 422 Unprocessable Content
+Content-Type: application/problem+json
+
+{
+  "type": "https://api.example.com/problems/validation-error",
+  "title": "Request validation failed",
+  "status": 422,
+  "detail": "2 fields failed validation",
+  "instance": "/api/v1/users",
+  "errors": [
+    { "field": "email", "message": "Must be a valid email address" },
+    { "field": "age", "message": "Must be between 0 and 150" }
+  ]
+}
+```
+
+`type` / `title` / `status` / `detail` / `instance` are the standard members;
+anything extra (like `errors` above) is an "extension member", which the RFC
+explicitly allows. If you control both ends and prefer an in-house envelope, the
+shape below is a common one — just don't invent a new format when problem+json
+fits:
 
 ```json
 {
@@ -327,6 +354,12 @@ app.delete("/api/v1/users/:id", requireRole("admin"), async (req, res) => {
 ## Rate Limiting
 
 ### Headers
+
+`X-RateLimit-*` is a de-facto convention (GitHub and many other APIs use it),
+not a standard. The IETF draft (`draft-ietf-httpapi-ratelimit-headers`) defines
+differently-named `RateLimit` / `RateLimit-Policy` fields instead — and it is
+still a draft, not an RFC. Using the `X-` headers is fine; just document them
+rather than assuming clients know them.
 
 ```
 HTTP/1.1 200 OK

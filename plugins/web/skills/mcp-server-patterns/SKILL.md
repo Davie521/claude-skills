@@ -37,6 +37,21 @@ For Cursor, cloud, or other remote clients, use **Streamable HTTP** (single MCP 
 
 ### Install and server setup
 
+Two official release lines exist (both from `modelcontextprotocol/typescript-sdk`):
+
+- **v2 — the stable line** since the 2026-07-28 MCP spec: split packages
+  `@modelcontextprotocol/server` (build servers) and `@modelcontextprotocol/client`.
+  Tool/prompt schemas use [Standard Schema](https://standardschema.dev/) — Zod v4,
+  Valibot, or ArkType all work. Thin runtime adapters ship separately:
+  `@modelcontextprotocol/node` / `express` / `fastify` / `hono`. Start new
+  servers here; follow the v2 docs at https://ts.sdk.modelcontextprotocol.io/v2/
+  for current API signatures rather than copying v1 snippets.
+- **v1 — legacy**: the single `@modelcontextprotocol/sdk` package (1.x). Not
+  deprecated — it receives bug fixes for at least 6 months after v2's release —
+  so existing v1 servers keep working and need no urgent migration.
+
+The v1 setup below is kept for maintaining existing servers:
+
 ```bash
 npm install @modelcontextprotocol/sdk zod
 ```
@@ -62,6 +77,6 @@ Use **Zod** (or the SDK’s preferred schema format) for input validation.
 
 ## Official SDKs and Docs
 
-- **JavaScript/TypeScript**: `@modelcontextprotocol/sdk` (npm). Use Context7 with library name "MCP" for current registration and transport patterns.
+- **JavaScript/TypeScript**: v2 `@modelcontextprotocol/server` + `@modelcontextprotocol/client`; v1 `@modelcontextprotocol/sdk` (npm). Use Context7 with library name "MCP" for current registration and transport patterns.
 - **Go**: Official Go SDK on GitHub (`modelcontextprotocol/go-sdk`).
 - **C#**: Official C# SDK for .NET.

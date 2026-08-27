@@ -39,7 +39,7 @@ Each layer has a specific job. Do not skip layers. Do not try to make one tool d
 Collect the source material:
 - **Screen Studio**: polished screen recordings for app demos, coding sessions, browser workflows
 - **Raw camera footage**: vlog footage, interviews, event recordings
-- **Desktop capture via VideoDB**: session recording with real-time context (VideoDB Python SDK, `pip install videodb`)
+- **Desktop capture via VideoDB**: session recording with real-time context (VideoDB Python SDK — install in a venv: `python3 -m venv .venv && .venv/bin/pip install videodb`)
 
 Output: raw files ready for organization.
 
@@ -70,6 +70,18 @@ FFmpeg handles the boring but critical work: splitting, trimming, concatenating,
 ffmpeg -i raw.mp4 -ss 00:12:30 -to 00:15:45 -c copy segment_01.mp4
 ```
 
+**`-c copy` cuts on keyframes, not frames.** Measured on ffmpeg 8.1 (keyframes
+every 2s, requesting 3s–8s): this form starts at the *next* keyframe after
+`-ss` (source 4.0s), so the head of what you asked for is missing and the clip
+opens with a gap; putting `-ss` before `-i` snaps to the *previous* keyframe
+instead, shifting boundaries the other way. A requested range containing no
+keyframe at all yields a file with no video. Fine for rough splits; when the
+cut points matter, re-encode:
+
+```bash
+ffmpeg -i raw.mp4 -ss 00:12:30 -to 00:15:45 -c:v libx264 -c:a aac segment_01.mp4
+```
+
 ### Batch cut from edit decision list
 
 ```bash
@@ -87,6 +99,12 @@ done < cuts.txt
 for f in segments/*.mp4; do echo "file '$f'"; done > concat.txt
 ffmpeg -f concat -safe 0 -i concat.txt -c copy assembled.mp4
 ```
+
+Concat with `-c copy` requires every segment to share codec, resolution, and
+encoding parameters — and mismatches do **not** error. Verified on ffmpeg 8.1:
+concatenating an h264 and an mpeg4 clip exits 0 and writes a file that breaks
+during playback (`missing picture in access unit`). Segments cut from the same
+source are safe; for anything else, re-encode instead of copying.
 
 ### Create proxy for faster editing
 
@@ -195,7 +213,7 @@ with open("voiceover.mp3", "wb") as f:
 
 ### Music and SFX with fal.ai
 
-Call the fal.ai API directly (`pip install fal-client`, set `FAL_KEY`) for:
+Call the fal.ai API directly (in a venv: `.venv/bin/pip install fal-client`, set `FAL_KEY`) for:
 - Background music generation
 - Sound effects (ThinkSound model for video-to-audio)
 - Transition sounds
@@ -271,7 +289,7 @@ reframed = video.reframe(start=0, end=60, target="vertical", mode=ReframeMode.sm
 
 ```bash
 # Detect scene changes (threshold 0.3 = moderate sensitivity)
-ffmpeg -i input.mp4 -vf "select='gt(scene,0.3)',showinfo" -vsync vfr -f null - 2>&1 | grep showinfo
+ffmpeg -i input.mp4 -vf "select='gt(scene,0.3)',showinfo" -fps_mode vfr -f null - 2>&1 | grep showinfo
 ```
 
 ### Silence detection for auto-cut

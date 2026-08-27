@@ -10,12 +10,21 @@ Patterns for implementing Apple's Liquid Glass — a dynamic material that blurs
 ## When to Activate
 
 - Building or updating apps for iOS 26+ with the new design language
-- Implementing glass-style buttons, cards, toolbars, or containers
+- Implementing glass-style buttons, toolbars, tab bars, or floating controls
 - Creating morphing transitions between glass elements
 - Applying Liquid Glass effects to widgets
 - Migrating existing blur/material effects to the new Liquid Glass API
 
 **NOT for web.** CSS glassmorphism / `backdrop-filter` on HTML pages is a different technique entirely — route those requests to `ui-ux-pro-max`.
+
+**Where glass belongs (HIG rule).** Liquid Glass is the material of the
+controls-and-navigation layer that floats *above* content — tab bars, toolbars,
+sidebars, floating buttons. Apple's HIG says outright: "Don't use Liquid Glass
+in the content layer." Content cards, list rows, and app backgrounds should use
+standard materials instead; the sanctioned exception is a control sitting in
+content (a slider or toggle) taking on glass transiently while being
+manipulated. Even in the right layer, use custom glass sparingly — system
+components adopt the material automatically.
 
 ## Core Pattern — SwiftUI
 
@@ -40,7 +49,8 @@ Text("Hello, World!")
 ```
 
 Key customization options:
-- `.regular` — standard glass effect
+- `.regular` — standard glass; blurs background content to keep text legible (what most system components use)
+- `.clear` — highly translucent variant for components floating over visually rich media (photos, video); consider a ~35% dark dimming layer behind it for legibility
 - `.tint(Color)` — add color tint for prominence
 - `.interactive()` — react to touch and pointer interactions
 - Shape: `.capsule` (default), `.rect(cornerRadius:)`, `.circle`
@@ -135,7 +145,8 @@ To allow horizontal scroll content to extend under a sidebar or inspector, ensur
 ### Basic UIGlassEffect
 
 ```swift
-let glassEffect = UIGlassEffect()
+let glassEffect = UIGlassEffect()               // regular style
+// UIGlassEffect(style: .clear) for media-rich backgrounds; styles: .regular, .clear
 glassEffect.tintColor = UIColor.systemBlue.withAlphaComponent(0.3)
 glassEffect.isInteractive = true
 
@@ -267,7 +278,8 @@ VStack { /* content */ }
 
 - Using multiple standalone `.glassEffect()` views without a GlassEffectContainer
 - Nesting too many glass effects — degrades performance and visual clarity
-- Applying glass to every view — reserve for interactive elements, toolbars, and cards
+- Applying glass to every view — reserve it for the controls/navigation layer (toolbars, tab bars, floating buttons)
+- Putting glass on content-layer elements (cards, list rows, app backgrounds) — the HIG explicitly forbids it; use standard materials there
 - Forgetting `clipsToBounds = true` in UIKit when using corner radii
 - Ignoring accented rendering mode in widgets — breaks tinted Home Screen appearance
 - Using opaque backgrounds behind glass — defeats the translucency effect
@@ -275,7 +287,7 @@ VStack { /* content */ }
 ## When to Use
 
 - Navigation bars, toolbars, and tab bars with the new iOS 26 design
-- Floating action buttons and card-style containers
+- Floating action buttons and floating control clusters
 - Interactive controls that need visual depth and touch feedback
 - Widgets that should integrate with the system's Liquid Glass appearance
 - Morphing transitions between related UI states

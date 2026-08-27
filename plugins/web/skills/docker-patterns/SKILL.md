@@ -323,8 +323,10 @@ docker compose build --no-cache app   # Force full rebuild
 
 # Clean up
 docker compose down                   # Stop and remove containers
-docker compose down -v                # Also remove volumes (DESTRUCTIVE)
-docker system prune                   # Remove unused images/containers
+docker compose down -v                # Also remove volumes (DESTRUCTIVE — database data is gone)
+docker system prune                   # DESTRUCTIVE and machine-wide: removes stopped containers and
+                                      # dangling images from ALL projects on this machine, not just
+                                      # this one. Run `docker system df` first and confirm.
 ```
 
 ### Debugging Network Issues

@@ -1,6 +1,6 @@
 ---
 name: to-prd
-description: Turn the current conversation context into a PRD and publish it to the project issue tracker (or save as a markdown file). Use when user wants to create a PRD from the current context.
+description: Turn the current conversation context into a PRD, saved as a local markdown file by default (published to the project issue tracker only when the user asks). Use when user wants to create a PRD from the current context.
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a PRD. **Do NOT interview the user** — just synthesize what you already know. If the conversation has not produced enough context yet, say so explicitly and suggest `/grill-with-docs` first; do not start interviewing from this skill.
@@ -19,12 +19,12 @@ This skill takes the current conversation context and codebase understanding and
 
    Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-3. **Write the PRD** using the template below, then publish it:
+3. **Write the PRD** using the template below, then save it:
 
-   - **If the repo has GitHub configured (`gh auth status` succeeds)**: publish as a GitHub issue.
-   - **Otherwise**: save to `docs/prds/PRD-{slug}.md` and tell the user the path.
+   - **Default**: save to `docs/prds/PRD-{slug}.md` and tell the user the path.
+   - **Publish as a GitHub issue only if the user asked for it, or confirms when you offer.** `gh auth status` succeeding means you *can* publish, not that you *should* — an issue on a shared or public repo is outward-facing.
 
-   If a triage label vocabulary is configured (e.g. `ready-for-agent`), apply it. Otherwise, no label.
+   When publishing, apply the triage label vocabulary if one is configured (e.g. `ready-for-agent`). Otherwise, no label.
 
 <prd-template>
 

@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Web stack: REST API design, Docker, deployment, MCP servers, Bun runtime, content-hash caching",
   "author": {
     "name": "Yifan"

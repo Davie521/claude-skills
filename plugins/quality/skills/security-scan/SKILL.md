@@ -142,7 +142,7 @@ Run the adversarial three-agent pipeline for deeper analysis:
 
 ```bash
 # Requires ANTHROPIC_API_KEY
-export ANTHROPIC_API_KEY=your-key
+export ANTHROPIC_API_KEY=your-key   # real keys: load from a secret manager (1Password, etc.), never hardcode in shell profiles or .env committed to git
 npx ecc-agentshield scan --opus --stream
 ```
 

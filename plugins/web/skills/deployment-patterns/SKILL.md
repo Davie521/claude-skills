@@ -241,7 +241,7 @@ startupProbe:
 
 ```bash
 # All config via environment variables — never in code
-DATABASE_URL=postgres://user:pass@host:5432/db
+DATABASE_URL=postgres://user:pass@host:5432/db   # placeholder — real values come from the platform's secret store, and any plaintext .env stays in .gitignore
 REDIS_URL=redis://host:6379/0
 API_KEY=${API_KEY}           # injected by secrets manager
 LOG_LEVEL=info

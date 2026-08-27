@@ -209,7 +209,7 @@ var body: some View {
 | Decision | Rationale |
 |----------|-----------|
 | On-device execution | Privacy — no data leaves the device; works offline |
-| 4,096 token limit | On-device model constraint; chunk large data across sessions |
+| Context window: query `contextSize` | `SystemLanguageModel.default.contextSize` reports the limit (4,096 on current OS releases); query it instead of hardcoding, and chunk large data across sessions |
 | Snapshot streaming (not deltas) | Structured output friendly; each snapshot is a complete partial state |
 | `@Generable` macro | Compile-time safety for structured generation; auto-generates `PartiallyGenerated` type |
 | Single request per session | `isResponding` prevents concurrent requests; create multiple sessions if needed |
@@ -221,20 +221,22 @@ var body: some View {
 - **Use `instructions`** to guide model behavior — they take priority over prompts
 - **Check `isResponding`** before sending a new request — sessions handle one request at a time
 - **Access `response.content`** for results — not `.output`
-- **Break large inputs into chunks** — 4,096 token limit applies to instructions + prompt + output combined
+- **Break large inputs into chunks** — the context window covers instructions + prompt + output combined; read it from `model.contextSize` (4,096 today, back-deployed to iOS 26.0) instead of hardcoding, and on iOS 26.4+ measure inputs with `model.tokenCount(for:)` (overloads for prompt, instructions, tools, schema, and transcript entries)
 - **Use `@Generable`** for structured output — stronger guarantees than parsing raw strings
 - **Use `GenerationOptions(temperature:)`** to tune creativity (higher = more creative)
 - **Monitor with Instruments** — use Xcode Instruments to profile request performance
+- **Re-test prompts after OS updates** — the on-device model itself changes with OS releases: Apple documents three model versions so far (26.0–26.3, 26.4, 27.0) and explicitly tells you to re-verify behavior on each ("Updating prompts for new model versions"). The 27 SDK also reorganizes errors — `LanguageModelError`, `SystemLanguageModel.Error`, `LanguageModelSession.Error` (none exist in the 26.x SDK) — and relaxes guardrails that over-blocked benign content
 
 ## Anti-Patterns to Avoid
 
 - Creating sessions without checking `model.availability` first
-- Sending inputs exceeding the 4,096 token context window
+- Sending inputs exceeding the model's context window — or hardcoding 4,096 instead of querying `contextSize`
 - Attempting concurrent requests on a single session
 - Using `.output` instead of `.content` to access response data
 - Parsing raw string responses when `@Generable` structured output would work
 - Building complex multi-step logic in a single prompt — break into multiple focused prompts
 - Assuming the model is always available — device eligibility and settings vary
+- Assuming prompts tuned on one OS model version behave the same on the next — they may not; re-test on each model version
 
 ## When to Use
 

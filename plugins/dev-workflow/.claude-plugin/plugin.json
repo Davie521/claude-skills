@@ -1,6 +1,6 @@
 {
   "name": "dev-workflow",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Dev workflow: Git PR pipeline with Copilot review triage + auto-merge, no-CI detection and explicit review requesting (cpr), deep-plan (restate/risk/phase + mandatory worktree), diagnosis loop, plan grilling (grill-with-docs: lite mode + ADR format), codebase deepening, throwaway prototype, conversation-to-PRD, issue triage state machine, caveman compressed-comms, cleanup (end-of-session teardown + memory persistence)",
   "author": {
     "name": "Yifan"

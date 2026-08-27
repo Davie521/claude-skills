@@ -85,6 +85,12 @@ For Dockerfiles, Compose, image hardening, volumes, and container debugging, see
 
 ### GitHub Actions (Standard Pipeline)
 
+Action majors below were current as of 2026-08 (verified against each repo's
+releases). They rot: before copying, check with
+`gh api repos/<owner>/<repo>/releases/latest --jq .tag_name`. Recent majors
+mainly moved to the Node 24 runtime — GitHub-hosted runners are always
+compatible, but **self-hosted runners must be ≥ 2.327.1**.
+
 ```yaml
 name: CI/CD
 
@@ -98,16 +104,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24   # active LTS as of 2026-08; 22 is in maintenance
           cache: npm
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test -- --coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage
@@ -118,14 +124,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v7
         with:
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -207,6 +213,11 @@ livenessProbe:
   periodSeconds: 30
   failureThreshold: 3
 
+# Liveness stays shallow on purpose: if it checked the database, a DB outage
+# would make Kubernetes restart every healthy pod. Readiness is where a
+# dependency check belongs — failing readiness only sheds traffic, so point it
+# at a handler that verifies critical dependencies (like /health/detailed
+# above) when your service cannot serve without them.
 readinessProbe:
   httpGet:
     path: /health
@@ -270,17 +281,34 @@ kubectl rollout undo deployment/app
 # Vercel: promote previous deployment
 vercel rollback
 
-# Railway: redeploy previous commit
-railway up --commit <previous-sha>
-
-# Database: rollback migration (if reversible)
-npx prisma migrate resolve --rolled-back <migration-name>
+# Railway: pick a previous deployment and redeploy it
+railway deployment list
+railway redeploy   # redeploys the latest; use the dashboard to restore older ones
 ```
+
+Application rollback is instant. **Schema rollback is not** — see below.
+
+### Database: There Is No Instant Rollback
+
+`prisma migrate resolve --rolled-back <name>` does **not** revert an applied
+migration. It sets `rolled_back_at` on a *failed* migration's row in
+`_prisma_migrations` so `migrate deploy` can retry it. On a migration that
+succeeded, Prisma refuses outright:
+
+```
+Error: P3012 Migration `<name>` cannot be rolled back because it is not in a failed state.
+```
+
+`migrate deploy` has no automatic down migrations, and there is no single
+command that reverts an applied one. Reverting means writing and testing the
+inverse migration yourself, then deploying it like any other — which is why the
+expand/contract discipline below matters more than any rollback command.
 
 ### Rollback Checklist
 
 - [ ] Previous image/artifact is available and tagged
-- [ ] Database migrations are backward-compatible (no destructive changes)
+- [ ] Previous app version verified against the *current* schema (expand/contract)
+- [ ] Any destructive schema change (drop/rename/narrow) is deferred to a later release
 - [ ] Feature flags can disable new features without deploy
 - [ ] Monitoring alerts configured for error rate spikes
 - [ ] Rollback tested in staging before production release

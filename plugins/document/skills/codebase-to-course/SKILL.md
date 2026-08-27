@@ -5,7 +5,7 @@ description: "Turn any codebase into a beautiful, interactive single-page HTML c
 
 # Codebase-to-Course
 
-Transform any codebase into a stunning, interactive single-page HTML course. The output is a single self-contained HTML file (no dependencies except Google Fonts) that teaches how the code works through scroll-based modules, animated visualizations, embedded quizzes, and plain-English translations of code.
+Transform any codebase into a stunning, interactive single-page HTML course. The output is a single fully self-contained HTML file — CSS, JS and fonts inlined, images as data URIs, zero network dependencies — that teaches how the code works through scroll-based modules, animated visualizations, embedded quizzes, and plain-English translations of code.
 
 ## First-Run Welcome
 
@@ -115,7 +115,8 @@ Generate a single HTML file with embedded CSS and JavaScript. Read `references/d
 3. **Polish pass** — After all modules are built, do a final pass for transitions, mobile responsiveness, and visual consistency.
 
 **Critical implementation rules:**
-- The file must be completely self-contained (only external dependency: Google Fonts CDN)
+- The file must be completely self-contained: **no CDN links of any kind**, fonts embedded as base64 `@font-face`, images as data URIs. It has to open offline and keep working after being emailed or moved to another machine
+- Emit a `<!--FONTS-->` placeholder in `<head>` and run the font inliner from [design-system.md](./references/design-system.md) as the final build step. Do not try to write the base64 yourself — it is ~370 KB. Do not skip the step either: the page would ship with no `@font-face` at all
 - Use CSS `scroll-snap-type: y proximity` (NOT `mandatory` — mandatory traps users in long modules)
 - Use `min-height: 100dvh` with `100vh` fallback for sections
 - Only animate `transform` and `opacity` for GPU performance
@@ -230,7 +231,7 @@ The visual design should feel like a **beautiful developer notebook** — warm, 
 
 - **Warm palette**: Off-white backgrounds (like aged paper), warm grays, NO cold whites or blues
 - **Bold accent**: One confident accent color (vermillion, coral, teal — NOT purple gradients)
-- **Distinctive typography**: Display font with personality for headings (Bricolage Grotesque, or similar bold geometric face — NEVER Inter, Roboto, Arial, or Space Grotesk). Clean sans-serif for body (DM Sans or similar). JetBrains Mono for code.
+- **Distinctive typography**: Display font with personality for headings (Bricolage Grotesque, or similar bold geometric face — NEVER Inter, Roboto, Arial, or Space Grotesk). Clean sans-serif for body (DM Sans or similar). JetBrains Mono for code. Embed all of them as base64 `@font-face` via the `<!--FONTS-->` placeholder + inliner script in [design-system.md](./references/design-system.md); a Google Fonts `<link>` breaks the self-contained requirement.
 - **Generous whitespace**: Modules breathe. Max 3-4 short paragraphs per screen.
 - **Alternating backgrounds**: Even/odd modules alternate between two warm background tones for visual rhythm
 - **Dark code blocks**: IDE-style with Catppuccin-inspired syntax highlighting on deep indigo-charcoal (#1E1E2E)

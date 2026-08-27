@@ -44,6 +44,11 @@ git status                                   # 未提交更改
 [ -d .github/workflows ] && echo "有 workflow 目录，属于配置问题" || echo "确实没有 CI，可跳过第 4-5 步"
 ```
 
+**别改用 `gh api repos/{owner}/{repo}/actions/workflows` 的 `total_count` 来判断**——
+它把 GitHub 自己的动态 workflow 也算进去。本仓库没有任何 `.github/workflows` 文件，
+该接口却返回 `total_count: 2`，两条都是 `dynamic/.../copilot-pull-request-reviewer`。
+按它判断会得出「有 CI」的错误结论，然后无限等一个永远不会出现的 check。
+
 （别用 `ls .github/workflows/`：目录不存在时它自己就非零退出并往 stderr 打错误，
 在状态机里又变成一个假的「步骤失败」——正是这一步想避免的毛病。）
 
@@ -63,14 +68,16 @@ git status                                   # 未提交更改
 **别假设审查会自动触发**——很多仓库不会，同一个仓库也可能时有时无（本仓库 PR #1 有、#2/#3 没有）。
 先看是否已请求或已审：`gh pr view <N> --json reviewRequests,reviews`。没有就手动请求：
 
-**gh ≥ 2.88.0（2026-03-11）起有官方支持**，优先用它：
-
 ```bash
 gh pr edit <N> --add-reviewer @copilot     # 或建 PR 时 gh pr create --reviewer @copilot
 ```
 
-先确认版本：`gh --version`。低于 2.88.0 时这条会报 `'Copilot' not found`——
-那不是语法写错，是 CLI 太旧，走 API 兜底：
+**`@` 前缀是关键，跟 gh 版本无关**。gh 2.73.0 实测：`@copilot` 退出码 0 成功；
+`Copilot` 和 `copilot`（不带 @）都报 `GraphQL: Could not resolve user with login 'copilot'`。
+gh 2.88.0 的 changelog 只是把它写进了文档并加了交互式选择，服务端此前已经认这个写法——
+**别因为本机 gh 旧就先入为主走兜底路径**。
+
+真要兜底（比如 `@copilot` 在某仓库不可用）走 API：
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/<N>/requested_reviewers -X POST \
@@ -79,6 +86,10 @@ gh api repos/{owner}/{repo}/pulls/<N>/requested_reviewers -X POST \
 
 **走 API 时只有带 `[bot]` 后缀的 slug 能成**：不带 `[bot]` 的裸 slug 报 422
 `Reviews may only be requested from collaborators`。
+
+**Copilot 可能因配额用尽而审不了**——此时 review 状态是 `COMMENTED`、正文写着
+`unable to review ... reached their quota limit`、没有任何行内评论。这不是「审查通过」，
+也不是「请求变更」，别把它当成两者中的任何一个：如实告诉用户这次没拿到审查。
 
 **POST 返回 200 但 `requested_reviewers` 是空数组属正常**——GitHub 立刻把请求转成进行中的审查，
 这个字段随即清空。别据此判定失败又重发，以评论是否出现为准。

@@ -2,7 +2,7 @@
 description: Codex code review via MCP — severity-tagged findings, read-only, single round-trip. Local diff, file/dir, or GitHub PR.
 argument-hint: '[path | <pr-number> | blank for working tree] [--base <ref>] [focus text ...]'
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh:*), mcp__codex__codex
+allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh:*), Bash(codex-best-model), mcp__codex__codex
 ---
 
 # `/codex-review`
@@ -61,7 +61,8 @@ Call `mcp__codex__codex` exactly once with:
 | `sandbox` | `read-only` (hard default — never override from this command) |
 | `approval-policy` | `never` (hard default) |
 | `cwd` | Absolute path of the current working directory |
-| `model` | Unset — let server default |
+| `model` | stdout of `codex-best-model` — strongest listed model, auto-tracks new releases. On non-zero exit omit `model` and let `~/.codex/config.toml` decide; never guess a slug. |
+| `config` | `{"model_reasoning_effort": "max"}` — required; the server is launched with `-c model_reasoning_effort=xhigh`, which only a per-call `config` can outrank. Keys are config.toml snake_case. |
 
 Do **not** set `workspace-write` or `on-request` from `/codex-review` — that's a different workflow. If the user wants Codex to actually edit, they should use `/codex:rescue` (upstream) or `codex:codex-rescue` subagent.
 

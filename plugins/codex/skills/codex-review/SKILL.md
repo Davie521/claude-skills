@@ -39,7 +39,36 @@ Make exactly one `mcp__codex__codex` call with:
 | `sandbox` | `read-only` |
 | `approval-policy` | `never` |
 | `cwd` | The current working directory (absolute path) |
-| `model` | Leave unset unless the user explicitly named one |
+| `model` | stdout of `codex-best-model` (see below); the name the user gave, if they named one |
+| `config` | `{"model_reasoning_effort": "max"}` |
+
+**Why `config` is mandatory here.** The MCP server is launched as
+`codex mcp-server -c model_reasoning_effort=xhigh`, and that launch flag
+outranks `~/.codex/config.toml` — so without a per-call override every review
+silently runs at `xhigh`. A per-call `config` object outranks the launch flag,
+making it the only way to lift review above `xhigh`. Verified 2026-09-06
+against the rollout log's `turn_context`: a passed value is recorded verbatim,
+in both directions (`low` and `max` both took). Keys in this object are
+**config.toml keys (snake_case)** — `model_reasoning_effort`, not
+`model-reasoning-effort`. A misspelled key is ignored silently, not rejected.
+
+`max` is deliberate, not maximal: the catalog also exposes `ultra` ("maximum
+reasoning with automatic task delegation"), but reviews already run ~8 min at
+the median and have hit the plan usage limit mid-review. Use `ultra` only on
+explicit request.
+
+**Picking the model.** Run `codex-best-model` and pass its stdout as `model`.
+It reads `~/.codex/models_cache.json` — the catalog the Codex CLI refreshes on
+its own — and prints the `visibility: "list"` entry with the lowest `priority`,
+which is OpenAI's own ranking with `1` as most capable. A newly shipped
+flagship is therefore picked up automatically, with nothing to edit here. Add
+`-v` for priority and catalog age on stderr.
+
+Do **not** hardcode a slug in this file: that silently keeps reviews on an
+ageing model after a better one ships. If `codex-best-model` exits non-zero,
+omit `model` entirely and let Codex fall back to `~/.codex/config.toml` — never
+guess a model name. Never pass a `visibility: "hide"` model such as
+`gpt-reserve` or `codex-auto-review`; those are internal to Codex.
 
 `sandbox=read-only` + `approval-policy=never` is a hard default. Override **only** if the user explicitly says "let codex edit / fix it" — in that case raise to `workspace-write` + `on-request` and confirm scope before calling.
 

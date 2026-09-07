@@ -40,7 +40,7 @@ Make exactly one `mcp__codex__codex` call with:
 | `approval-policy` | `never` |
 | `cwd` | The current working directory (absolute path) |
 | `model` | stdout of `codex-best-model` (see below); the name the user gave, if they named one |
-| `config` | `{"model_reasoning_effort": "max"}` |
+| `config` | `{"model_reasoning_effort": "<stdout of `codex-best-model --effort`>"}` |
 
 **Why `config` is mandatory here.** The MCP server is launched as
 `codex mcp-server -c model_reasoning_effort=xhigh`, and that launch flag
@@ -52,10 +52,19 @@ in both directions (`low` and `max` both took). Keys in this object are
 **config.toml keys (snake_case)** — `model_reasoning_effort`, not
 `model-reasoning-effort`. A misspelled key is ignored silently, not rejected.
 
-`max` is deliberate, not maximal: the catalog also exposes `ultra` ("maximum
-reasoning with automatic task delegation"), but reviews already run ~8 min at
-the median and have hit the plan usage limit mid-review. Use `ultra` only on
-explicit request.
+**Run reviews at the model's ceiling.** `codex-best-model --effort` prints the
+highest level the selected model supports, so model and effort always match:
+today that resolves to `ultra` on `gpt-6-astra`. Do not hardcode `ultra` — not
+every model reaches it (`gpt-5.5` stops at `xhigh`, `gpt-5.6-luna` at `max`),
+and passing a level the model does not list is a silent-downgrade risk once the
+auto-selected flagship changes. If the command exits non-zero, fall back to
+`"max"`.
+
+`ultra` is "maximum reasoning with automatic task delegation" — the model may
+fan work out to sub-tasks. Budget for it: reviews already ran ~7–8 min at the
+median on `max`, and a `max`-level review has hit the plan usage limit
+mid-report before. A review that dies partway with a usage-limit error is that
+expected failure mode, not a broken skill — rerun later or drop one level.
 
 **Picking the model.** Run `codex-best-model` and pass its stdout as `model`.
 It reads `~/.codex/models_cache.json` — the catalog the Codex CLI refreshes on

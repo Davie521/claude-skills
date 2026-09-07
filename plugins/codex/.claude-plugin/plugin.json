@@ -1,6 +1,6 @@
 {
   "name": "codex",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
   "author": {
     "name": "Yifan"

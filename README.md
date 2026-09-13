@@ -161,6 +161,8 @@ A4 landscape, 5 columns, 6pt font — maximum information density. Supports LaTe
 
 > **Prerequisites**: a venv (`python3 -m venv` — `--break-system-packages` is explicitly forbidden), plus system poppler for `pdf2image`.
 
+> **Prefer this over `document-skills:pdf`**: this is a fork of the upstream `anthropics/skills` PDF skill, with the venv setup step added and the `reference.md` / `forms.md` / `check_fillable_fields.py` path bugs fixed. Upstream ships a byte-identical `description`, so if both plugins are enabled the model would otherwise pick between them at random — the description here states the preference explicitly.
+
 ### `doc-coauthoring` — Structured document co-authoring
 
 **Trigger**: co-writing a real document — proposal, technical spec, decision doc

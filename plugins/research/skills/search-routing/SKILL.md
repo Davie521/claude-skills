@@ -55,12 +55,23 @@ Use `depth=standard` ($0.005). Deep needs confirmation — see §6.
 ### 4. Library / API docs → Context7 BEFORE search
 
 Trigger when query is "how do I use X" / "X API syntax" / "X config options"
-for a known library (React, FastAPI, Prisma, etc.).
-Use `mcp__plugin_context7_context7__query-docs` first; only fall back
-to exa if Context7 returns nothing relevant.
+for a known library (React, FastAPI, SQLAlchemy, SwiftUI, Stripe, etc.).
 
-This case is ~45% of typical search volume — getting it right saves
-the most tokens.
+1. **Load the tools first** — they are deferred: `ToolSearch` with query
+   `context7`. Skipping this is why Context7 went almost unused: 14 calls in
+   two months (2026-07/09) while ~330 library-doc queries went straight to exa.
+2. `mcp__plugin_context7_context7__resolve-library-id` →
+   `mcp__plugin_context7_context7__query-docs`.
+3. **Check the answer is on topic before using it.** When a library is missing
+   or thinly indexed, Context7 does not error — it returns plausible but
+   unrelated snippets (2026-09-13: two different 汇付 queries got the identical
+   9 KB generic block; a WeasyPrint `@page` question got nothing on point).
+   Off topic → fall back to exa + the official doc page.
+
+Reading the official page when falling back: Apple docs are JS-rendered
+(WebFetch returns only the title) → `https://sosumi.ai/documentation/<path>`;
+very large pages get truncated → read the doc source on GitHub with
+`gh api repos/<owner>/<repo>/contents/<path>`.
 
 ### 5. Default → exa web_search_exa ($0.005)
 
@@ -103,7 +114,7 @@ ranking, not full deep-research value. Mention this when asking.
 | linkup standard | $0.005 | pricing / premium publishers / multi-hop |
 | exa deep | $0.012 | **confirm first** |
 | linkup deep | $0.05 (10×) | **confirm first** — MCP doesn't expose sourcedAnswer |
-| Context7 query-docs | free (cached) | library / API docs |
+| Context7 query-docs | free: 1,000 calls/month with an account key (`CONTEXT7_API_KEY`); anonymous limits unpublished | library / API docs |
 
 ## Anti-patterns
 
@@ -113,8 +124,10 @@ ranking, not full deep-research value. Mention this when asking.
 - Don't auto-invoke `linkup-search depth=deep` — MCP returns only raw
   `searchResults`, not the synthesis output that justifies the 10× price
 - Don't fan out searches across all three "just to be thorough" — pick one
-- Don't skip Context7 for library docs and go straight to exa —
-  Context7 is more accurate and free for that case
+- Don't skip Context7 for library docs and go straight to exa — load it via
+  `ToolSearch` first. In a 2026-09-13 spot check it answered 7 of 7 doc
+  questions without a factual error at 4–8× fewer tokens than exa; fall back
+  only when its answer is off topic (see §4)
 
 ## Exa tool signatures (verified against live server, 2026-08-08)
 

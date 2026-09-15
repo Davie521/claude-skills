@@ -57,20 +57,21 @@ Run exactly one review, as described in the `codex:codex-review` skill's Invocat
 
 1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-review.XXXXXX")`
 2. Write the composed prompt to `$D/prompt.md` with the Write tool.
-3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"`. The wrapper picks the model (`codex-best-model`) and effort (`codex-best-model --effort`, today `ultra`), forces `-s read-only`, and skips `~/.codex/config.toml`. Reviews take minutes, beyond the foreground Bash limit — wait for the completion notification.
-4. Exit `0` → the review is everything after the `-----` line. Non-zero → see Output handling.
+3. Bash: `codex-run --start <absolute cwd> "$D/prompt.md" "$D"` — returns at once; the run is detached. The wrapper picks the model (`codex-best-model`) and effort (`codex-best-model --effort`, today `ultra`), forces `-s read-only`, and skips `~/.codex/config.toml`.
+4. Bash (foreground, `timeout: 600000`): `codex-run --wait "$D"`. Exit `75` = still running → call it again, repeat until another exit code. Never `run_in_background` — it dies with the caller in headless runs and subagents.
+5. Final exit `0` → the review is everything after the `-----` line. Anything else → see Output handling.
 
 There is no write mode. If the user wants Codex to actually edit, they should use `/codex:rescue` (upstream) or `codex:codex-rescue` subagent.
 
 ## Output handling
 
 - Return Codex's response **verbatim**. No reformat, no commentary, no "here's what I found" preamble.
-- If `codex-run` exits non-zero (3 = Codex errors such as usage limit or auth, 124 = timeout, other = crash), print its output and stop. Do not invent findings to fill the gap.
+- If the final `codex-run --wait` exits non-zero (3 = Codex errors such as usage limit or auth, 124 = timeout, 130 = stopped, 6 = runner vanished, other = crash), print its output and stop. Do not invent findings to fill the gap.
 - After printing, **stop**. Do not edit any files. Do not announce a follow-up. Wait for the user.
 
 ## Out of scope
 
-- `--wait` / `--background` flags — the run always goes to the background because reviews take minutes.
+- `--wait` / `--background` flags on this command — the run is always detached and polled with `codex-run --wait`.
 - `/codex:status` job tracking — this command does not register a companion job. To see history, the user should switch to `/codex:review` (upstream).
 - Auto-fixing — see Core constraint.
 - Posting to GitHub (`gh pr review`) — out of scope for v1.

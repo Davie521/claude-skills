@@ -57,8 +57,9 @@ Run exactly one challenge, as described in the `codex:design-challenge` skill's 
 
 1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-challenge.XXXXXX")`
 2. Write the composed prompt to `$D/prompt.md` with the Write tool.
-3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"`. Wait for the completion notification.
-4. Exit `0` → the critique is everything after the `-----` line. Non-zero → see Output handling.
+3. Bash: `codex-run --start <absolute cwd> "$D/prompt.md" "$D"` — returns at once; the run is detached.
+4. Bash (foreground, `timeout: 600000`): `codex-run --wait "$D"`. Exit `75` = still running → call it again until another exit code. Never `run_in_background`.
+5. Final exit `0` → the critique is everything after the `-----` line. Anything else → see Output handling.
 
 `codex-run` is read-only with no write mode. A design challenge that lets Codex write contradicts the whole framing.
 
@@ -70,7 +71,7 @@ Run exactly one challenge, as described in the `codex:design-challenge` skill's 
 
 ## Out of scope
 
-- `--wait` / `--background` flags — the run always goes to the background because it takes minutes.
+- `--wait` / `--background` flags on this command — the run is always detached and polled with `codex-run --wait`.
 - Bug hunting / severity matrix / BLOCK-APPROVE verdict — those are `/codex-review`'s job.
 - Auto-iterating on the design — that's a conversation between the user and Claude, not this command's mandate.
 - Posting to GitHub — out of scope.

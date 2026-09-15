@@ -37,19 +37,29 @@ Run exactly one review through the `codex-run` wrapper (`~/.local/bin/codex-run`
 1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-review.XXXXXX")` — one scratch dir per review.
 2. Write the review brief (template below) to `$D/prompt.md` with the Write tool —
    not a heredoc, diffs contain quotes and `$`.
-3. Run with the Bash tool, **`run_in_background: true`**:
-   `codex-run <absolute cwd> "$D/prompt.md" "$D"`
-   Add `--model <name>` only if the user named a model. Reviews take minutes
-   (median ~7 min, up to ~17), past the 10-minute foreground Bash limit — so never
-   run it in the foreground. Wait for the completion notification, then read the
-   task output.
-4. Exit code decides what happened — **not** whether text came back:
+3. Bash: `codex-run --start <absolute cwd> "$D/prompt.md" "$D"` — returns at once;
+   the run is detached. Add `--model <name>` only if the user named a model.
+4. Bash (foreground, `timeout: 600000`): `codex-run --wait "$D"` — blocks up to
+   9 minutes. **Exit `75` means still running: call `codex-run --wait "$D"` again**,
+   and keep repeating until it returns anything else.
+
+Why not `run_in_background`: reviews take minutes (median ~7, up to ~17), past the
+10-minute foreground Bash limit, and a background task is killed together with its
+caller in headless `claude -p` and in subagents — verified 2026-09-15, the review died
+38 s in with no result. The detached `--start` run survives its caller, and `--wait`
+is an ordinary foreground call that works in every context. If the user interrupts,
+the run keeps going: resume with `--wait "$D"`, or cancel with `codex-run --stop "$D"`.
+
+Exit code of the final `--wait` decides what happened — **not** whether text came back:
 
 | exit | meaning | do |
 |---|---|---|
 | `0` | review finished; the report follows the `-----` line | present it (see After the call) |
+| `75` | still running | call `--wait` again |
 | `3` | Codex reported errors (usage limit, auth, bad model) — the wrapper prints them | report verbatim, stop |
 | `124` | hit `CODEX_RUN_MAX_SECS` (default 2400 s) | report, stop; offer a rerun at a lower `--effort` |
+| `130` | stopped (`--stop`) | report, stop |
+| `6` | the detached runner vanished without a result (reboot, kill -9) | report, stop; offer a rerun |
 | `90` | no codex with `--ignore-user-config` on this machine | report, stop |
 | other | codex crashed — wrapper prints stderr tail | report verbatim, stop |
 

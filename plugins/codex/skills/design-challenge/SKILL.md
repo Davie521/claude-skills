@@ -40,8 +40,9 @@ Codex removed `codex mcp-server` in 0.154.0. Run exactly one challenge through `
 
 1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-challenge.XXXXXX")`
 2. Write the challenge brief (template below) to `$D/prompt.md` with the Write tool.
-3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"` — add `--model <name>` only if the user named one. Wait for the completion notification.
-4. Exit `0` → the critique follows the `-----` line. Any other exit → report the wrapper's output verbatim and stop.
+3. Bash: `codex-run --start <absolute cwd> "$D/prompt.md" "$D"` — returns at once; add `--model <name>` only if the user named one.
+4. Bash (foreground, `timeout: 600000`): `codex-run --wait "$D"`. Exit `75` = still running → call `--wait` again until it returns something else. Do not use `run_in_background` — it dies with the caller in headless runs and subagents.
+5. Final exit `0` → the critique follows the `-----` line. Any other exit → report the wrapper's output verbatim and stop.
 
 Model and effort default to `codex-best-model` (strongest listed model, at its ceiling). Before the 0.154 migration this skill ran at `~/.codex/config.toml`'s level, which the wrapper now deliberately ignores; pass `--effort high` if the user wants a quicker pass.
 

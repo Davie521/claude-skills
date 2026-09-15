@@ -1,6 +1,6 @@
 {
   "name": "codex",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Invoke Codex (read-only codex exec via ~/.local/bin/codex-run) for code review and design challenge.",
   "author": {
     "name": "Yifan"

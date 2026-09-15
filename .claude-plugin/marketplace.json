@@ -91,7 +91,7 @@
     },
     {
       "name": "codex",
-      "description": "Invoke Codex via MCP for code review and second-opinion analysis. Read-only by default.",
+      "description": "Invoke Codex (read-only codex exec via ~/.local/bin/codex-run) for code review and design challenge.",
       "source": "./plugins/codex",
       "category": "testing"
     }

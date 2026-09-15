@@ -109,6 +109,8 @@ Read-only is a hard default and `codex-run` has no write mode. If the user expli
 
 Codex hasn't seen your conversation, so brief it cold and embed the review discipline. This template mirrors the methodology in `code-review:code-review` (severity matrix, file:line, scope triage, security pass) — collapsed into a single prompt:
 
+**Keep the brief blind: context + scope + conventions only. Do not append your own "things worth scrutinising" list.** That list is Claude's prior assumptions, which the whole route exists to avoid. On 2026-09-15 a primed run's findings mostly echoed the hint list, and the user asked whether the review was really independent. If specific areas must be checked, run the blind pass first and verify those areas yourself afterwards.
+
 ```
 You are reviewing a code change with the same rigor as a senior engineer
 gating a merge. I'm Claude Code on the same codebase; you are an

@@ -461,7 +461,7 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 0. 已知 URL → 直接抓取，不搜索（JS 重 / 付费墙 / 需渲染的走 `firecrawl_scrape`）
 1. 带 `site:` / 引号等操作符、指定域名 → firecrawl（**exa 是神经检索，会忽略操作符**）
 2. 中文 SERP → firecrawl（对中文搜索结果的覆盖优于 exa 的神经索引）
-3. 价格 / 付费墙 / 优质出版商数据 → linkup standard（有 Statista、Xerfi 等内容授权）
+3. 价格 / 多跳事实 / 发布时间 → exa，再到官方页面核对（linkup 已于 2026-09-15 移除；它并不能访问付费墙内容）
 4. 库和 API 文档 → **先 Context7**，返回不相关再退回 exa
 5. 其余默认 exa
 6. deep 模式（约 10 倍成本）**必须先问你**，并说明理由和单次价格
@@ -484,7 +484,7 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 
 搜索用 `web_search_exa`，深读用 `web_fetch_exa` 或 `firecrawl_scrape`（JS 重 / 付费墙），最后综合成带来源引用的报告，有质量规则把关。
 
-> **先确认后端在不在，再照着它规划。** MCP server 是按配置目录隔离的，`exa` / `firecrawl` / `linkup` 可能这个会话有、那个会话没有。现在 skill 会先检查，不在就退到内置 `/deep-research` workflow 或内置 `WebSearch`，并说明这次用的是哪条路——而不是拿着调不动的工具硬跑。
+> **先确认后端在不在，再照着它规划。** MCP server 是按配置目录隔离的，`exa` / `firecrawl` 可能这个会话有、那个会话没有。现在 skill 会先检查，不在就退到内置 `/deep-research` workflow 或内置 `WebSearch`，并说明这次用的是哪条路——而不是拿着调不动的工具硬跑。
 
 ### `llm-cost-discipline` — 两层 LLM 成本控制
 
@@ -611,7 +611,7 @@ done
 - 飞书 MCP server — `feishu` skill 需要
 - Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
-- 各类 API key 按 skill 不同（Exa / firecrawl / linkup / Context7 / Gemini / ElevenLabs / fal.ai 等）
+- 各类 API key 按 skill 不同（Exa / firecrawl / Context7 / Gemini / ElevenLabs / fal.ai 等）
 
 ## 许可证
 

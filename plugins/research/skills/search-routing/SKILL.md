@@ -1,18 +1,20 @@
 ---
 name: search-routing
-description: Single decision skill for all web search needs. Routes among exa, firecrawl_search, and linkup-search based on query characteristics. Auto-selects the cheapest sufficient tool; asks user before invoking expensive deep modes. Use this BEFORE any web search call when the user has multiple search MCPs available.
+description: Single decision skill for all web search needs. Routes between exa and firecrawl_search based on query characteristics. Auto-selects the cheapest sufficient tool; asks user before invoking expensive deep modes. Use this BEFORE any web search call when the user has multiple search MCPs available.
 origin: ECC
 ---
 
 # Search Routing
 
-Three search MCPs are typically available: **exa**, **firecrawl**, **linkup**.
-This skill picks one — never run multiple by default.
-Deep modes (10× cost) require explicit user confirmation.
+Two search MCPs are configured: **exa** and **firecrawl**. (linkup was removed
+2026-09-15: no measured quality edge over exa, its key sat on the command line,
+and ~81% of its spend went to 10×-priced deep mode.)
+This skill picks one — never run both by default.
+Expensive / deep modes require explicit user confirmation.
 
 > **First check they exist in this session.** MCP servers are scoped per config
 > directory, so a server added under one is absent under another — verify, don't assume.
-> If none of the three are present, routes 1/2/3/5 have nothing to route to: use the
+> If neither is present, routes 1/2/3/5 have nothing to route to: use the
 > built-in `WebSearch` for those. **Route 4 (Context7) is unaffected** — it is a separate
 > MCP and stays the correct choice for library/API docs regardless.
 
@@ -38,19 +40,19 @@ Trigger when the query is mostly Chinese characters AND targets
 China-specific tools/services (微信支付 / 国内 API / 国内厂商 / 汇付斗拱 etc.).
 Firecrawl reaches Chinese SERPs better than exa's neural index.
 
-### 3. Pricing / paywall / premium publisher data → linkup-search standard
+### 3. Pricing / multi-hop facts / release timing → exa, then verify at the source
 
 Trigger when query asks for:
 
 - Pricing, fees, subscriptions, cost comparisons
-- Statista / financial data / paywall articles
 - Multi-hop fact synthesis ("X company 2024 revenue vs Y")
 - Product release timing where recency + cited sources matter
 
-Linkup has content-licensing deals with publishers (Statista, Xerfi,
-paywalled news) that exa can't reach.
-
-Use `depth=standard` ($0.005). Deep needs confirmation — see §6.
+Use `mcp__exa__web_search_exa`, then open the vendor's own pricing /
+announcement page with `mcp__exa__web_fetch_exa` before quoting a number.
+No backend configured here reaches paywalled publisher content (Statista,
+paywalled news) — the old note that Linkup did was wrong: Linkup's own FAQ says
+it only indexes publicly available content.
 
 ### 4. Library / API docs → Context7 BEFORE search
 
@@ -89,21 +91,15 @@ is warranted, surface the decision:
 
 Candidates for deep:
 
-- `linkup-search depth=deep` ($0.05, 10× standard) — multi-hop premium
-  facts where standard's raw search results aren't enough
-- `mcp__exa__web_search_exa` with deep settings ($0.012) — comprehensive
-  technical research
 - `research:research` skill (orchestrated multi-search) — full
   research workflows
+- Exa's advanced / deep tools (`web_search_advanced_exa`, `agent_run`) are
+  **not enabled**: the exa server URL pins `tools=web_search_exa,web_fetch_exa`
+  on purpose, because `agent_run` bills per run. Enabling them is a config
+  change the user must approve.
 
 **Default behavior**: run standard first. Only suggest deep if standard
 results are clearly insufficient.
-
-**Known caveat for linkup deep**: the MCP server returns only raw
-`searchResults` (link + snippet). Linkup's premium output (`sourcedAnswer`
-with LLM-synthesized answer + citations, or `structured` schema output)
-is NOT exposed through MCP. So the 10× cost buys mainly better source
-ranking, not full deep-research value. Mention this when asking.
 
 ## Cost Reference (per call)
 
@@ -111,9 +107,6 @@ ranking, not full deep-research value. Mention this when asking.
 |---|---:|---|
 | firecrawl_search | ~$0.001 | operators, Chinese SERPs, URL list |
 | exa standard | $0.005 | default, ~80% of cases |
-| linkup standard | $0.005 | pricing / premium publishers / multi-hop |
-| exa deep | $0.012 | **confirm first** |
-| linkup deep | $0.05 (10×) | **confirm first** — MCP doesn't expose sourcedAnswer |
 | Context7 query-docs | free: 1,000 calls/month with an account key (`CONTEXT7_API_KEY`); anonymous limits unpublished | library / API docs |
 
 ## Anti-patterns
@@ -121,9 +114,7 @@ ranking, not full deep-research value. Mention this when asking.
 - Don't pass `site:` / `"..."` to exa — it's neural, ignores operators
 - Don't use firecrawl_search alone if you need content body —
   it returns links + descriptions only; chain with scrape if needed
-- Don't auto-invoke `linkup-search depth=deep` — MCP returns only raw
-  `searchResults`, not the synthesis output that justifies the 10× price
-- Don't fan out searches across all three "just to be thorough" — pick one
+- Don't fan out the same query to both backends "just to be thorough" — pick one
 - Don't skip Context7 for library docs and go straight to exa — load it via
   `ToolSearch` first. In a 2026-09-13 spot check it answered 7 of 7 doc
   questions without a factual error at 4–8× fewer tokens than exa; fall back

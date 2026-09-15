@@ -459,7 +459,7 @@ Decision order, top down:
 0. Known URL → fetch it, don't search (JS-heavy / paywalled / needs rendering → `firecrawl_scrape`)
 1. Operator-laden or domain-targeted (`site:`, quoted phrases) → firecrawl — **exa is a neural index and ignores operators**
 2. Chinese-language SERPs → firecrawl, which reaches them better than exa's neural index
-3. Pricing / paywalled / premium publisher data → linkup standard (content-licensing deals with Statista, Xerfi and others)
+3. Pricing / multi-hop facts / release timing → exa, then verify on the vendor's own page (linkup removed 2026-09-15; it never reached paywalled content)
 4. Library and API docs → **Context7 first**, fall back to exa only if it returns nothing relevant
 5. Everything else → exa
 6. Deep modes (~10× cost) → **always ask first**, stating the reason and the per-call price
@@ -482,7 +482,7 @@ Decomposes the research question, then follows a scenario-specific collection ch
 
 Searches with `web_search_exa`, deep-reads with `web_fetch_exa` or `firecrawl_scrape` (JS-heavy / paywalled), and synthesizes a cited report under explicit quality rules.
 
-> **Check the backends exist before planning around them.** MCP servers are scoped per config directory, so `exa` / `firecrawl` / `linkup` can be present in one session and absent in another. The skill now verifies first and falls back to the bundled `/deep-research` workflow or built-in `WebSearch` — naming which backend it used — instead of running searches with nothing to call.
+> **Check the backends exist before planning around them.** MCP servers are scoped per config directory, so `exa` / `firecrawl` can be present in one session and absent in another. The skill now verifies first and falls back to the bundled `/deep-research` workflow or built-in `WebSearch` — naming which backend it used — instead of running searches with nothing to call.
 
 ### `llm-cost-discipline` — Two layers of LLM cost control
 
@@ -609,7 +609,7 @@ Most skills auto-trigger from natural language matching their description — th
 - Feishu MCP server for the `feishu` skill
 - Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin
 - A Python venv for the `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` scripts
-- Various API keys depending on skill (Exa, firecrawl, linkup, Context7, Gemini, ElevenLabs, fal.ai, …)
+- Various API keys depending on skill (Exa, firecrawl, Context7, Gemini, ElevenLabs, fal.ai, …)
 
 ## License
 

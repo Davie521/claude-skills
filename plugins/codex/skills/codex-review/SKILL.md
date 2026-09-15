@@ -1,11 +1,11 @@
 ---
 name: codex-review
-description: Default code review route — runs Codex via MCP with the multi-language code-review methodology (severity matrix, file:line, scope triage, mandatory security pass). Read-only, no edits. Trigger when the user says "code review" / "审一下" / "review 一下" / "审这个 diff" / "用 codex 审" / "second opinion" / "复审" / "看看这次改动" or asks for any code review on a diff, file, or PR. This is the preferred entry point — route to the built-in /code-review skill when the user wants inline PR comments (--comment) or the findings auto-applied (--fix), and to the Claude-subagent dispatcher (code-review:code-review) only when the user explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review".
+description: Default code review route — runs Codex (read-only `codex exec` via the codex-run wrapper) with the multi-language code-review methodology (severity matrix, file:line, scope triage, mandatory security pass). Read-only, no edits. Trigger when the user says "code review" / "审一下" / "review 一下" / "审这个 diff" / "用 codex 审" / "second opinion" / "复审" / "看看这次改动" or asks for any code review on a diff, file, or PR. This is the preferred entry point — route to the built-in /code-review skill when the user wants inline PR comments (--comment) or the findings auto-applied (--fix), and to the Claude-subagent dispatcher (code-review:code-review) only when the user explicitly asks for "Claude reviewers" / "subagent review" / "the multi-agent code-review".
 ---
 
-# Codex Review (MCP)
+# Codex Review
 
-The **default** code review route for this user. Codex sees the code without Claude's prior assumptions and reports back through a single MCP round-trip. Read-only by hard default.
+The **default** code review route for this user. Codex sees the code without Claude's prior assumptions and reports back from a single read-only `codex exec` run. Read-only by hard default.
 
 ## When to use
 
@@ -31,34 +31,48 @@ Additional reasons to pick the plugin dispatcher (`code-review:code-review`):
 
 ## Invocation
 
-Make exactly one `mcp__codex__codex` call with:
+Codex removed `codex mcp-server` in 0.154.0, so there is no MCP tool any more.
+Run exactly one review through the `codex-run` wrapper (`~/.local/bin/codex-run`):
 
-| param | value |
-|---|---|
-| `prompt` | The review brief (see template below) |
-| `sandbox` | `read-only` |
-| `approval-policy` | `never` |
-| `cwd` | The current working directory (absolute path) |
-| `model` | stdout of `codex-best-model` (see below); the name the user gave, if they named one |
-| `config` | `{"model_reasoning_effort": "<stdout of `codex-best-model --effort`>"}` |
+1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-review.XXXXXX")` — one scratch dir per review.
+2. Write the review brief (template below) to `$D/prompt.md` with the Write tool —
+   not a heredoc, diffs contain quotes and `$`.
+3. Run with the Bash tool, **`run_in_background: true`**:
+   `codex-run <absolute cwd> "$D/prompt.md" "$D"`
+   Add `--model <name>` only if the user named a model. Reviews take minutes
+   (median ~7 min, up to ~17), past the 10-minute foreground Bash limit — so never
+   run it in the foreground. Wait for the completion notification, then read the
+   task output.
+4. Exit code decides what happened — **not** whether text came back:
 
-**Why `config` is mandatory here.** The MCP server is launched as
-`codex mcp-server -c model_reasoning_effort=xhigh`, and that launch flag
-outranks `~/.codex/config.toml` — so without a per-call override every review
-silently runs at `xhigh`. A per-call `config` object outranks the launch flag,
-making it the only way to lift review above `xhigh`. Verified 2026-09-06
-against the rollout log's `turn_context`: a passed value is recorded verbatim,
-in both directions (`low` and `max` both took). Keys in this object are
-**config.toml keys (snake_case)** — `model_reasoning_effort`, not
-`model-reasoning-effort`. A misspelled key is ignored silently, not rejected.
+| exit | meaning | do |
+|---|---|---|
+| `0` | review finished; the report follows the `-----` line | present it (see After the call) |
+| `3` | Codex reported errors (usage limit, auth, bad model) — the wrapper prints them | report verbatim, stop |
+| `124` | hit `CODEX_RUN_MAX_SECS` (default 2400 s) | report, stop; offer a rerun at a lower `--effort` |
+| `90` | no codex with `--ignore-user-config` on this machine | report, stop |
+| other | codex crashed — wrapper prints stderr tail | report verbatim, stop |
+
+What the wrapper fixes for you, so do not re-add these by hand:
+
+- `--ignore-user-config`: `~/.codex/config.toml` is skipped, so the user's own
+  Codex MCP servers (blender, node_repl…) are not spawned and its global
+  `sandbox_mode = "danger-full-access"` cannot leak into a review.
+- `-s read-only` and `--skip-git-repo-check` (reviews of non-git paths work).
+- Model = `codex-best-model`, effort = `codex-best-model --effort` (see below).
+- Success is judged from the event stream: Codex exits 0 even when every tool
+  call inside the run failed, so the wrapper requires no `error` / `turn.failed`
+  events, a `turn.completed` event and a non-empty final answer.
+
+Artifacts stay in `$D` (`last.md`, `events.jsonl`, `stderr.log`) for debugging.
 
 **Run reviews at the model's ceiling.** `codex-best-model --effort` prints the
 highest level the selected model supports, so model and effort always match:
 today that resolves to `ultra` on `gpt-6-astra`. Do not hardcode `ultra` — not
 every model reaches it (`gpt-5.5` stops at `xhigh`, `gpt-5.6-luna` at `max`),
 and passing a level the model does not list is a silent-downgrade risk once the
-auto-selected flagship changes. If the command exits non-zero, fall back to
-`"max"`.
+auto-selected flagship changes. The wrapper falls back to `max` if the command
+fails; pass `--effort <level>` only when the user asks for a lighter run.
 
 `ultra` is "maximum reasoning with automatic task delegation" — the model may
 fan work out to sub-tasks. Budget for it: reviews already ran ~7–8 min at the
@@ -66,7 +80,7 @@ median on `max`, and a `max`-level review has hit the plan usage limit
 mid-report before. A review that dies partway with a usage-limit error is that
 expected failure mode, not a broken skill — rerun later or drop one level.
 
-**Picking the model.** Run `codex-best-model` and pass its stdout as `model`.
+**Picking the model.** `codex-run` calls `codex-best-model` and passes its stdout as the model.
 It reads `~/.codex/models_cache.json` — the catalog the Codex CLI refreshes on
 its own — and prints the `visibility: "list"` entry with the lowest `priority`,
 which is OpenAI's own ranking with `1` as most capable. A newly shipped
@@ -75,11 +89,11 @@ flagship is therefore picked up automatically, with nothing to edit here. Add
 
 Do **not** hardcode a slug in this file: that silently keeps reviews on an
 ageing model after a better one ships. If `codex-best-model` exits non-zero,
-omit `model` entirely and let Codex fall back to `~/.codex/config.toml` — never
-guess a model name. Never pass a `visibility: "hide"` model such as
-`gpt-reserve` or `codex-auto-review`; those are internal to Codex.
+the wrapper omits the model and Codex uses its built-in default — never guess a
+model name. Never pass a `visibility: "hide"` model such as `gpt-reserve` or
+`codex-auto-review`; those are internal to Codex.
 
-`sandbox=read-only` + `approval-policy=never` is a hard default. Override **only** if the user explicitly says "let codex edit / fix it" — in that case raise to `workspace-write` + `on-request` and confirm scope before calling.
+Read-only is a hard default and `codex-run` has no write mode. If the user explicitly says "let codex edit / fix it", that is not this skill — confirm scope with the user and hand off to `codex:codex-rescue`.
 
 ## Prompt template
 
@@ -153,7 +167,7 @@ Apply the same rules as the `codex-result-handling` skill in the upstream plugin
 - Preserve evidence boundaries — if Codex marked something as inference or open question, keep that label.
 - **STOP after presenting findings.** Do not apply fixes. Ask the user which findings, if any, to fix. Auto-fixing from a review is forbidden, even for "obvious" ones — that's the whole point of an independent review.
 - If Codex reported no findings, say so directly and include its "highest-risk area scrutinised" note so the user can judge coverage.
-- If the MCP call failed (auth error, sandbox violation, malformed response), report the failure verbatim and stop. Do not generate a substitute review yourself.
+- If `codex-run` exited non-zero (usage limit, auth error, timeout, crash), report its output verbatim and stop. Do not generate a substitute review yourself.
 
 ## What this skill is NOT
 

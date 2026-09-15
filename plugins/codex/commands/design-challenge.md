@@ -1,13 +1,13 @@
 ---
-description: Codex design challenge via MCP — asks "is this approach right?" not "are there bugs?". Surfaces assumptions, failure modes, alternatives. Read-only.
+description: Codex design challenge via codex exec (codex-run wrapper) — asks "is this approach right?" not "are there bugs?". Surfaces assumptions, failure modes, alternatives. Read-only.
 argument-hint: '[path | <pr-number> | blank for working tree] [--base <ref>] [hypothesis / focus text ...]'
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh:*), mcp__codex__codex
+allowed-tools: Read, Glob, Grep, Write, Bash(git:*), Bash(gh:*), Bash(mktemp:*), Bash(codex-run:*)
 ---
 
 # `/design-challenge`
 
-Run an adversarial design review through the `mcp__codex__codex` MCP tool. Distinct from `/codex-review` — this command challenges the **approach**, not the **correctness** of the code.
+Run an adversarial design review through one read-only `codex exec` run, via the `codex-run` wrapper. Distinct from `/codex-review` — this command challenges the **approach**, not the **correctness** of the code.
 
 Raw slash-command arguments:
 `$ARGUMENTS`
@@ -15,7 +15,7 @@ Raw slash-command arguments:
 ## Core constraint
 
 - **Review-only.** Do not fix issues, apply patches, draft alternative implementations, or hint that you are about to.
-- Your only job: pick the scope, hand it to Codex through one MCP call, and return Codex's output verbatim.
+- Your only job: pick the scope, hand it to Codex through one `codex-run`, and return Codex's output verbatim.
 - No paraphrasing, no summarizing, no commentary before or after the Codex output.
 - This is a **discussion artifact, not a gate.** Do not translate Codex's recommendation into a code change. Wait for the user to decide which threads to pull on.
 
@@ -53,27 +53,24 @@ Keep the CHALLENGE DISCIPLINE block and OUTPUT FORMAT block (Assumptions / Failu
 
 ## Invocation
 
-Call `mcp__codex__codex` exactly once with:
+Run exactly one challenge, as described in the `codex:design-challenge` skill's Invocation section:
 
-| param | value |
-|---|---|
-| `prompt` | The composed prompt |
-| `sandbox` | `read-only` (hard default — never override from this command) |
-| `approval-policy` | `never` (hard default) |
-| `cwd` | Absolute path of the current working directory |
-| `model` | Unset — let server default |
+1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-challenge.XXXXXX")`
+2. Write the composed prompt to `$D/prompt.md` with the Write tool.
+3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"`. Wait for the completion notification.
+4. Exit `0` → the critique is everything after the `-----` line. Non-zero → see Output handling.
 
-Never set `workspace-write` from this command. A design challenge that lets Codex write contradicts the whole framing.
+`codex-run` is read-only with no write mode. A design challenge that lets Codex write contradicts the whole framing.
 
 ## Output handling
 
 - Return Codex's response **verbatim**. Preserve the four-section structure (Assumptions / Failure modes / Alternatives / Recommendation).
-- If the MCP call fails (provider auth, network, malformed response), print the failure line(s) and stop. Do not generate a substitute critique.
+- If `codex-run` exits non-zero (Codex errors, timeout, crash), print its output and stop. Do not generate a substitute critique.
 - After printing, **stop**. Do not edit files, do not draft an alternative implementation, do not "helpfully" apply Codex's recommendation. The user reads, the user decides.
 
 ## Out of scope
 
-- Background execution — MCP is synchronous; no `--wait` / `--background` flags.
+- `--wait` / `--background` flags — the run always goes to the background because it takes minutes.
 - Bug hunting / severity matrix / BLOCK-APPROVE verdict — those are `/codex-review`'s job.
 - Auto-iterating on the design — that's a conversation between the user and Claude, not this command's mandate.
 - Posting to GitHub — out of scope.

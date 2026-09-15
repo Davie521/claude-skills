@@ -1,9 +1,9 @@
 ---
 name: design-challenge
-description: Challenge an implementation approach or design choice via Codex MCP. Read-only, asks "is this the right path?" — not "are there bugs?". Trigger when the user says "质疑这个方案" / "这个设计靠不靠谱" / "challenge this design" / "design review" / "second-guess this approach" / "考虑过 X 吗" / "is this the right approach" / "stress-test the design" / "punch holes in this". Returns assumptions / failure modes / alternatives — NOT a bug list, NOT a severity matrix. Division of labor with grill-with-docs — user wants to be interactively grilled question-by-question → dev-workflow:grill-with-docs; user wants a fully-formed proposal attacked by an external model in one pass → this skill.
+description: Challenge an implementation approach or design choice via Codex (read-only `codex exec` through the codex-run wrapper). Read-only, asks "is this the right path?" — not "are there bugs?". Trigger when the user says "质疑这个方案" / "这个设计靠不靠谱" / "challenge this design" / "design review" / "second-guess this approach" / "考虑过 X 吗" / "is this the right approach" / "stress-test the design" / "punch holes in this". Returns assumptions / failure modes / alternatives — NOT a bug list, NOT a severity matrix. Division of labor with grill-with-docs — user wants to be interactively grilled question-by-question → dev-workflow:grill-with-docs; user wants a fully-formed proposal attacked by an external model in one pass → this skill.
 ---
 
-# Design Challenge (MCP)
+# Design Challenge
 
 The companion to `codex:codex-review`. Where codex-review asks **"is this code correct?"**, this skill asks **"is this approach right?"** — surfacing assumptions, hidden coupling, and real-world failure modes the author may not have considered.
 
@@ -22,7 +22,7 @@ The companion to `codex:codex-review`. Where codex-review asks **"is this code c
 
 ## codex-review vs. design-challenge
 
-Both run Codex via MCP, read-only. They differ in what they look for:
+Both run Codex through `codex-run`, read-only. They differ in what they look for:
 
 | | `codex-review` | `design-challenge` |
 |---|---|---|
@@ -36,17 +36,16 @@ Chain pattern (rare, high-stakes only): `design-challenge` → reach alignment o
 
 ## Invocation
 
-Make exactly one `mcp__codex__codex` call with:
+Codex removed `codex mcp-server` in 0.154.0. Run exactly one challenge through `codex-run`, the same way `codex:codex-review` does — see that skill's Invocation section for the exit-code table and what the wrapper already handles:
 
-| param | value |
-|---|---|
-| `prompt` | The challenge brief (template below) |
-| `sandbox` | `read-only` |
-| `approval-policy` | `never` |
-| `cwd` | Absolute path of the current working directory |
-| `model` | Unset unless the user named one |
+1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-challenge.XXXXXX")`
+2. Write the challenge brief (template below) to `$D/prompt.md` with the Write tool.
+3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"` — add `--model <name>` only if the user named one. Wait for the completion notification.
+4. Exit `0` → the critique follows the `-----` line. Any other exit → report the wrapper's output verbatim and stop.
 
-`sandbox=read-only` + `approval-policy=never` is a **hard** default. Never override from this skill — challenging a design that's not yet implemented does not need write access. If the user wants Codex to draft an alternative implementation, use `codex:codex-rescue` instead.
+Model and effort default to `codex-best-model` (strongest listed model, at its ceiling). Before the 0.154 migration this skill ran at `~/.codex/config.toml`'s level, which the wrapper now deliberately ignores; pass `--effort high` if the user wants a quicker pass.
+
+Read-only is a **hard** default and `codex-run` has no write mode — challenging a design that's not yet implemented does not need write access. If the user wants Codex to draft an alternative implementation, use `codex:codex-rescue` instead.
 
 ## Prompt template
 
@@ -138,7 +137,7 @@ so the reader can see the coverage of the all-clear.
 - Preserve Codex's section structure (Assumptions → Failure modes → Alternatives → Recommendation) verbatim.
 - This is a **discussion artifact, not a gate.** Do not treat it as merge approval/rejection. Do not auto-apply any of its suggestions. Wait for the user to decide which threads to pull on.
 - If the user wants to iterate the design after reading it, that's a design conversation — not a code edit. Help them think; don't start writing the alternative.
-- If the MCP call fails or returns malformed output, report verbatim and stop. Do not generate a substitute design critique.
+- If `codex-run` exits non-zero or the critique is malformed, report verbatim and stop. Do not generate a substitute design critique.
 
 ## What this skill is NOT
 

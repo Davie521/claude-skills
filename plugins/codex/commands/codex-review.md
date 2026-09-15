@@ -1,13 +1,13 @@
 ---
-description: Codex code review via MCP — severity-tagged findings, read-only, single round-trip. Local diff, file/dir, or GitHub PR.
+description: Codex code review via codex exec (codex-run wrapper) — severity-tagged findings, read-only, one run. Local diff, file/dir, or GitHub PR.
 argument-hint: '[path | <pr-number> | blank for working tree] [--base <ref>] [focus text ...]'
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh:*), Bash(codex-best-model), Bash(codex-best-model --effort), mcp__codex__codex
+allowed-tools: Read, Glob, Grep, Write, Bash(git:*), Bash(gh:*), Bash(mktemp:*), Bash(codex-best-model), Bash(codex-best-model --effort), Bash(codex-run:*)
 ---
 
 # `/codex-review`
 
-Run a Codex code review through the `mcp__codex__codex` MCP tool. The companion CLI is not involved — this is a single MCP round-trip.
+Run a Codex code review through one read-only `codex exec` run, via the `codex-run` wrapper. (`codex mcp-server` was removed in Codex 0.154.0.)
 
 Raw slash-command arguments:
 `$ARGUMENTS`
@@ -15,7 +15,7 @@ Raw slash-command arguments:
 ## Core constraint
 
 - **Review-only.** Do not fix issues, apply patches, or hint that you are about to.
-- Your only job: pick the scope, hand it to Codex through one MCP call, and return Codex's output verbatim.
+- Your only job: pick the scope, hand it to Codex through one `codex-run`, and return Codex's output verbatim.
 - No paraphrasing, no summarizing, no commentary before or after the Codex output.
 - If Codex returns findings, do not "helpfully" start applying them. The user will say what to fix.
 
@@ -53,28 +53,24 @@ Use the prompt template from the `codex:codex-review` skill. The skill is the so
 
 ## Invocation
 
-Call `mcp__codex__codex` exactly once with:
+Run exactly one review, as described in the `codex:codex-review` skill's Invocation section:
 
-| param | value |
-|---|---|
-| `prompt` | The composed prompt |
-| `sandbox` | `read-only` (hard default — never override from this command) |
-| `approval-policy` | `never` (hard default) |
-| `cwd` | Absolute path of the current working directory |
-| `model` | stdout of `codex-best-model` — strongest listed model, auto-tracks new releases. On non-zero exit omit `model` and let `~/.codex/config.toml` decide; never guess a slug. |
-| `config` | `{"model_reasoning_effort": "<stdout of `codex-best-model --effort`>"}` — required; the server is launched with `-c model_reasoning_effort=xhigh`, which only a per-call `config` can outrank. The flag prints the selected model's ceiling (today `ultra`); fall back to `"max"` if it exits non-zero. Keys are config.toml snake_case. |
+1. `D=$(mktemp -d "${TMPDIR:-/tmp}/codex-review.XXXXXX")`
+2. Write the composed prompt to `$D/prompt.md` with the Write tool.
+3. Bash with **`run_in_background: true`**: `codex-run <absolute cwd> "$D/prompt.md" "$D"`. The wrapper picks the model (`codex-best-model`) and effort (`codex-best-model --effort`, today `ultra`), forces `-s read-only`, and skips `~/.codex/config.toml`. Reviews take minutes, beyond the foreground Bash limit — wait for the completion notification.
+4. Exit `0` → the review is everything after the `-----` line. Non-zero → see Output handling.
 
-Do **not** set `workspace-write` or `on-request` from `/codex-review` — that's a different workflow. If the user wants Codex to actually edit, they should use `/codex:rescue` (upstream) or `codex:codex-rescue` subagent.
+There is no write mode. If the user wants Codex to actually edit, they should use `/codex:rescue` (upstream) or `codex:codex-rescue` subagent.
 
 ## Output handling
 
 - Return Codex's response **verbatim**. No reformat, no commentary, no "here's what I found" preamble.
-- If the MCP call fails (provider auth, network, malformed response), print the failure line(s) and stop. Do not invent findings to fill the gap.
+- If `codex-run` exits non-zero (3 = Codex errors such as usage limit or auth, 124 = timeout, other = crash), print its output and stop. Do not invent findings to fill the gap.
 - After printing, **stop**. Do not edit any files. Do not announce a follow-up. Wait for the user.
 
 ## Out of scope
 
-- Background execution — MCP is synchronous and the round-trip is short. No `--wait` / `--background` flags.
+- `--wait` / `--background` flags — the run always goes to the background because reviews take minutes.
 - `/codex:status` job tracking — this command does not register a companion job. To see history, the user should switch to `/codex:review` (upstream).
 - Auto-fixing — see Core constraint.
 - Posting to GitHub (`gh pr review`) — out of scope for v1.

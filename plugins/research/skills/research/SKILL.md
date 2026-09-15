@@ -1,12 +1,12 @@
 ---
 name: research
-description: Multi-source deep research. Prefers firecrawl/exa MCPs, falls back to the bundled /deep-research workflow or built-in WebSearch when they are absent. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
+description: Multi-source deep research. Prefers the exa MCP for search (firecrawl for scraping), falls back to the bundled /deep-research workflow or built-in WebSearch when they are absent. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
 origin: ECC
 ---
 
 # Research
 
-Produce thorough, cited research reports from multiple web sources — using firecrawl/exa MCP tools when available, otherwise the fallbacks below.
+Produce thorough, cited research reports from multiple web sources — using exa (search) and firecrawl (scraping) MCP tools when available, otherwise the fallbacks below.
 
 ## When to Activate
 
@@ -19,8 +19,8 @@ Produce thorough, cited research reports from multiple web sources — using fir
 ## Backends — check availability before planning, not mid-run
 
 Preferred, at least one of:
-- **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
-- **exa** — `web_search_exa`, `web_fetch_exa` (the installed server exposes exactly these two; verified signatures live in the `search-routing` skill)
+- **exa** — the search backend: `web_search_exa`, `web_fetch_exa` (the configured server exposes exactly these two; verified signatures live in the `search-routing` skill). It scored best in a 2026-09-13 blind eval, including on Chinese and `site:` queries.
+- **firecrawl** — the scraper: `firecrawl_scrape` for JS-heavy pages or structured extraction, `firecrawl_crawl` for a site section. `firecrawl_search` is a fallback only — Free plan, 1,000 credits/month; on `402` / `Insufficient credits` stop calling it for the rest of the run and tell every subagent so.
 
 Both together give the best coverage. Configure them as MCP servers (`claude mcp add`, or the `mcpServers` block of your Claude Code config / `~/.codex/config.toml` for Codex). MCP servers are scoped **per config directory** — if you run more than one, a server added under one is absent under the other, so verify from the session you actually intend to research in.
 
@@ -63,20 +63,24 @@ Break the topic into 3-5 research sub-questions. Example:
 
 For EACH sub-question, search using available MCP tools:
 
-**With firecrawl:**
+**With exa (default):**
+```
+web_search_exa(query: "<sub-question as a description of the ideal page>", numResults: 8,
+               objective: "<which sources should rank first / be excluded>")
+```
+
+Add `site:<domain>` to `query` to stay on one site (verified to work on the
+remote exa server, 2026-09-15).
+
+**With firecrawl (fallback, only if exa comes back thin and credits remain):**
 ```
 firecrawl_search(query: "<sub-question keywords>", limit: 8)
 ```
 
-**With exa:**
-```
-web_search_exa(query: "<sub-question keywords>", numResults: 8)
-```
-
 Exa has no date-filter parameter. For recency-sensitive sub-questions, put the
-time constraint in the query text (e.g. "<keywords> 2025", "<keywords> latest"),
-or route to `firecrawl_search` with a date operator in the query
-(e.g. `<keywords> after:2025-01-01`).
+time constraint in `query` or `objective` (e.g. "<keywords> 2025", "published
+after June 2025"); only reach for `firecrawl_search` with a date operator
+(e.g. `<keywords> after:2025-01-01`) when exa's results are clearly stale.
 
 **Search strategy:**
 - Use 2-3 different keyword variations per sub-question
@@ -88,18 +92,20 @@ or route to `firecrawl_search` with a date operator in the query
 
 For the most promising URLs, fetch full content:
 
-**With firecrawl:**
-```
-firecrawl_scrape(url: "<url>")
-```
-
-**With exa:**
+**With exa (default):**
 ```
 web_fetch_exa(urls: ["<url>"], maxCharacters: 20000)
 ```
 
-`web_fetch_exa` handles static pages. For JS-heavy or paywalled pages, prefer
-`firecrawl_scrape`; to sweep a whole site section, use `firecrawl_crawl`.
+**With firecrawl:**
+```
+firecrawl_scrape(url: "<url>", formats: ["markdown"])
+```
+
+`web_fetch_exa` handles static pages; if it fails, try the free
+`curl -s https://r.jina.ai/<url>` before spending credits. For JS-heavy pages,
+prefer `firecrawl_scrape` (keep `formats: ["markdown"]` — JSON formats cost +4
+credits per page); to sweep a whole site section, use `firecrawl_crawl`.
 
 Read 3-5 key sources in full for depth. Do not rely only on search snippets.
 

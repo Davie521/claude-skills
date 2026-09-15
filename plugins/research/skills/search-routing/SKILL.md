@@ -1,6 +1,6 @@
 ---
 name: search-routing
-description: Single decision skill for all web search needs. Routes between exa and firecrawl_search based on query characteristics. Auto-selects the cheapest sufficient tool; asks user before invoking expensive deep modes. Use this BEFORE any web search call when the user has multiple search MCPs available.
+description: Single decision skill for all web search needs. exa is the default search backend (including `site:` and Chinese queries); firecrawl is for scraping pages exa cannot fetch, and firecrawl_search is only a fallback. Asks user before invoking expensive deep modes. Use this BEFORE any web search call when the user has multiple search MCPs available.
 origin: ECC
 ---
 
@@ -9,7 +9,15 @@ origin: ECC
 Two search MCPs are configured: **exa** and **firecrawl**. (linkup was removed
 2026-09-15: no measured quality edge over exa, its key sat on the command line,
 and ~81% of its spend went to 10×-priced deep mode.)
-This skill picks one — never run both by default.
+
+**exa is the search backend; firecrawl is a scraper.** In a 2026-09-13 blind
+eval of 20 real queries, exa scored 54/60 against built-in `WebSearch` 47 and
+`firecrawl_search` 46; exa led on Chinese cloud / payment docs, while
+`firecrawl_search` once surfaced a superseded 2021 policy document. firecrawl
+also runs on the Free plan (1,000 credits/month, shared by both config dirs) and
+ran dry in both July and August.
+
+Pick one tool — never run both by default.
 Expensive / deep modes require explicit user confirmation.
 
 > **First check they exist in this session.** MCP servers are scoped per config
@@ -20,25 +28,34 @@ Expensive / deep modes require explicit user confirmation.
 
 ## Decision Order (apply top-down, stop at first match)
 
-### 0. Known URL → direct fetch, no search
+### 0. Known URL → fetch, no search
 
 - Static page → `mcp__exa__web_fetch_exa`
-- JS-heavy / paywall / needs rendering → `mcp__firecrawl__firecrawl_scrape`
+- exa fetch fails or comes back empty → `curl -s https://r.jina.ai/<url>`
+  (free, no key; matched firecrawl on 4 of 5 hard pages in a 2026-09-13 test)
+- Needs JS rendering, clicks, a stealth proxy, or JSON-schema extraction →
+  `mcp__firecrawl__firecrawl_scrape`. Ask for `formats: ["markdown"]` unless you
+  truly need structured output: JSON / question formats cost +4 credits per page
+  and were 80% of past scrape spend.
 
-### 1. Operator-laden or domain-targeted → firecrawl_search (~$0.001)
+### 1. Operator-laden or domain-targeted → exa, operator in the query
 
-Trigger when the query contains: `site:`, `"..."`, `OR`, `intitle:`,
-`inurl:`, `-keyword`, or targets a specific domain
-(e.g. `site:github.com awesome lists`).
+Put `site:<domain>` directly in `query`. Verified 2026-09-15 against the remote
+server: `site:v2ex.com` and `site:news.ycombinator.com` each returned 8/8 results
+on that domain, versus 0/8 for the same query without the operator. Use
+`objective` to say which pages should rank first or be excluded.
 
-Empirical signal: in observed usage, 100% of `site:` operator queries
-went to firecrawl. Formalize this instinct.
+Other operators (`"exact phrase"`, `OR`, `-keyword`, `intitle:`, `inurl:`,
+`after:`) are **untested** on exa. If the answer depends on one being honored
+strictly, check the results; when they ignore it, fall back to `firecrawl_search`
+(operator-aware) or built-in `WebSearch` (`allowed_domains` / `blocked_domains`).
 
-### 2. Chinese-language SERPs → firecrawl_search
+### 2. Chinese-language queries → exa
 
-Trigger when the query is mostly Chinese characters AND targets
-China-specific tools/services (微信支付 / 国内 API / 国内厂商 / 汇付斗拱 etc.).
-Firecrawl reaches Chinese SERPs better than exa's neural index.
+Same tool as the default. Name the official source in `objective` (e.g. "official
+docs on cloud.tencent.com should rank first") — in a 2026-09-15 check on a 腾讯云
+SES question, all 8 results came from Tencent Cloud's own domains. Fall back to
+`firecrawl_search` only when exa comes back thin.
 
 ### 3. Pricing / multi-hop facts / release timing → exa, then verify at the source
 
@@ -79,7 +96,17 @@ very large pages get truncated → read the doc source on GitHub with
 
 Everything else: natural-language descriptive queries, "compare X vs Y",
 academic / arxiv search, engineering blogs, "how they built X",
-company intel, people lookup. This covers ~80% of remaining cases.
+company intel, people lookup (`category:company` / `category:people` in the
+query). This covers ~80% of remaining cases.
+
+### When firecrawl is out of credits
+
+`402 Payment Required` or `Insufficient credits` means the month's quota is gone
+(Free plan, resets on the 7th). **Do not retry, and do not let parallel subagents
+each rediscover it**: switch to exa / `WebSearch` / Jina for the rest of the
+session, and when dispatching subagents tell them "firecrawl credits are
+exhausted, don't call it". Past logs show 478 subagents each hitting 402 on
+their own.
 
 ### 6. DEEP MODES — ASK USER FIRST
 
@@ -93,6 +120,8 @@ Candidates for deep:
 
 - `research:research` skill (orchestrated multi-search) — full
   research workflows
+- `firecrawl_agent`, `firecrawl_crawl` over a large site, `firecrawl_interact`
+  (billed per page or per browser-minute against the 1,000-credit month)
 - Exa's advanced / deep tools (`web_search_advanced_exa`, `agent_run`) are
   **not enabled**: the exa server URL pins `tools=web_search_exa,web_fetch_exa`
   on purpose, because `agent_run` bills per run. Enabling them is a config
@@ -105,30 +134,43 @@ results are clearly insufficient.
 
 | Tool | Cost | When |
 |---|---:|---|
-| firecrawl_search | ~$0.001 | operators, Chinese SERPs, URL list |
-| exa standard | $0.005 | default, ~80% of cases |
+| exa `web_search_exa` | $0.005 | default search, incl. `site:` and Chinese |
+| Jina Reader (`r.jina.ai`) | free (rate-limited) | known URL when exa fetch fails |
+| `firecrawl_scrape` | 1 credit/page, +4 for JSON / question formats | JS-heavy pages, structured extraction |
+| `firecrawl_search` | 2 credits per 10 results | fallback only |
 | Context7 query-docs | free: 1,000 calls/month with an account key (`CONTEXT7_API_KEY`); anonymous limits unpublished | library / API docs |
+
+firecrawl Free plan: 1,000 credits/month, 10 requests/minute per endpoint,
+2 concurrent; a failed fetch that returns a 403/404 page still costs 1 credit.
 
 ## Anti-patterns
 
-- Don't pass `site:` / `"..."` to exa — it's neural, ignores operators
+- Don't route `site:` or Chinese queries to `firecrawl_search` by default — exa
+  handles both (§1–2)
 - Don't use firecrawl_search alone if you need content body —
   it returns links + descriptions only; chain with scrape if needed
+- Don't keep calling firecrawl after a 402 / `Insufficient credits`
 - Don't fan out the same query to both backends "just to be thorough" — pick one
 - Don't skip Context7 for library docs and go straight to exa — load it via
   `ToolSearch` first. In a 2026-09-13 spot check it answered 7 of 7 doc
   questions without a factual error at 4–8× fewer tokens than exa; fall back
   only when its answer is off topic (see §4)
 
-## Exa tool signatures (verified against live server, 2026-08-08)
+## Exa tool signatures (verified against the remote server, 2026-09-15)
 
-The installed exa-mcp-server exposes exactly two tools — anything else
-documented elsewhere (get_code_context_exa, web_search_advanced_exa,
-crawling_exa) does not exist:
+The configured server (`https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa`)
+exposes exactly two tools:
 
-- `mcp__exa__web_search_exa(query, numResults)` — neural search; ignores
-  `site:` / quote operators
-- `mcp__exa__web_fetch_exa(urls, maxCharacters)` — fetch page content
+- `mcp__exa__web_search_exa(query, numResults, objective)` — `query` is a
+  natural-language description of the ideal page; it honors `site:<domain>` and
+  `category:company` / `category:people`. `objective` says which pages should
+  rank first or be excluded and what facts to pull. There is no date filter:
+  put the time frame in `query` or `objective`.
+- `mcp__exa__web_fetch_exa(urls, maxCharacters)` — batch several URLs in one
+  call; `maxCharacters` defaults to 3000.
+
+Anything documented elsewhere — `get_code_context_exa` (shut down 2026-04),
+`web_search_advanced_exa`, `crawling_exa` — is not available here.
 
 Tip: the first retrieval round is often about learning the project's own
 vocabulary — a search for "rate limit" may fail because the codebase calls
@@ -136,6 +178,6 @@ it "throttle". Re-search with the project's terms before concluding absence.
 
 ## Related Skills
 
-- `research` — orchestrated firecrawl + exa research workflow,
-  including business-research scenario checklists
+- `research` — orchestrated exa-first research workflow (firecrawl for
+  scraping), including business-research scenario checklists
   (also requires user confirmation per §6)

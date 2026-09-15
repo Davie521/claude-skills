@@ -23,7 +23,7 @@ Every skill below names what it's for in its heading, then states how it's **tri
 | [`research`](#research) | 3 | Deep research incl. market research, search routing, LLM cost discipline |
 | [`skills`](#skills) | 3 | Skill management — stocktake, compliance audit, rules distillation |
 | [`business`](#business) | 1 | Investor materials with outreach cadence |
-| [`codex`](#codex) | 2 | Codex MCP second opinion — code review, design challenge |
+| [`codex`](#codex) | 2 | Codex second opinion (read-only `codex exec`) — code review, design challenge |
 | [`session-summary`](#session-summary) | hooks only | Session summary hooks and scripts (no skills) |
 
 **Actually used, in order** (counted by skill injections, not tool calls): `deep-plan` › `/cpr` › `santa-method` › `research` › `ui-ux-pro-max`. Those five carry the daily load; the rest is reference material waiting for its topic — zero invocations doesn't mean zero value when a skill exists for one specific situation.
@@ -537,13 +537,13 @@ Guidance for deck structure, one-pagers, memos, financial models, use-of-funds t
 
 ## codex
 
-Second opinion via Codex MCP — read-only sandbox, approvals off, **never edits**. The two split cleanly: one hunts bugs, one questions the direction.
+Second opinion via Codex — one read-only `codex exec` run through `~/.local/bin/codex-run` (Codex removed `codex mcp-server` in 0.154.0), **never edits**. The two split cleanly: one hunts bugs, one questions the direction.
 
 ### `codex-review` — Default code review route
 
 **Trigger**: say code review / 审一下 / second opinion / take a look at this change
 
-Runs the multi-language review methodology through `mcp__codex__codex` on a different model: severity matrix, `file:line` anchors, scope triage, mandatory security pass. Three-way routing:
+Runs the multi-language review methodology through `codex-run` on a different model: severity matrix, `file:line` anchors, scope triage, mandatory security pass. Three-way routing:
 
 - default here — the whole point is an **outside** opinion
 - inline PR comments (`--comment`) or auto-applied fixes (`--fix`) → the built-in `/code-review`
@@ -607,7 +607,7 @@ Most skills auto-trigger from natural language matching their description — th
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) for the `cpr` workflow
 - Feishu MCP server for the `feishu` skill
-- Codex CLI + MCP server for the `codex` plugin
+- Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin
 - A Python venv for the `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` scripts
 - Various API keys depending on skill (Exa, firecrawl, linkup, Context7, Gemini, ElevenLabs, fal.ai, …)
 

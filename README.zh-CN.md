@@ -23,7 +23,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 | [`research`](#research) | 3 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律 |
 | [`skills`](#skills) | 3 | Skill 管理 — 盘点、合规审计、规则蒸馏 |
 | [`business`](#business) | 1 | 投资人材料 + outreach 跟进节奏 |
-| [`codex`](#codex) | 2 | Codex MCP 第二意见 — 代码审查、方案质疑 |
+| [`codex`](#codex) | 2 | Codex 第二意见（只读 `codex exec`）— 代码审查、方案质疑 |
 | [`session-summary`](#session-summary) | 仅 hooks | 会话总结 hooks 和脚本（无 skill） |
 
 **实际使用量排序**（按 skill 注入次数统计，不是工具调用数）：`deep-plan` › `/cpr` › `santa-method` › `research` › `ui-ux-pro-max`。这五个是日常主力，其余是「话题一来就上场」的参考资料 —— 零调用不等于没价值，很多 skill 就是等着某个特定场景出现的。
@@ -539,13 +539,13 @@ Deck 结构、一页纸、备忘录、财务模型、use-of-funds 表、里程�
 
 ## codex
 
-通过 Codex MCP 拿第二意见 —— read-only sandbox、approval never，**只读不改**。两个的分工：一个找 bug，一个质疑方向。
+通过 Codex 拿第二意见 —— 经 `~/.local/bin/codex-run` 跑一次只读 `codex exec`（Codex 0.154.0 已删除 `codex mcp-server`），**只读不改**。两个的分工：一个找 bug，一个质疑方向。
 
 ### `codex-review` — 默认代码审查入口
 
 **触发**：说 code review / 审一下 / second opinion / 看看这次改动
 
-通过 `mcp__codex__codex` 让另一个模型跑多语言审查方法论：严重度矩阵、`file:line` 定位、范围分诊、强制安全检查。三方路由表：
+通过 `codex-run` 让另一个模型跑多语言审查方法论：严重度矩阵、`file:line` 定位、范围分诊、强制安全检查。三方路由表：
 
 - 默认走这里 —— 要的就是**外部**第二意见
 - 要发 PR 行内评论（`--comment`）或自动应用修复（`--fix`）→ 内置 `/code-review`
@@ -609,7 +609,7 @@ done
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) — `cpr` 工作流需要
 - 飞书 MCP server — `feishu` skill 需要
-- Codex CLI + MCP server — `codex` plugin 需要
+- Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / linkup / Context7 / Gemini / ElevenLabs / fal.ai 等）
 

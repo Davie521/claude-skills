@@ -89,7 +89,8 @@ gh api repos/{owner}/{repo}/pulls/<N>/requested_reviewers -X POST \
 
 **Copilot 可能因配额用尽而审不了**——此时 review 状态是 `COMMENTED`、正文写着
 `unable to review ... reached their quota limit`、没有任何行内评论。这不是「审查通过」，
-也不是「请求变更」，别把它当成两者中的任何一个：如实告诉用户这次没拿到审查。
+也不是「请求变更」。**用户已定（2026-09-18）：配额用完就不管**——不重试、不再等、不暂停合并，
+CI 通过就照常合并，最终汇报里带一句「Copilot 配额用完，这次没审」即可。
 
 **POST 返回 200 但 `requested_reviewers` 是空数组属正常**——GitHub 立刻把请求转成进行中的审查，
 这个字段随即清空。别据此判定失败又重发，以评论是否出现为准。

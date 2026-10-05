@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
+Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 51 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
 
 每个 skill 的标题就点明它解决什么，下面写清**触发**（怎么让它上场）和**机制**（它内部实际怎么跑）；标题不够说明白的，另起一行 **定位** 补上。
 
@@ -20,7 +20,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 | [`data`](#data) | 2 | 迁移 + PostgreSQL 速查、自动爬虫 |
 | [`quality`](#quality) | 8 | TDD、E2E、安全审查/扫描、对抗式验证 |
 | [`code-review`](#code-review) | 5 agent + 1 命令 | `/code-review` 自动按语言分发到 Python/TypeScript/Swift 专家 + 强制 security 审查 |
-| [`research`](#research) | 3 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律 |
+| [`research`](#research) | 4 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律、OpenCLI 安装引导 |
 | [`skills`](#skills) | 3 | Skill 管理 — 盘点、合规审计、规则蒸馏 |
 | [`business`](#business) | 1 | 投资人材料 + outreach 跟进节奏 |
 | [`codex`](#codex) | 2 | Codex 第二意见（只读 `codex exec`）— 代码审查、方案质疑 |
@@ -494,6 +494,24 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 - **Layer 2 · 让调用变便宜**：按任务体量路由模型档位（cheap / strong 双档常量），不可变 CostTracker 从 `response.usage` 实时计费。
 
 > **定价原则**：一律现查（`claude-api` skill 或官方定价页），文档里绝不硬编码价格数字 —— 硬编码的价格半年后就是错的。
+
+### `setup-opencli` — 带新用户装好 OpenCLI，并验证真能读到数据
+
+**定位**：[OpenCLI](https://github.com/jackwener/OpenCLI) 借用你 Chrome 里的登录态，把小红书、X、B站、知乎、淘宝等 100 多个网站变成命令行命令。这个 skill 只管「装好、连上、验证」，日常用法交给 OpenCLI 自带的 skill（`opencli skills read opencli-usage`），那份跟着版本走。
+**触发**：提到 OpenCLI 或要求安装；任务要读登录后才能看的网站而 `opencli` 还没装好或没连上；`opencli` 报 `command not found` / `BROWSER_CONNECT` / `Extension: disconnected` / `attach failed`；要升级 opencli 或它提示有新版本时
+
+流程：
+
+0. 先跑 `opencli doctor`，三行 `[OK]` 就直接干活，不走安装
+1. **装任何东西之前先讲清楚、等你同意**：一个全局 npm 包、一个 Chrome 扩展，以及代价——连上之后，本机以你身份运行的任何程序都能带着你的登录态操作 Chrome
+2. 检查 Node（装 22 LTS 及以上），不用 `sudo npm`
+3. `npm install -g @jackwener/opencli`，处理 `EACCES` 和 PATH 问题
+4. 在 Chrome 里打开扩展商店页，「添加至 Chrome」由你来点（Chrome 不允许程序代装）；连不上时按表排查，附一个只读脚本，查出扩展装在哪个 Chrome 用户里、是否启用、当前开的是不是那个用户
+5. 你登录目标网站后，跑一条只有登录才有结果的只读命令，拿到真实数据才算装好
+
+附 `references/pitfalls.md`：官方 skill 没写的坑——**升级会悄悄删掉你 eject 改过的适配器**（要 `--ignore-scripts`）、会话丢标签页、`eval` 漂到 `about:blank`、上传被拒、风控限速。
+
+> **只在 macOS 上实测过。** Linux / Windows 流程相同，但打开 Chrome、查进程的命令不同，skill 会照实告诉你而不是瞎猜。
 
 ---
 

@@ -503,13 +503,13 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 流程：
 
 0. 先跑 `opencli doctor`，三行 `[OK]` 就直接干活，不走安装
-1. **装任何东西之前先讲清楚、等你同意**：一个全局 npm 包、一个 Chrome 扩展，以及代价——连上之后，本机以你身份运行的任何程序都能带着你的登录态操作 Chrome
-2. 检查 Node（装 22 LTS 及以上），不用 `sudo npm`
+1. **先确认装了 Chrome，再在装任何东西之前讲清楚、等你同意**：一个全局 npm 包、一个 Chrome 扩展，以及代价——本地 daemon 没有按用户的口令，Chrome 连着时，这台电脑上的任何程序（包括别的账户）都能带着你的登录态操作 Chrome、读你的 cookie；也讲清楚怎么全部撤掉
+2. 检查 Node（22 LTS 及以上，用 fnm / nvm / Homebrew 装），不用 `sudo npm`。Claude Code 自己的 shell 要重启才看得到新的 `PATH`，所以新装的命令一律用绝对路径调
 3. `npm install -g @jackwener/opencli`，处理 `EACCES` 和 PATH 问题
-4. 在 Chrome 里打开扩展商店页，「添加至 Chrome」由你来点（Chrome 不允许程序代装）；连不上时按表排查，附一个只读脚本，查出扩展装在哪个 Chrome 用户里、是否启用、当前开的是不是那个用户
-5. 你登录目标网站后，跑一条只有登录才有结果的只读命令，拿到真实数据才算装好
+4. 在 Chrome 里打开扩展商店页，「添加至 Chrome」由你来点（Chrome 不允许程序代装）；连不上时按表排查（开错用户、多个用户同时连着、daemon 版本过旧……），附一个只读脚本，查出扩展装在哪个 Chrome 用户里（商店版或解压版）、是否启用、当前开的是不是那个用户
+5. 你登录目标网站后，跑一条只有登录才有结果的 `access: read` 命令，拿到真实数据才算装好；绝不拿 `access: write` 的命令做测试
 
-附 `references/pitfalls.md`：官方 skill 没写的坑——**升级会悄悄删掉你 eject 改过的适配器**（要 `--ignore-scripts`）、会话丢标签页、`eval` 漂到 `about:blank`、上传被拒、风控限速。
+附 `references/pitfalls.md`：官方 skill 没写的坑——**升级会悄悄删掉你 eject 改过的适配器**（要 `--ignore-scripts`）、`attach failed`（页面里有别的扩展的 frame，或会话指错了标签页）、`eval` 漂到 `about:blank`、上传被拒、风控限速。
 
 > **只在 macOS 上实测过。** Linux / Windows 流程相同，但打开 Chrome、查进程的命令不同，skill 会照实告诉你而不是瞎猜。
 
@@ -629,6 +629,7 @@ done
 - 飞书 MCP server — `feishu` skill 需要
 - Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
+- Node.js ≥ 20（推荐 22 LTS）和 Google Chrome — `setup-opencli` 需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / Context7 / Gemini / ElevenLabs / fal.ai 等）
 
 ## 许可证

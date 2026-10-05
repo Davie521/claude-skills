@@ -8,50 +8,63 @@ Symptom → cause → fix. Collected from real use of opencli 1.8.x on macOS.
 had customised behaves like stock again. No error, nothing in npm's output.
 
 **Cause:** the postinstall script (`scripts/fetch-adapters.js`) deletes the whole
-`~/.opencli/clis/<site>/` override for every site whose official adapter
-changed — whether or not you edited it. No backup, not moved to the trash.
+`~/.opencli/clis/<site>/` override for every site whose official adapter files
+changed — whether or not you edited it. No backup, not moved to the trash. A
+release can touch most sites' adapter files, so one plain upgrade can take nearly
+all of your overrides at once.
 
 **Fix:** run `opencli adapter status`. If it lists any local overrides:
 
 ```bash
 cp -a ~/.opencli/clis ~/.opencli/clis.bak-$(date +%F)
-opencli daemon stop          # --ignore-scripts also skips the preuninstall that stops it
+opencli daemon stop          # otherwise the old daemon keeps running the old code
 npm install -g @jackwener/opencli@<version> --ignore-scripts
+opencli doctor
 ```
 
-Keep using `--ignore-scripts` on **every** upgrade from then on. Skipping
-postinstall once leaves `~/.opencli/adapter-manifest.json` at the old version;
-the next upgrade without the flag diffs against that stale manifest and removes
-almost all overrides in one go. Skipping postinstall only costs the shell
-completion install — commands work.
+Run these one at a time — never chain the backup and the install into one
+command — and upgrade only after `/bin/ls ~/.opencli/` shows the backup directory.
 
-No local overrides → a plain upgrade is safe.
+Use `--ignore-scripts` on every upgrade while you have overrides. What it costs:
+shell completion isn't refreshed, and your overrides are never cleaned up
+automatically — they keep shadowing upstream fixes for those sites. Drop one you
+no longer need with `opencli adapter reset <site>`.
+
+No local overrides → a plain upgrade is safe; if doctor then reports
+`Stale daemon detected`, run `opencli daemon restart`.
 
 ## BROWSER_CONNECT right after a daemon restart
 
 The extension has not reconnected yet. Poll `opencli daemon status` until the
-line reads `Extension: connected`, then retry the same command. Match the whole
-string (`grep -q 'Extension: connected'`): a pattern like `*connected*` also
-matches `disconnected`.
+line reads `Extension: connected` — give up after ~30 s and go back to the
+SKILL.md §4 table — then retry the same command. Match the whole string
+(`grep -q 'Extension: connected'`): a pattern like `*connected*` also matches
+`disconnected`.
 
 ## `attach failed: Cannot access a chrome-extension:// URL of different extension`
 
-**On `opencli browser <session> …`:** the text blames another extension, but the
-real cause is that the session lost its target tab; `opencli daemon restart`
-won't help. Most predictable fix:
+Chrome refuses to attach its debugger when the target tab contains a frame
+belonging to another extension. Two common causes:
 
-```bash
-opencli browser <session> unbind
-opencli browser <session> open <url>   # opencli opens a tab it controls
-```
+1. **Another extension injects frames into the page** — password managers such
+   as 1Password often do on login forms. OpenCLI's own `opencli-browser` skill
+   says to disable such extensions temporarily. Ask the user before touching
+   their extensions.
+2. **On `opencli browser <session> …`, the session is pointed at the wrong tab**
+   (e.g. an extension page). Re-target it:
 
-`opencli browser <session> bind` also works, but it attaches whatever tab is in
-front — possibly `about:blank` or a page the user is reading — and a bound tab
-refuses `tab new / select / close`.
+   ```bash
+   opencli browser <session> unbind
+   opencli browser <session> open <url>   # opencli opens a tab it controls
+   ```
 
-**On a site adapter (`opencli <site> …`):** usually a redirect during
-navigation interrupted the command. Retry once; if it persists, collect a trace
-and report it upstream (`opencli skills read opencli-autofix`).
+   `opencli browser <session> bind` also works, but it attaches whatever tab is
+   in front — possibly `about:blank` or a page the user is reading — and a bound
+   tab refuses `tab new / select / close`.
+
+On a site adapter (`opencli <site> …`) where neither applies, retry once; if it
+persists, collect a trace and report it upstream
+(`opencli skills read opencli-autofix`).
 
 ## `eval` suddenly returns nothing
 

@@ -13,11 +13,13 @@ changed — whether or not you edited it. No backup, not moved to the trash. A
 release can touch most sites' adapter files, so one plain upgrade can take nearly
 all of your overrides at once.
 
-**Fix:** run `opencli adapter status`. If it lists any local overrides:
+**Fix:** if the upgrade was prompted by opencli's `Update available` notice
+rather than asked for by the user, ask before doing anything. Then run
+`opencli adapter status`. If it lists any local overrides:
 
 ```bash
-cp -a ~/.opencli/clis ~/.opencli/clis.bak-$(date +%F)
-opencli daemon stop          # otherwise the old daemon keeps running the old code
+cp -a ~/.opencli/clis ~/.opencli/clis.bak-$(date +%F-%H%M%S)
+opencli daemon stop          # so the new version starts a fresh daemon
 npm install -g @jackwener/opencli@<version> --ignore-scripts
 opencli doctor
 ```
@@ -25,7 +27,9 @@ opencli doctor
 Run these one at a time — never chain the backup and the install into one
 command — and upgrade only after `/bin/ls ~/.opencli/` shows the backup directory.
 
-Use `--ignore-scripts` on every upgrade while you have overrides. What it costs:
+Use `--ignore-scripts` on every upgrade while you have overrides: a skipped
+postinstall also leaves `~/.opencli/adapter-manifest.json` at the old version, so
+a later plain upgrade diffs against an even older baseline. What it costs:
 shell completion isn't refreshed, and your overrides are never cleaned up
 automatically — they keep shadowing upstream fixes for those sites. Drop one you
 no longer need with `opencli adapter reset <site>`.

@@ -8,14 +8,19 @@
 // from a release zip, which get a path-derived ID) by their manifest name.
 //
 // Prints one JSON object. `verdict` is one of:
-//   ok                      enabled in a profile Chrome is using
+//   ok                      enabled in a profile Chrome is using (or Chrome has
+//                           no record of which profile is in use)
 //   wrong_profile_open      enabled somewhere, but not in the profile(s) in use
 //   installed_but_disabled  installed, disabled in every profile
 //   not_installed           no profile has it
+//   unknown                 not found, but some profile's preference files won't parse
 //   chrome_not_found        no Chrome user-data dir (exit 2)
 //   local_state_unreadable  user-data dir exists but `Local State` won't parse (exit 3)
-// `multipleProfiles: true` means it is enabled in more than one profile; OpenCLI
-// then needs a default (`opencli profile use <name>`).
+// `multipleProfiles: true`: enabled in more than one profile — fine unless they
+// are open at the same time, then OpenCLI wants `opencli profile use <name>`.
+// `duplicateInProfile: true`: one profile has two enabled copies (e.g. Web Store
+// plus Load unpacked); each connects separately.
+// Exit 64 on bad arguments.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -35,7 +40,7 @@ function defaultUserDataDir() {
     case 'win32':
       return path.join(process.env.LOCALAPPDATA ?? path.join(home, 'AppData', 'Local'), 'Google', 'Chrome', 'User Data');
     default:
-      return path.join(home, '.config', 'google-chrome');
+      return path.join(process.env.XDG_CONFIG_HOME || path.join(home, '.config'), 'google-chrome');
   }
 }
 
@@ -70,20 +75,18 @@ function readJson(file) {
   }
 }
 
-// Per-extension settings, merging the older "Preferences" with the current
-// "Secure Preferences" field by field (Secure wins on conflicts).
+const asObject = (x) => (x && typeof x === 'object' && !Array.isArray(x) ? x : null);
+
+// Extension settings from current Chrome's "Secure Preferences" and older
+// builds' "Preferences". `readable` is false when neither file parses.
 function extensionSettings(profileDir) {
-  const merged = {};
-  let found = false;
-  for (const file of ['Preferences', 'Secure Preferences']) {
-    const settings = readJson(path.join(profileDir, file))?.extensions?.settings;
-    if (!settings || typeof settings !== 'object') continue;
-    found = true;
-    for (const [id, s] of Object.entries(settings)) {
-      if (s && typeof s === 'object') merged[id] = { ...merged[id], ...s };
-    }
-  }
-  return { settings: merged, found };
+  const secureFile = readJson(path.join(profileDir, 'Secure Preferences'));
+  const prefsFile = readJson(path.join(profileDir, 'Preferences'));
+  return {
+    secure: asObject(secureFile?.extensions?.settings) ?? {},
+    prefs: asObject(prefsFile?.extensions?.settings) ?? {},
+    readable: secureFile !== null || prefsFile !== null,
+  };
 }
 
 // true / false, or null when Chrome left no recognisable state field.
@@ -94,16 +97,35 @@ function enabledFrom(s) {
   return null;
 }
 
-function findInstalls(settings, extensionId) {
+function findInstalls({ secure, prefs }, extensionId) {
   const installs = [];
-  for (const [id, s] of Object.entries(settings)) {
+  for (const id of new Set([...Object.keys(secure), ...Object.keys(prefs)])) {
+    const s = asObject(secure[id]);
+    const p = asObject(prefs[id]);
+    if (!s && !p) continue;
+    const location = s?.location ?? p?.location;
+    const extPath = s?.path ?? p?.path;
     let kind = null;
     if (id === extensionId) kind = 'store';
-    else if (UNPACKED_LOCATIONS.has(s.location) && typeof s.path === 'string'
-      && readJson(path.join(s.path, 'manifest.json'))?.name === EXTENSION_NAME) kind = 'unpacked';
-    if (kind) installs.push({ id, kind, enabled: enabledFrom(s) });
+    else if (UNPACKED_LOCATIONS.has(location) && typeof extPath === 'string'
+      && readJson(path.join(extPath, 'manifest.json'))?.name === EXTENSION_NAME) kind = 'unpacked';
+    // Secure Preferences is authoritative; Preferences only fills in a missing state.
+    if (kind) installs.push({ id, kind, enabled: (s ? enabledFrom(s) : null) ?? (p ? enabledFrom(p) : null) });
   }
   return installs;
+}
+
+// Profile directories: Local State's info_cache, or a directory scan when it is empty.
+function profileDirs(userDataDir, infoCache) {
+  const known = Object.entries(asObject(infoCache) ?? {});
+  if (known.length > 0) return known.map(([dir, info]) => ({ dir, name: info?.name ?? null }));
+  let entries = [];
+  try {
+    entries = fs.readdirSync(userDataDir, { withFileTypes: true });
+  } catch {}
+  return entries
+    .filter((e) => e.isDirectory() && (e.name === 'Default' || /^Profile \d+$/.test(e.name)))
+    .map((e) => ({ dir: e.name, name: null }));
 }
 
 const { userDataDir, extensionId } = parseArgs(process.argv.slice(2));
@@ -118,15 +140,15 @@ if (!localState || typeof localState !== 'object') {
   process.exit(3);
 }
 
-const profileState = localState.profile ?? {};
-const profiles = Object.entries(profileState.info_cache ?? {}).map(([dir, info]) => {
-  const { settings, found } = extensionSettings(path.join(userDataDir, dir));
+const profileState = asObject(localState.profile) ?? {};
+const profiles = profileDirs(userDataDir, profileState.info_cache).map(({ dir, name }) => {
+  const settings = extensionSettings(path.join(userDataDir, dir));
   const installs = findInstalls(settings, extensionId);
   // Enabled if any install is enabled; null (unknown) is not evidence of disabled.
   let enabled = false;
   if (installs.some((x) => x.enabled === true)) enabled = true;
   else if (installs.some((x) => x.enabled === null)) enabled = null;
-  return { dir, name: info?.name ?? null, preferencesFound: found, installs, enabled };
+  return { dir, name, preferencesReadable: settings.readable, installs, enabled };
 });
 
 const lastUsed = typeof profileState.last_used === 'string' ? profileState.last_used : null;
@@ -136,7 +158,9 @@ const inUse = lastActive.length > 0 ? lastActive : lastUsed ? [lastUsed] : [];
 const usable = profiles.filter((p) => p.installs.length > 0 && p.enabled !== false).map((p) => p.dir);
 
 let verdict;
-if (!profiles.some((p) => p.installs.length > 0)) verdict = 'not_installed';
+if (!profiles.some((p) => p.installs.length > 0)) {
+  verdict = profiles.some((p) => !p.preferencesReadable) ? 'unknown' : 'not_installed';
+}
 else if (usable.length === 0) verdict = 'installed_but_disabled';
 else if (inUse.length > 0 && !inUse.some((d) => usable.includes(d))) verdict = 'wrong_profile_open';
 else verdict = 'ok';
@@ -145,6 +169,7 @@ console.log(JSON.stringify({
   verdict,
   openThisProfile: usable.find((d) => inUse.includes(d)) ?? usable[0] ?? null,
   multipleProfiles: usable.length > 1,
+  duplicateInProfile: profiles.some((p) => p.installs.filter((x) => x.enabled !== false).length > 1),
   inUse,
   lastUsed,
   profiles,

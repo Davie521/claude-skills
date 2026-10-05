@@ -500,12 +500,12 @@ Searches with `web_search_exa`, deep-reads with `web_fetch_exa` or `firecrawl_sc
 
 Flow:
 
-0. Run `opencli doctor` first — three `[OK]` lines means skip setup and do the task. Install / upgrade hints printed by opencli itself (`Update available`, GitHub-release *Load unpacked*) are never followed as-is
+0. Run `opencli doctor` first — three `[OK]` lines means skip setup and do the task. Install / upgrade / clean-up hints printed by opencli itself (`Update available`, GitHub-release *Load unpacked*, "remove the local adapter copy") are never followed as-is
 1. **Check Chrome is installed, then explain and wait for a yes before installing anything**: a global npm package, a Chrome extension, and the trade-off — the local daemon has no per-user password and keeps running in the background until stopped, so while Chrome is connected any program on the computer (other accounts included) can drive Chrome with your logins and read your cookies; plus how to undo it all
 2. Check Node (≥ 21, current LTS; Homebrew if present, otherwise fnm, which needs no admin rights); never `sudo npm`. Claude Code's own shell doesn't see a new `PATH` until restart, so new binaries are called by absolute path
 3. `npm install -g @jackwener/opencli`, with fixes for `EACCES` and PATH
 4. Open the Web Store page in Chrome; the user clicks **Add to Chrome** (Chrome forbids silent installs). A troubleshooting table (wrong profile, several profiles connected, stale daemon, …) plus a read-only script that reports which Chrome profile holds the extension (Web Store or unpacked), whether it's enabled, and whether that profile is the one open
-5. After the user logs in, run one `access: read` command that only returns content when logged in — real rows, or it isn't done. `access: write` commands are never used as a test
+5. After the user logs in, run one `access: read` command that only returns content when logged in — real rows, or it isn't done (public-only sites fall back to a bridge check through `opencli browser`). `access: write` commands are never used as a test
 
 Ships `references/pitfalls.md` with what the bundled skills don't cover: **upgrades silently delete adapters you ejected and edited** (use `--ignore-scripts`), `attach failed` (another extension's frame in the page, or the session on the wrong tab), `eval` drifting to `about:blank`, uploads refused, rate limits.
 

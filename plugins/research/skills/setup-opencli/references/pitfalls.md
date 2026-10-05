@@ -20,7 +20,7 @@ rather than asked for by the user, ask before doing anything. Then run
 ```bash
 cp -a ~/.opencli/clis ~/.opencli/clis.bak-$(date +%F-%H%M%S)
 opencli daemon stop          # so the new version starts a fresh daemon
-npm install -g @jackwener/opencli@<version> --ignore-scripts
+npm install -g @jackwener/opencli@<version> --ignore-scripts   # <version>: npm view @jackwener/opencli version
 opencli doctor
 ```
 
@@ -39,11 +39,15 @@ No local overrides → a plain upgrade is safe; if doctor then reports
 
 ## BROWSER_CONNECT right after a daemon restart
 
-The extension has not reconnected yet. Poll `opencli daemon status` until the
-line reads `Extension: connected` — give up after ~30 s and go back to the
-SKILL.md §4 table — then retry the same command. Match the whole string
-(`grep -q 'Extension: connected'`): a pattern like `*connected*` also matches
-`disconnected`.
+The extension has not reconnected yet (its back-off goes up to 15 s). Re-run
+`opencli doctor` every ~10 s until it shows `[OK] Extension` — give up after
+~30 s and go back to the SKILL.md §4 table — then retry the same command.
+
+`opencli daemon status` is only a reliable check with one Chrome profile
+connected: it ignores the saved default, so with two or more it always reports
+`… connected, none selected`. If you do match its `Extension: connected` line,
+match the whole string (`grep -q 'Extension: connected'`): a pattern like
+`*connected*` also matches `disconnected`.
 
 ## `attach failed: Cannot access a chrome-extension:// URL of different extension`
 
@@ -81,8 +85,9 @@ chances to lose the tab midway.
 ## `file://` URLs are refused
 
 `opencli browser` only accepts http(s). To look at a local HTML file, serve its
-directory: `python3 -m http.server <port> --bind 127.0.0.1`, open
-`http://127.0.0.1:<port>/<file>`, and stop the server afterwards.
+directory: `python3 -m http.server <port> --bind 127.0.0.1` (on macOS `python3`
+needs the Xcode Command Line Tools — without them it opens an install dialog),
+open `http://127.0.0.1:<port>/<file>`, and stop the server afterwards.
 
 ## `upload` returns `{"code":-32000,"message":"Not allowed"}`
 

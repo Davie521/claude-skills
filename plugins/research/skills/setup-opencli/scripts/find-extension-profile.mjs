@@ -6,10 +6,13 @@
 //
 // Finds the Web Store install by ID, and unpacked installs ("Load unpacked"
 // from a release zip, which get a path-derived ID) by their manifest name.
+// Chrome keeps leftover settings for removed extensions; an entry only counts
+// as installed when it has a `location` (and, for the store copy, files).
 //
 // Prints one JSON object. `verdict` is one of:
-//   ok                      enabled in a profile Chrome is using (or Chrome has
-//                           no record of which profile is in use)
+//   ok                      enabled (or state unknown, `enabled: null`) in a
+//                           profile Chrome is using, or Chrome has no record of
+//                           which profile is in use
 //   wrong_profile_open      enabled somewhere, but not in the profile(s) in use
 //   installed_but_disabled  installed, disabled in every profile
 //   not_installed           no profile has it
@@ -97,7 +100,7 @@ function enabledFrom(s) {
   return null;
 }
 
-function findInstalls({ secure, prefs }, extensionId) {
+function findInstalls({ secure, prefs }, extensionId, profileDir) {
   const installs = [];
   for (const id of new Set([...Object.keys(secure), ...Object.keys(prefs)])) {
     const s = asObject(secure[id]);
@@ -105,9 +108,11 @@ function findInstalls({ secure, prefs }, extensionId) {
     if (!s && !p) continue;
     const location = s?.location ?? p?.location;
     const extPath = s?.path ?? p?.path;
+    if (typeof location !== 'number') continue;
     let kind = null;
-    if (id === extensionId) kind = 'store';
-    else if (UNPACKED_LOCATIONS.has(location) && typeof extPath === 'string'
+    if (id === extensionId) {
+      if (typeof extPath === 'string' || fs.existsSync(path.join(profileDir, 'Extensions', id))) kind = 'store';
+    } else if (UNPACKED_LOCATIONS.has(location) && typeof extPath === 'string'
       && readJson(path.join(extPath, 'manifest.json'))?.name === EXTENSION_NAME) kind = 'unpacked';
     // Secure Preferences is authoritative; Preferences only fills in a missing state.
     if (kind) installs.push({ id, kind, enabled: (s ? enabledFrom(s) : null) ?? (p ? enabledFrom(p) : null) });
@@ -142,8 +147,9 @@ if (!localState || typeof localState !== 'object') {
 
 const profileState = asObject(localState.profile) ?? {};
 const profiles = profileDirs(userDataDir, profileState.info_cache).map(({ dir, name }) => {
-  const settings = extensionSettings(path.join(userDataDir, dir));
-  const installs = findInstalls(settings, extensionId);
+  const profileDir = path.join(userDataDir, dir);
+  const settings = extensionSettings(profileDir);
+  const installs = findInstalls(settings, extensionId, profileDir);
   // Enabled if any install is enabled; null (unknown) is not evidence of disabled.
   let enabled = false;
   if (installs.some((x) => x.enabled === true)) enabled = true;

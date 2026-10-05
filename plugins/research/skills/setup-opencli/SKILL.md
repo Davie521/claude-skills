@@ -38,22 +38,26 @@ Verified on macOS with Google Chrome. On Linux / Windows the flow is the same bu
 the commands for checking Chrome, opening it and checking processes differ; other
 Chromium browsers aren't covered. Say so rather than guessing.
 
-## Ground rule: opencli's own install advice is not yours to follow
+## Ground rule: opencli's own maintenance advice is not yours to follow
 
-opencli prints install and upgrade instructions of its own. **Never act on them
-or pass them along as-is:**
+opencli prints install, upgrade and clean-up instructions of its own. **Never
+act on them or pass them along as-is:**
 
 - after almost every command: `Update available: … Run: npm install -g @jackwener/opencli`
+  and `Extension update available: … Download: https://github.com/jackwener/opencli/releases`
 - in doctor's `Issues:`: "Download from https://github.com/jackwener/opencli/releases
   … Load unpacked", "Extension update available … Download from: …/releases",
   "Update the CLI: npm install -g @jackwener/opencli"
+- under doctor's `Local adapter overrides shadow packaged adapters:`: "Remove the
+  local ~/.opencli/clis copy, or run opencli adapter reset <site>" — that deletes
+  the user's edited adapters. The list itself is information, not a fault.
 
 The extension comes from the Chrome Web Store, which updates it automatically;
 a second, unpacked copy next to it just causes profile conflicts. Every CLI
 upgrade goes through
 `${CLAUDE_PLUGIN_ROOT}/skills/setup-opencli/references/pitfalls.md` § Upgrades.
-Other doctor issues (stale daemon, profile selection, the list of local adapter
-overrides) are handled in §4.
+Other doctor issues (stale daemon, profile selection, connectivity) are handled
+in §4.
 
 ## 0. Where are we?
 
@@ -87,8 +91,9 @@ On macOS, confirm Google Chrome is installed:
 No output → tell the user this setup needs Google Chrome and stop until they
 have it. On Linux / Windows, ask the user instead.
 
-It is the user's machine. Before the first install command, say in plain words
-what will happen and **wait for an explicit yes**:
+Run §2's read-only checks too (`node -v`, `command -v brew fnm nvm`) so you can
+name the Node route. It is the user's machine. Before the first install command,
+say in plain words what will happen and **wait for an explicit yes**:
 
 - a global npm package, `@jackwener/opencli` (open source:
   https://github.com/jackwener/OpenCLI) — plus Node first, if §2 finds it
@@ -106,7 +111,7 @@ what will happen and **wait for an explicit yes**:
   OpenCLI works. Usually fine on a personal machine; think twice on a shared one.
 - **Chrome Sync:** if extension sync is on, the extension is added on their
   other computers too, where it connects to whatever program listens on
-  `127.0.0.1:19825` — it checks no token. If that matters, remove it there or
+  `localhost:19825` — it checks no token. If that matters, remove it there or
   turn off extension sync.
 - **undo:** `opencli daemon stop` first (required: npm ≥ 7 never runs a
   package's uninstall hook, so `npm rm` alone leaves the daemon running) →
@@ -114,7 +119,8 @@ what will happen and **wait for an explicit yes**:
   Optionally delete `~/.opencli` (config, edited adapters, a `spotify.env`
   credentials template) and the shell completion file the install wrote: zsh
   `~/.zsh/completions/_opencli`, bash `~/.bash_completion.d/opencli`, fish
-  `~/.config/fish/completions/opencli.fish`.
+  `~/.config/fish/completions/opencli.fish`. If §2 installed fnm: `~/.fnm` and
+  the fnm lines it added to their shell rc file.
 
 Also mention that upstream offers a desktop app, **OpenCLIApp**, which it
 recommends for macOS / Windows desktop use (download link in OpenCLI's README).
@@ -133,21 +139,24 @@ node -v
 ```
 
 Treat anything below 21 as too old: the package's own floor is 20, the bundled
-`opencli-usage` skill asks for ≥ 21. Install the current LTS. Routes, in order:
+`opencli-usage` skill asks for ≥ 21. Any newer version works; the LTS is the
+safe pick. Routes, in order:
 
-- **Homebrew present** (`command -v brew`) → `brew install node`.
-- **No Homebrew** → fnm, which needs no admin rights (only `curl` and `unzip`,
-  both part of macOS):
+- **A version manager is already there** → use it. fnm:
+  `fnm install --lts`; nvm: `. ~/.nvm/nvm.sh && nvm install --lts`, then
+  `nvm which current` for the path.
+- **Homebrew present** (`command -v brew`) → `brew install node` (Homebrew's
+  latest Node, fine).
+- **Neither** → fnm, which needs no admin rights (only `curl` and `unzip`, both
+  part of macOS):
 
   ```bash
   curl -fsSL https://fnm.vercel.app/install | bash -s -- --force-no-brew --install-dir "$HOME/.fnm"
-  "$HOME/.fnm/fnm" install --lts
-  "$HOME/.fnm/fnm" default            # prints the default; if empty: "$HOME/.fnm/fnm" default <version from "$HOME/.fnm/fnm" list>
+  "$HOME/.fnm/fnm" install --lts                     # the first install becomes the default
   "$HOME/.fnm/fnm" exec --using=default which node
   ```
 
   The installer adds fnm's setup lines to the user's shell rc file — tell them.
-- **nvm already installed** → `. ~/.nvm/nvm.sh && nvm install --lts`.
 - Installing Homebrew itself, or Node from the nodejs.org installer, needs an
   admin password: the user runs those in their own Terminal — you can't type it.
   The nodejs.org installer also leaves npm's global directory root-owned, so §3
@@ -158,8 +167,7 @@ Treat anything below 21 as too old: the package's own floor is 20, the bundled
 environment when the session starts, so rc-file changes don't reach you until
 the user restarts Claude Code. Until then, call new binaries by absolute path,
 or prefix each command: `export PATH="<bin dir>:$PATH"; node -v`, where
-`<bin dir>` is the directory of the `node` path found above (for fnm, the last
-command prints it). The user's new terminals pick it up from the rc file.
+`<bin dir>` is the directory of the `node` path found above. The user's new terminals pick it up from the rc file.
 
 ## 3. Install the package
 
@@ -168,8 +176,9 @@ npm install -g @jackwener/opencli
 opencli --version   # or "$(npm prefix -g)/bin/opencli" --version, see §2
 ```
 
-- `EACCES` → npm's global directory is root-owned. Don't `sudo`. Switch to a
-  user-level Node (§2), or — after asking, since it changes npm's global config —
+- `EACCES` → npm's global directory is root-owned. Don't `sudo`. Ask first, then
+  either switch to a user-level Node (§2 — this installs a second Node and edits
+  their shell rc file) or change npm's global config:
   `npm config set prefix ~/.npm-global`, put `~/.npm-global/bin` on `PATH`, and
   retry.
 - Installed but `opencli: command not found` → the global bin dir isn't on
@@ -177,9 +186,10 @@ opencli --version   # or "$(npm prefix -g)/bin/opencli" --version, see §2
   the absolute path in this session (§2) and tell the user which rc file to add
   it to.
 
-npm hides the install's postinstall output. It silently writes the shell
-completion file listed in §1's undo, creates `~/.opencli/` with a `spotify.env`
-template, and records an adapter manifest there. Upgrades are different from a
+npm hides the install's postinstall output. It records an adapter manifest in
+`~/.opencli/` and, when it recognises the user's shell (zsh, bash or fish),
+silently writes the completion file listed in §1's undo and a `spotify.env`
+template. Upgrades are different from a
 first install — read pitfalls § Upgrades before ever upgrading.
 
 ## 4. Chrome extension
@@ -205,12 +215,15 @@ Work down the table, re-running `opencli doctor` after each fix.
 | Symptom / check | How | Fix |
 |---|---|---|
 | Chrome running? | `pgrep -x "Google Chrome"` | `open -ga "Google Chrome"` |
-| Chrome just started, or the daemon just (re)started | — | the extension reconnects with a back-off of up to 15 s: poll `opencli daemon status` for `Extension: connected` for ~30 s, then re-run doctor |
+| `opencli` errors before printing any doctor output | — | check `node -v` (§2); an old Node breaks the CLI itself |
+| Chrome just started, or the daemon just (re)started | — | the extension reconnects with a back-off of up to 15 s: re-run `opencli doctor` every ~10 s for ~30 s. Don't poll `opencli daemon status` — it ignores the saved default profile, so with two or more profiles open it always reports `… connected, none selected` |
 | Is it installed, enabled, in the open profile? | profile script below | `wrong_profile_open` → `open -na "Google Chrome" --args --profile-directory="<openThisProfile>"`; `installed_but_disabled` → user turns it on at `chrome://extensions`; `not_installed` → §1's disclosure if not given yet, then step 1; `unknown` / `local_state_unreadable` → ask the user to check `chrome://extensions`; `chrome_not_found` → Chrome never ran, or isn't Google Chrome |
 | Two copies in one profile | script: `duplicateInProfile: true` | each copy connects separately (usually Web Store + Load unpacked); ask, then have the user remove the unpacked one at `chrome://extensions` |
-| Several profiles connected at once | `opencli daemon status`: `… connected, none selected — run opencli profile use <name>`; doctor: `Multiple Chrome profiles are connected to the daemon, but no default profile was selected.` | `opencli profile list`, then `opencli profile use <name>`. The names are opaque IDs: close all but one profile, `opencli profile rename <id> <alias>`, repeat for the others |
-| Default profile not connected | `opencli daemon status`: `requested profile not connected`; doctor: `Selected browser profile is not connected` | open that profile, or `opencli profile use` another |
+| Several profiles connected at once | doctor: `Multiple Chrome profiles are connected to the daemon, but no default profile was selected.` | `opencli profile list`, then `opencli profile use <name>`. The names are opaque IDs: close all but one profile, `opencli profile rename <id> <alias>`, repeat for the others |
+| Saved default profile gone | doctor: `Default browser profile is stale: … is not connected` | `opencli profile list`, then `opencli profile use <name>` |
+| `[OK] Extension` but `[FAIL] Connectivity` | doctor | the live probe timed out: re-run doctor once, then `opencli daemon restart` |
 | Daemon older than the CLI | doctor: `Stale daemon detected` | `opencli daemon restart` |
+| Local adapter overrides listed | doctor: `Local adapter overrides shadow packaged adapters:` | nothing — information, not a fault (it lists files; `opencli adapter status` lists the sites). Never delete `~/.opencli/clis` or run `opencli adapter reset` unless the user asks for that site; mention pitfalls § Upgrades once |
 | Still disconnected after `opencli daemon restart` twice | — | the extension's background worker is stuck: quit and reopen Chrome. **Ask first** — it closes their tabs; note the open URLs |
 
 Profile script (read-only; reads Chrome's `Local State` and each profile's
@@ -244,9 +257,11 @@ when the verdict and what the user sees disagree, believe the user. Exit codes:
 
 If the site has no such command (public-only sites), verify on another site the
 user is logged in to, or prove the bridge directly:
-`opencli browser check open https://example.com`, then
-`opencli browser check eval "document.title"`, then
-`opencli browser check close`.
+`opencli browser setup-probe open https://example.com`, then
+`opencli browser setup-probe eval "document.title"`, then
+`opencli browser setup-probe close`. (A session name must not match one of the
+subcommands in `opencli browser --help` — `check`, `open`, `close`, `state`, … —
+or the command is parsed wrongly.)
 
 An auth error means not logged in. The reverse also happens: sites keep
 nickname / avatar cookies after the session expires, so the browser *looks*
@@ -278,7 +293,8 @@ failure modes the bundled skills don't: upgrades deleting edited adapters,
 
 - install anything — Node, the package, the extension, npm config — before the
   user's yes in §1
-- act on install / upgrade / download instructions printed by opencli itself
+- act on install / upgrade / download / clean-up instructions printed by opencli
+  itself; never delete `~/.opencli/clis` or run `opencli adapter reset` unasked
 - `sudo npm install -g`
 - type the user's passwords or solve CAPTCHAs for them
 - run an `access: write` command to test a setup

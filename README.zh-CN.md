@@ -502,12 +502,12 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 
 流程：
 
-0. 先跑 `opencli doctor`，三行 `[OK]` 就直接干活，不走安装。opencli 自己打印的安装/升级提示（`Update available`、GitHub 发布包 *Load unpacked*）一律不照做
+0. 先跑 `opencli doctor`，三行 `[OK]` 就直接干活，不走安装。opencli 自己打印的安装/升级/清理提示（`Update available`、GitHub 发布包 *Load unpacked*、「删掉本地适配器副本」）一律不照做
 1. **先确认装了 Chrome，再在装任何东西之前讲清楚、等你同意**：一个全局 npm 包、一个 Chrome 扩展，以及代价——本地 daemon 没有按用户的口令，而且会一直在后台跑到你手动停掉；Chrome 连着时，这台电脑上的任何程序（包括别的账户）都能带着你的登录态操作 Chrome、读你的 cookie；也讲清楚怎么全部撤掉
 2. 检查 Node（≥ 21，装当前 LTS；有 Homebrew 用它，没有就用不需要管理员权限的 fnm），不用 `sudo npm`。Claude Code 自己的 shell 要重启才看得到新的 `PATH`，所以新装的命令一律用绝对路径调
 3. `npm install -g @jackwener/opencli`，处理 `EACCES` 和 PATH 问题
 4. 在 Chrome 里打开扩展商店页，「添加至 Chrome」由你来点（Chrome 不允许程序代装）；连不上时按表排查（开错用户、多个用户同时连着、daemon 版本过旧……），附一个只读脚本，查出扩展装在哪个 Chrome 用户里（商店版或解压版）、是否启用、当前开的是不是那个用户
-5. 你登录目标网站后，跑一条只有登录才有结果的 `access: read` 命令，拿到真实数据才算装好；绝不拿 `access: write` 的命令做测试
+5. 你登录目标网站后，跑一条只有登录才有结果的 `access: read` 命令，拿到真实数据才算装好（只有公开内容的网站，退而用 `opencli browser` 验证连通）；绝不拿 `access: write` 的命令做测试
 
 附 `references/pitfalls.md`：官方 skill 没写的坑——**升级会悄悄删掉你 eject 改过的适配器**（要 `--ignore-scripts`）、`attach failed`（页面里有别的扩展的 frame，或会话指错了标签页）、`eval` 漂到 `about:blank`、上传被拒、风控限速。
 

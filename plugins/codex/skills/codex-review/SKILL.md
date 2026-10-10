@@ -27,6 +27,8 @@ Additional reasons to pick the plugin dispatcher (`code-review:code-review`):
 - User wants automatic in-scope fix application (this skill never edits).
 - User wants the artifact written to `.claude/PRPs/reviews/` or auto-posted via `gh pr review`.
 
+**Inside `cpr`**: the PR pipeline runs this skill on every new HEAD as its merge gate, in place of Copilot review — see the exception under "After the call".
+
 **Chain pattern (optional, high-stakes work only)**: `/code-review` → apply fixes → `codex-review` as adversarial verification before merge. Mirrors `quality:santa-method`. Don't chain by default.
 
 ## Invocation
@@ -81,7 +83,7 @@ highest level the selected model supports, so model and effort always match:
 today that resolves to `ultra` on `gpt-6-astra`. Do not hardcode `ultra` — not
 every model reaches it (`gpt-5.5` stops at `xhigh`, `gpt-5.6-luna` at `max`),
 and passing a level the model does not list is a silent-downgrade risk once the
-auto-selected flagship changes. The wrapper falls back to `max` if the command
+auto-selected model changes. The wrapper falls back to `max` if the command
 fails; pass `--effort <level>` only when the user asks for a lighter run.
 
 `ultra` is "maximum reasoning with automatic task delegation" — the model may
@@ -92,10 +94,18 @@ expected failure mode, not a broken skill — rerun later or drop one level.
 
 **Picking the model.** `codex-run` calls `codex-best-model` and passes its stdout as the model.
 It reads `~/.codex/models_cache.json` — the catalog the Codex CLI refreshes on
-its own — and prints the `visibility: "list"` entry with the lowest `priority`,
-which is OpenAI's own ranking with `1` as most capable. A newly shipped
-flagship is therefore picked up automatically, with nothing to edit here. Add
-`-v` for priority and catalog age on stderr.
+its own — and, among `visibility: "list"` models named `gpt-<version>-<tier>`,
+picks the strongest tier (astra > sol > terra > luna), then the newest version.
+A newly shipped Astra is therefore picked up automatically, with nothing to
+edit here. Add `-v` to see the rule used, the catalog's own default and the
+catalog age on stderr.
+
+`priority` in that catalog is Codex's default order, **not** a capability
+ranking: on 2026-10-08 it put the cheaper workhorse `gpt-6.1-sol` at 1 and the
+flagship `gpt-6-astra` at 2, and reviews silently ran on Sol for two days while
+the picker still used "lowest priority". The user wants reviews on the
+flagship (decided 2026-10-10). `codex-run` prints `model=` on every run — if it
+is not an Astra, check `codex-best-model -v` before trusting the rule.
 
 Do **not** hardcode a slug in this file: that silently keeps reviews on an
 ageing model after a better one ships. If `codex-best-model` exits non-zero,
@@ -178,6 +188,7 @@ Apply the same rules as the `codex-result-handling` skill in the upstream plugin
 - Preserve Codex's severity ordering, file paths, and line numbers verbatim.
 - Preserve evidence boundaries — if Codex marked something as inference or open question, keep that label.
 - **STOP after presenting findings.** Do not apply fixes. Ask the user which findings, if any, to fix. Auto-fixing from a review is forbidden, even for "obvious" ones — that's the whole point of an independent review.
+- **Exception — inside the `dev-workflow:cpr` pipeline.** cpr runs this review as its merge gate (it replaced Copilot review, user decision 2026-10-10), and invoking cpr pre-authorises the fix loop: verify each finding, fix the necessary ones, push, re-review until the gate passes, stopping only for the decisions cpr lists; failed runs follow cpr's own exit-code table. Outside cpr, both the stop rule above and the stop-on-failed-run rule below hold.
 - If Codex reported no findings, say so directly and include its "highest-risk area scrutinised" note so the user can judge coverage.
 - If `codex-run` exited non-zero (usage limit, auth error, timeout, crash), report its output verbatim and stop. Do not generate a substitute review yourself.
 

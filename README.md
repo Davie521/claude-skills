@@ -36,21 +36,23 @@ Automated development workflows. The workhorse group — `deep-plan` and `/cpr` 
 
 ### `/cpr` — Git PR Pipeline
 
-**For**: one command from local changes to a merged PR, without stopping to ask between steps.
-**Trigger**: say `cpr` or `cl` (the old Copilot Lint review workflow is absorbed here; `cl` still triggers it)
+**For**: one command from local changes to a merged PR; it never stops to ask between steps unless a decision is genuinely yours.
+**Trigger**: say `cpr` or `cl` (`cl` was the old Copilot review command; it is absorbed here and still triggers it)
+**Requires**: the `codex` plugin and `~/.local/bin/codex-run` for the review gate; if either is missing it stops before committing instead of merging unreviewed
 
-It resumes from wherever you already are — `gh pr view --json number,state`, `gh pr checks` and `git status` decide the entry point (no PR → create one; CI running → wait; CI failed → fix; CI green → check comments; all green and comments handled → merge).
+It resumes from wherever you already are — `gh pr view --json number,state,baseRefName,headRefOid`, `gh pr checks`, `git status --porcelain`, plus `$(git rev-parse --git-dir)/cpr-review-<PR number>`, which gets one line per review run (the commit it covered, the base branch, and where its result lives); the number of distinct commits is the round count. A changed commit or base branch, or uncommitted changes in the tree, void the old review.
 
 1. **Branch check** — if you're on `main`, cut a branch first
 2. **Commit** — `git add` + `git commit`
 3. **Push + create PR** — `git push -u` + `gh pr create`
-4. **Watch CI** — `gh pr checks --watch`; on `no checks reported`, confirm with `[ -d .github/workflows ]` whether the repo has no CI at all, and skip to step 6 if so
-5. **On failure** — `gh run view <id> --log-failed` → fix → push
-6. **Copilot comments** — request the review first if it didn't fire on its own, then read both `gh pr view --comments` *and* `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments` → judge each one → fix only what's necessary → push
-7. **Loop 4–6** until everything is green
-8. **Auto-merge** — `gh pr merge --merge --delete-branch` once all checks pass and no review is outstanding; if a review requested changes or hasn't passed, pause the merge and notify you
+4. **Start a Codex review** — first bring local and remote PR branches in line (local ahead: push; remote ahead: fast-forward; diverged: stop and ask you), then save `gh pr diff` (GitHub's diff against the PR's real base), then the blind brief from `codex:codex-review`, detached with `codex-run --start`, running in parallel with CI
+5. **Watch CI** — `gh pr checks --watch`; on `no checks reported`, confirm with `[ -d .github/workflows ]` whether the repo has no CI at all, and skip step 6 if so
+6. **On CI failure** — read the log and plan the fix; don't touch files while the review is still reading them
+7. **Collect the review** — verify each finding, then judge it against the must-fix / safe-to-ignore table
+8. **Fix → push → back to step 4** — every new commit gets a fresh review of the whole PR
+9. **Auto-merge** — CI green and the review of the current HEAD passes the gate with nothing left to fix → recheck that the remote head and base branch still match the review record → `gh pr merge --merge --delete-branch --match-head-commit <reviewed commit>`
 
-Step 6 is the opinionated part — **don't blindly apply every Copilot suggestion**:
+**The gate** = no CRITICAL / HIGH introduced or enlarged by this PR; pre-existing problems don't block the merge and go into the report. Findings are **not applied blindly**:
 
 | Must fix | Safe to ignore |
 |----------|----------------|
@@ -60,9 +62,11 @@ Step 6 is the opinionated part — **don't blindly apply every Copilot suggestio
 | Obvious performance problems | Micro-optimization, premature optimization |
 | Changes with real benefit | Dogmatic advice |
 
-The test is: is this a real problem *in this context*, does fixing it actually gain anything, does it fit the project? Each comment gets an explicit `fix: [reason]` / `ignore: [reason]` verdict.
+The test is: is this a real problem *in this context*, does fixing it actually gain anything, does it fit the project? Each finding gets an explicit `fix: [reason]` / `ignore: [reason]` verdict.
 
-> **Three traps it encodes.** *Comments live in two places*: Copilot's inline review comments only exist in the REST response at `repos/{owner}/{repo}/pulls/<n>/comments` — `gh pr view --comments` returns conversation-level comments only, so checking just that misses **every** code comment. *Exit 1 is ambiguous*: `gh pr checks` exits non-zero both when checks fail and when nothing reported for this head commit (`no checks reported`) — the second is not a failure and must not block the merge, though it proves only that no check ran, so confirm against `.github/workflows` before concluding the repo has no CI. *Review often needs asking*: Copilot doesn't always auto-trigger, and only the `copilot-pull-request-reviewer[bot]` slug can request it (plain `Copilot` gives "not found", the bare slug 422s); comments then take 2–3 minutes, so poll instead of checking once.
+**When it stops to ask you**: an introduced or enlarged CRITICAL / HIGH it judges a false positive or out of scope; a fix with real trade-offs (product behaviour, API, data migration, money, permissions); a finding beyond the PR's scope; the same finding reported again after a fix; a review that can't finish (usage limit, timeout); local and remote branches that have diverged; five rounds without passing the gate; a human reviewer requesting changes.
+
+> **Traps it encodes.** *Exit 1 is ambiguous*: `gh pr checks` exits non-zero both when checks fail and when nothing reported for this head commit (`no checks reported`) — the second is not a failure and must not block the merge, though it proves only that no check ran, so confirm against `.github/workflows` before concluding the repo has no CI. *Keep the review blind*: no round tells Codex what earlier rounds found or how they were fixed, or the review stops being independent. *Review the commit you merge*: editing the tree mid-review, pushing after a passing review, or retargeting the base all require a new round, and the merge is pinned with `--match-head-commit` so a commit someone pushed in the meantime can't ride an old approval. *Diff against the PR's real base*: a local `origin/<base>` may be stale, and a fork's PR to upstream doesn't target `origin` at all, hence `gh pr diff`. Copilot review is no longer used (2026-10-10); comments it posts on its own are ignored and don't block the merge.
 
 ### `deep-plan` — The planning gate before any code
 
@@ -549,6 +553,8 @@ Runs the multi-language review methodology through `codex-run` on a different mo
 - inline PR comments (`--comment`) or auto-applied fixes (`--fix`) → the built-in `/code-review`
 - specifically want Claude language subagents → the `code-review` plugin
 
+It is also `cpr`'s merge gate (in place of Copilot review since 2026-10-10). Standalone it only reports and never edits; inside `cpr` the fix-and-re-review loop is pre-authorised.
+
 ### `design-challenge` — Question the approach, not the code
 
 **Trigger**: say challenge this design / punch holes in this / is this the right approach
@@ -607,7 +613,7 @@ Most skills auto-trigger from natural language matching their description — th
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) for the `cpr` workflow
 - Feishu MCP server for the `feishu` skill
-- Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin
+- Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin — and for `dev-workflow`'s `cpr` review gate (which also needs the `codex` plugin installed)
 - A Python venv for the `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` scripts
 - Various API keys depending on skill (Exa, firecrawl, Context7, Gemini, ElevenLabs, fal.ai, …)
 

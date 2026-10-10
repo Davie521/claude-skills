@@ -36,21 +36,23 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 
 ### `/cpr` — Git PR 流水线
 
-**定位**：一条命令从本地改动走到 PR 合并完成，中途不停下来问，每步做完直接继续下一步。
-**触发**：说 `cpr` 或 `cl`（原 Copilot Lint 审查工作流已并入，`cl` 仍能触发）
+**定位**：一条命令从本地改动走到 PR 合并完成；中途不停下来问，只有需要你拍板时才停。
+**触发**：说 `cpr` 或 `cl`（`cl` 是早年 Copilot 审查流程的口令，已并入，仍能触发）
+**依赖**：审查闸门要 `codex` plugin 和 `~/.local/bin/codex-run`，缺了会在提交前停下，不会跳过审查直接合并
 
-先检测状态再决定从哪接续 —— `gh pr view --json number,state`、`gh pr checks`、`git status` 三条命令定位入口（无 PR → 从建 PR 开始；CI 运行中 → 等；CI 失败 → 查错修复；CI 通过 → 检查 Copilot 评论；全绿且评论已处理 → 合并）。
+先检测状态再决定从哪接续 —— `gh pr view --json number,state,baseRefName,headRefOid`、`gh pr checks`、`git status --porcelain`，再加上 `$(git rev-parse --git-dir)/cpr-review-<PR号>`（每次起审查追加一行「审的是哪个提交、目标分支、结果在哪个目录」，不同提交的个数就是已审轮数），定位入口。提交、目标分支对不上，或工作树有未提交改动，旧的审查结论都作废。
 
 1. **检查分支** —— 在 `main` 上则先切一个新分支
 2. **提交更改** —— `git add` + `git commit`
 3. **推送 + 建 PR** —— `git push -u` + `gh pr create`
-4. **等待 CI** —— `gh pr checks --watch`；出现 `no checks reported` 时用 `[ -d .github/workflows ]` 落实一下是不是真没 CI，是就跳到第 6 步
-5. **CI 失败时** —— `gh run view <id> --log-failed` 读日志 → 修复 → 推送
-6. **Copilot 评论** —— 审查没自动触发就先手动请求，再拉 `gh pr view --comments` **加上** `gh api repos/{owner}/{repo}/pulls/$PR_NUMBER/comments` → 逐条评估 → 只修必要的 → 推送
-7. **循环 4–6** 直到全部通过
-8. **自动合并** —— 全部检查通过且无未处理 review → `gh pr merge --merge --delete-branch`；若有 review 请求变更或未通过，暂停合并并通知你
+4. **起 Codex 审查** —— 先让本地和远端 PR 分支一致（本地领先就推送，远端领先就快进拉下来，分叉就停下问你），再用 `gh pr diff` 存下 GitHub 按真实目标算的 diff，用 `codex:codex-review` 那套盲审说明，`codex-run --start` 在后台跑，和 CI 并行
+5. **等待 CI** —— `gh pr checks --watch`；出现 `no checks reported` 时用 `[ -d .github/workflows ]` 落实一下是不是真没 CI，是就跳过第 6 步
+6. **CI 失败时** —— 读日志、想好修法；审查还在跑就先不改文件，等结果出来一起改
+7. **取审查结果** —— 逐条核实，按「必须修 / 可忽略」表给决策
+8. **修复 → 推送 → 回到第 4 步** —— 新提交一律重新审整个 PR
+9. **自动合并** —— CI 全绿，且审当前提交的那轮过闸、没有要修的 → 合并前再核一次远端最新提交和目标分支都和审查记录一致 → `gh pr merge --merge --delete-branch --match-head-commit <审过的提交>`
 
-第 6 步是这个 skill 真正有主见的地方 —— **不要盲目修改所有 Copilot 建议**：
+**过闸** = 没有本次引入或放大的 CRITICAL / HIGH；原本就有的问题不挡合并，写进汇报。逐条评估时**不要盲目照改**：
 
 | 必须修改 | 可以忽略 |
 |----------|----------|
@@ -60,9 +62,11 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 | 明显的性能问题 | 微优化、过早优化 |
 | 有实际收益的改进 | 教条式建议 |
 
-判断标准：当前上下文是否真有问题？修改有实际收益？符合项目需求？每条评论输出显式决策 —— `需要修改: [原因]` / `忽略: [原因]`。
+判断标准：当前上下文是否真有问题？修改有实际收益？符合项目需求？每条输出显式决策 —— `需要修改: [原因]` / `忽略: [原因]`。
 
-> **它固化了三个坑**。*评论分两处*：Copilot 的行内 review 评论只存在于 REST 的 `repos/{owner}/{repo}/pulls/<n>/comments` 响应里，`gh pr view --comments` 只返回会话级评论 —— 只查后者会漏掉**全部**代码评论。*退出码 1 有歧义*：`gh pr checks` 在「检查失败」和「这个 commit 没有任何 check」（`no checks reported`）两种情况下都非零，后者不是失败、不能拿它阻塞合并；但它只证明「没跑过检查」，要断定仓库没有 CI 还得对着 `.github/workflows` 落实一次。*审查常要主动请求*：Copilot 不一定自动触发，而且只有 `copilot-pull-request-reviewer[bot]` 这个带后缀的 slug 请求得动（写 `Copilot` 报 not found，裸 slug 报 422）；请求后评论要 2–3 分钟才出，得轮询而不是查一次就下结论。
+**会停下来问你的情况**：某条本次引入或放大的 CRITICAL / HIGH 判成误报或不该在本 PR 修；修法有取舍（产品行为、接口、数据迁移、钱、权限）；问题超出本 PR 范围；同一问题修过又报；审查跑不出结论（额度用完、超时）；本地和远端分支分叉；审满 5 轮仍未过闸；PR 上有人请求变更。
+
+> **它固化了几个坑**。*退出码 1 有歧义*：`gh pr checks` 在「检查失败」和「这个 commit 没有任何 check」（`no checks reported`）两种情况下都非零，后者不是失败、不能拿它阻塞合并；但它只证明「没跑过检查」，要断定仓库没有 CI 还得对着 `.github/workflows` 落实一次。*审查要盲*：每一轮都不告诉 Codex 上一轮报了什么、怎么改的，否则就不是独立审查。*审的必须是要合的那个提交*：审查进行中改工作树、审完又推了新提交、改了目标分支，都得重审；合并时用 `--match-head-commit` 锁住审过的提交，免得别人中途推的提交借着旧结论被合进去。*diff 要按 PR 的真实目标算*：本地 `origin/<base>` 可能过时，fork 里往上游提的 PR 目标根本不在 `origin`，所以用 `gh pr diff`。2026-10-10 起不再用 Copilot 审查，它自己冒出来的评论不处理、不挡合并。
 
 ### `deep-plan` — 写码前的强制规划闸门
 
@@ -551,6 +555,8 @@ Deck 结构、一页纸、备忘录、财务模型、use-of-funds 表、里程�
 - 要发 PR 行内评论（`--comment`）或自动应用修复（`--fix`）→ 内置 `/code-review`
 - 点名要 Claude 语言专家 subagent → `code-review` plugin
 
+它也是 `cpr` 合并前的审查闸门（2026-10-10 起替代 Copilot 审查）。单独用时只报告不改代码；在 `cpr` 里「修完再审」的循环已获授权。
+
 ### `design-challenge` — 质疑方案本身
 
 **触发**：说 质疑这个方案 / challenge this design / punch holes in this / 这个设计靠不靠谱
@@ -609,7 +615,7 @@ done
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) — `cpr` 工作流需要
 - 飞书 MCP server — `feishu` skill 需要
-- Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要
+- Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要；`dev-workflow` 的 `cpr` 审查闸门也靠它们（还要装 `codex` plugin）
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / Context7 / Gemini / ElevenLabs / fal.ai 等）
 

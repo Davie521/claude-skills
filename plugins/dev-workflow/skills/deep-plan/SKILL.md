@@ -101,7 +101,7 @@ description: "Restate requirements, assess risks, create a step-by-step implemen
 
 ## 实现后 · 交接
 实现 + 自测通过后，主动引导继续：
-- **`/cpr`** — Git PR 全流程：提交 → 建 PR → 等 CI → 修复 → 批判性处理 Copilot 评论 → 循环至全绿 →（CI 过后自动合并；review 未过则暂停并通知）。
+- **`/cpr`** — Git PR 全流程：提交 → 建 PR → CI 与 Codex 审查并行 → 修复 → 再审 → 循环至 CI 全绿且审查过闸 → 自动合并（需要用户拍板时停下）。
 - **code review** — `/code-review`（多语言 + 强制安全审查）或 `codex` 的 codex-review 独立复审；关键产物可 `/quality:santa-method` 双 reviewer 对抗式验证。
 
 ## 示例

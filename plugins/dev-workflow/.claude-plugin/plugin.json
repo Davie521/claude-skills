@@ -1,6 +1,6 @@
 {
   "name": "dev-workflow",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "Dev workflow: Git PR pipeline with a Codex review gate (fix and re-review until it passes) + auto-merge, no-CI detection (cpr), deep-plan (restate/risk/phase + mandatory worktree), diagnosis loop, plan grilling (grill-with-docs: lite mode + ADR format), codebase deepening, throwaway prototype, conversation-to-PRD, issue triage state machine, caveman compressed-comms, cleanup (end-of-session teardown + memory persistence)",
   "author": {
     "name": "Yifan"

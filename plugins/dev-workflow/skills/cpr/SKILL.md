@@ -75,12 +75,16 @@ cat "$(git rev-parse --git-dir)/cpr-review-<PR号>" 2>/dev/null       # 每次�
    （审查期间可能有人推了提交，或把 PR 改指向别的分支），不一致就回第 4 步。一致再合并：
    `gh pr merge <PR号> --merge --delete-branch --match-head-commit <那个 SHA>`，把合并锁在审过的那个提交上。
    核对之后远端又变了，GitHub 会拒绝合并：同样回第 4 步，**别去掉这个参数重试**。
+   合并后以 `gh pr view <PR号> --json state` 为 `MERGED` 为准。`--delete-branch` 不一定把本地切回 main：
+   还停在功能分支就 `git switch main && git pull --ff-only && git branch -d <分支>`
+   （在另开的工作树里，main 被主树占着切不过去，就留给收尾处理）。
    PR 上有人请求变更 → 暂停合并并通知用户
 
 ## Codex 审查
 
-调用方式照 `codex:codex-review` 技能的「Invocation」节（`codex-run --start` 起、`--wait` 反复等，
-退出码 `75` = 还在跑，再调一次），说明模板也用那里的。cpr 里这样填：
+先用 Skill 工具加载 `codex:codex-review`（别去硬盘上找它的文件，换台机器路径就不一样），
+照它的「Invocation」节调用（`codex-run --start` 起、`--wait` 反复等，退出码 `75` = 还在跑，再调一次），
+说明模板也用那里的。修不修按本技能的规则，不按它「出结果就停」那条。cpr 里这样填：
 
 先让本地和远端的 PR 分支一致（工作树要干净）：
 

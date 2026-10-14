@@ -2,7 +2,7 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Yifan's personal Claude Code plugin marketplace — **15 plugins, 50 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
+Yifan's personal Claude Code plugin marketplace — **15 plugins, 51 skills + 5 review agents + 1 review command** for development workflow automation, design, language patterns, testing, research, and more.
 
 Every skill below names what it's for in its heading, then states how it's **triggered** and how it actually **works** inside. Where the heading isn't enough, an explicit **For** line spells the purpose out.
 
@@ -20,7 +20,7 @@ Every skill below names what it's for in its heading, then states how it's **tri
 | [`data`](#data) | 2 | Migrations + PostgreSQL quick reference, automated scraping |
 | [`quality`](#quality) | 8 | TDD, E2E, security review/scan, adversarial verification |
 | [`code-review`](#code-review) | 5 agents + 1 cmd | `/code-review` auto-dispatches to language specialist (Python/TypeScript/Swift) + mandatory security review |
-| [`research`](#research) | 3 | Deep research incl. market research, search routing, LLM cost discipline |
+| [`research`](#research) | 4 | Deep research incl. market research, search routing, LLM cost discipline, OpenCLI onboarding |
 | [`skills`](#skills) | 3 | Skill management — stocktake, compliance audit, rules distillation |
 | [`business`](#business) | 1 | Investor materials with outreach cadence |
 | [`codex`](#codex) | 2 | Codex second opinion (read-only `codex exec`) — code review, design challenge |
@@ -497,6 +497,24 @@ Searches with `web_search_exa`, deep-reads with `web_fetch_exa` or `firecrawl_sc
 
 > **Pricing rule**: always look it up (the `claude-api` skill or the official pricing page); never hardcode a price into the doc — a hardcoded price is wrong within six months.
 
+### `setup-opencli` — Get a new user's OpenCLI installed, connected and proven on real data
+
+**For**: [OpenCLI](https://github.com/jackwener/OpenCLI) borrows your logged-in Chrome to turn 100+ sites (Xiaohongshu, X, Bilibili, Zhihu, Taobao, …) into CLI commands. This skill only does install → connect → verify; everyday usage is handed to the skills OpenCLI ships itself (`opencli skills read opencli-usage`), which track the installed version.
+**Trigger**: OpenCLI is mentioned or an install is requested; a task needs a site behind the user's login and `opencli` isn't installed or connected; an `opencli` command fails with `command not found` / `BROWSER_CONNECT` / `Extension: disconnected` / `attach failed`; an upgrade is requested or opencli prints `Update available`
+
+Flow:
+
+0. Run `opencli doctor` first — three `[OK]` lines means skip setup and do the task. Install / upgrade / clean-up hints printed by opencli itself (`Update available`, GitHub-release *Load unpacked*, "remove the local adapter copy") are never followed as-is
+1. **Check Chrome is installed, then explain and wait for a yes before installing anything**: a global npm package, a Chrome extension, and the trade-off — the local daemon has no per-user password and keeps running in the background until stopped, so while Chrome is connected any program on the computer (other accounts included) can drive Chrome with your logins and read your cookies; plus how to undo it all
+2. Check Node (≥ 21, current LTS; Homebrew if present, otherwise fnm, which needs no admin rights); never `sudo npm`. Claude Code's own shell doesn't see a new `PATH` until restart, so new binaries are called by absolute path
+3. `npm install -g @jackwener/opencli`, with fixes for `EACCES` and PATH
+4. Open the Web Store page in Chrome; the user clicks **Add to Chrome** (Chrome forbids silent installs). A troubleshooting table (wrong profile, several profiles connected, stale daemon, …) plus a read-only script that reports which Chrome profile holds the extension (Web Store or unpacked), whether it's enabled, and whether that profile is the one open
+5. After the user logs in, run one `access: read` command that only returns content when logged in — real rows, or it isn't done (public-only sites fall back to a bridge check through `opencli browser`). `access: write` commands are never used as a test
+
+Ships `references/pitfalls.md` with what the bundled skills don't cover: **upgrades silently delete adapters you ejected and edited** (use `--ignore-scripts`), `attach failed` (another extension's frame in the page, or the session on the wrong tab), `eval` drifting to `about:blank`, uploads refused, rate limits.
+
+> **Verified on macOS only.** Linux / Windows follow the same flow, but the commands for opening Chrome and checking processes differ — the skill says so instead of guessing.
+
 ---
 
 ## skills
@@ -615,6 +633,7 @@ Most skills auto-trigger from natural language matching their description — th
 - Feishu MCP server for the `feishu` skill
 - Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin — and for `dev-workflow`'s `cpr` review gate (which also needs the `codex` plugin installed)
 - A Python venv for the `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` scripts
+- Node.js ≥ 21 (current LTS recommended) and Google Chrome for `setup-opencli`
 - Various API keys depending on skill (Exa, firecrawl, Context7, Gemini, ElevenLabs, fal.ai, …)
 
 ## License

@@ -194,9 +194,9 @@ The target reader is a **vibe coder** — someone who directs AI to write code b
 ### `feishu` — Feishu/Lark integration
 
 **For**: everything Feishu/Lark through the official `lark-cli` — messages and group chats, docs, sheets, Base, drive, wiki, calendar, tasks, mail, meetings, approvals.
-**Trigger**: Feishu/Lark is mentioned or a Feishu link is shared and no official `lark-*` skills are installed, or `lark-cli` needs installing, app setup or login
+**Trigger**: Feishu/Lark is mentioned or a Feishu link is shared and the official `lark-*` skill for that domain isn't installed, or `lark-cli` needs installing, app setup or login
 
-Walks through install (`npm install -g @larksuite/cli`), app setup (`lark-cli config init --new`, plus `--brand lark` for international Lark) and login (`lark-cli auth login --recommend`), then loads only the official domain guide it needs with `lark-cli skills read <name>` — the guides ship inside the CLI binary and stay in sync with its version, so you don't preload two dozen skills into every session. If the official `lark-*` skills are already installed, it defers to them.
+Walks through install (`npm install -g @larksuite/cli`), app setup (`lark-cli config init --new`, plus `--brand lark` for international Lark) and login (`lark-cli auth login --recommend`), then loads only the official domain guide it needs with `lark-cli skills read <name>` — the guides ship inside the CLI binary and stay in sync with its version, so you don't preload two dozen skills into every session. Where the official `lark-*` skill for the domain at hand is installed, it defers to that skill. The embedded guides are text only — when one calls for a helper script, fetch it from the matching `larksuite/cli` release tag.
 
 > **Prerequisite**: Node.js for `npm install -g @larksuite/cli`, and a Feishu/Lark account that can create a self-built app in its tenant.
 

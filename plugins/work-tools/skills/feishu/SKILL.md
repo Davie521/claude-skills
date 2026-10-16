@@ -1,6 +1,6 @@
 ---
 name: feishu
-description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages and group chats, docs, sheets, Base, drive, wiki, calendar, tasks, mail, meetings, approvals and more. Use when the user mentions '飞书'/Feishu/Lark or shares a Feishu link and no official lark-* skills are installed, or when lark-cli needs installing, app setup or login. Loads the matching official guide on demand with `lark-cli skills read <name>` instead of preloading every domain skill."
+description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages and group chats, docs, sheets, Base, drive, wiki, calendar, tasks, mail, meetings, approvals and more. Use when the user mentions '飞书'/Feishu/Lark or shares a Feishu link and the official lark-* skill for that domain is not installed, or when lark-cli needs installing, app setup or login. Loads the matching official guide on demand with `lark-cli skills read <name>` instead of preloading every domain skill."
 ---
 
 # 飞书（官方 lark-cli）
@@ -9,8 +9,8 @@ description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages
 
 ## 先判断走哪条路
 
-- 当前会话已经有官方 `lark-*` 技能（如 `lark-shared`、`lark-im`）→ 直接用它们，本技能只管安装和登录。
-- 没有 → 按下面流程，需要哪个领域就 `lark-cli skills read` 读哪个。
+- **按领域判断**：当前请求所属领域的官方技能（如发消息对应 `lark-im`）已经在会话里 → 直接用它。
+- 那个领域没装（哪怕装了别的 `lark-*` 技能）→ 按下面流程，用 `lark-cli skills read` 现读那个领域的说明。
 
 ## 安装与登录（一次性）
 
@@ -19,9 +19,11 @@ description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages
 3. 登录：`lark-cli auth login --recommend`，同样放后台、把链接交给用户授权。链接 10 分钟内有效，别反复重启命令，每次重启都会让上一个链接失效。
 4. 验证：`lark-cli auth status` 里 `identities.user.tokenStatus` 为 `valid` 即可。
 
-macOS 上应用密钥和令牌存在系统钥匙串里（其他平台存法不同），`~/.lark-cli/config.json` 只存引用。
+密钥和令牌由命令行加密保管（macOS 上解密用的主钥匙放在系统钥匙串），`~/.lark-cli/config.json` 里不含明文密钥。
 
 官方还提供 `npx @larksuite/cli@latest install` 安装向导，它会用 `npx skills add` 把官方技能装进技能目录、常驻系统提示。只想按需使用就跳过它，用本技能现读。
+
+注意：内置说明**只含文字，不含 `scripts/`、`assets/` 目录**。说明里要求跑脚本时（比如表格的图表质量检查、幻灯片的 XML 校验），去 GitHub `larksuite/cli` 与本机 `lark-cli --version` 相同的版本标签下，取 `skills/<名字>/scripts/` 里对应的文件，或改装该领域的官方技能。
 
 ## 按需读官方说明
 

@@ -19,7 +19,7 @@ description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages
 3. 登录：`lark-cli auth login --recommend`，同样放后台、把链接交给用户授权。链接 10 分钟内有效，别反复重启命令，每次重启都会让上一个链接失效。
 4. 验证：`lark-cli auth status` 里 `identities.user.tokenStatus` 为 `valid` 即可。
 
-密钥和令牌由命令行加密保管（macOS 上解密用的主钥匙放在系统钥匙串），`~/.lark-cli/config.json` 里不含明文密钥。
+密钥和令牌由命令行自己保管，`~/.lark-cli/config.json` 里不含明文密钥。
 
 官方还提供 `npx @larksuite/cli@latest install` 安装向导，它会用 `npx skills add` 把官方技能装进技能目录、常驻系统提示。只想按需使用就跳过它，用本技能现读。
 
@@ -53,7 +53,7 @@ lark-cli skills read lark-doc references/<文件>.md   # 读它引用的参考�
 
 - 优先用领域下的 `+` 快捷命令：`lark-cli <领域> --help` 列出全部，例如 `lark-cli calendar +agenda`。
 - 调用前看参数：`lark-cli schema <service>.<resource>.<method>`。
-- 快捷命令与类型化命令都支持 `--as user|bot` 选身份、`--dry-run` 只预览不执行、`--format` 选输出格式（默认 json，可选值各命令略有不同，看 `--help`）。
+- 快捷命令与类型化命令都支持 `--as user|bot` 选身份、`--dry-run` 只预览不执行、`--format` 选输出格式（可选值和默认值因命令而异，比如多维表格的记录查询默认输出 ndjson 文件，用前看 `--help`）。
 - 兜底裸调：`lark-cli api GET /open-apis/<路径>`。
 - 每个命令的 `--help` 标了风险等级 `read` / `write` / `high-risk-write`。`high-risk-write` 要加 `--yes`，**只在用户明确确认后加**。**所有写入和删除操作，不论用哪个身份、风险等级标的是什么，执行前都先跟用户确认目标和改动内容。** 默认身份是 `auto`（由命令行自己挑）；用户身份下的写操作是以用户本人名义执行的，必要时显式加 `--as`。
 

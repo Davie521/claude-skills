@@ -15,11 +15,11 @@ description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages
 ## 安装与登录（一次性）
 
 1. 装命令行：`npm install -g @larksuite/cli`（安装脚本从 GitHub Releases 下载二进制，并按包内校验和核对）。`lark-cli --version` 能出版本号即可。
-2. 绑定应用：`lark-cli config init --new`。它会打印一个链接，**放后台跑**，把链接交给用户在浏览器里点「创建」，完成后命令自己退出。飞书的接口都要经过一个应用，这一步会在用户所在企业建一个自建应用并自动配好权限。
+2. 绑定应用：`lark-cli config init --new`（默认是飞书；**国际版 Lark 用户必须加 `--brand lark`**，否则会被带到飞书的页面，先问清用户用的是哪个）。它会打印一个链接，**放后台跑**，把链接交给用户在浏览器里点「创建」，完成后命令自己退出。飞书的接口都要经过一个应用，这一步会在用户所在企业建一个自建应用并自动配好权限。
 3. 登录：`lark-cli auth login --recommend`，同样放后台、把链接交给用户授权。链接 10 分钟内有效，别反复重启命令，每次重启都会让上一个链接失效。
 4. 验证：`lark-cli auth status` 里 `identities.user.tokenStatus` 为 `valid` 即可。
 
-应用密钥和令牌存在系统钥匙串里，`~/.lark-cli/config.json` 只存引用。
+macOS 上应用密钥和令牌存在系统钥匙串里（其他平台存法不同），`~/.lark-cli/config.json` 只存引用。
 
 官方还提供 `npx @larksuite/cli@latest install` 安装向导，它会用 `npx skills add` 把官方技能装进技能目录、常驻系统提示。只想按需使用就跳过它，用本技能现读。
 
@@ -53,7 +53,7 @@ lark-cli skills read lark-doc references/<文件>.md   # 读它引用的参考�
 - 调用前看参数：`lark-cli schema <service>.<resource>.<method>`。
 - 快捷命令与类型化命令都支持 `--as user|bot` 选身份、`--dry-run` 只预览不执行、`--format` 选输出格式（默认 json，可选值各命令略有不同，看 `--help`）。
 - 兜底裸调：`lark-cli api GET /open-apis/<路径>`。
-- 每个命令的 `--help` 标了风险等级 `read` / `write` / `high-risk-write`。`high-risk-write` 要加 `--yes`，**只在用户明确确认后加**。默认身份是 `auto`（由命令行自己挑）；用户身份下的写操作（发消息、删文件）是以用户本人名义执行的，先跟用户确认内容，必要时显式加 `--as`。
+- 每个命令的 `--help` 标了风险等级 `read` / `write` / `high-risk-write`。`high-risk-write` 要加 `--yes`，**只在用户明确确认后加**。**所有写入和删除操作，不论用哪个身份、风险等级标的是什么，执行前都先跟用户确认目标和改动内容。** 默认身份是 `auto`（由命令行自己挑）；用户身份下的写操作是以用户本人名义执行的，必要时显式加 `--as`。
 
 ## 容易误判的地方
 

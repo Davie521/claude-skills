@@ -199,7 +199,7 @@ HEIC→PNG（`sips`）→ EXIF 旋转矫正 → 模型直接读图并翻译 → 
 **定位**：通过飞书官方命令行 `lark-cli` 操作飞书 —— 消息与群聊、云文档、表格、多维表格、云盘、知识库、日历、任务、邮件、会议、审批。
 **触发**：提到飞书 / Lark 或给了飞书链接、且没装该领域的官方 `lark-*` 技能时；或需要安装、绑定应用、登录 `lark-cli` 时
 
-带你走完安装（`npm install -g @larksuite/cli`）、绑定应用（`lark-cli config init --new`，国际版 Lark 加 `--brand lark`）、登录（`lark-cli auth login --recommend`），之后用到哪个领域就用 `lark-cli skills read <名字>` 现读那一份官方说明 —— 这些说明内置在命令行二进制里、随版本更新，不用把二十多个技能全部常驻每个会话。当前领域已装官方 `lark-*` 技能时，它让位给那个技能。内置说明只含文字，要用到辅助脚本时去 `larksuite/cli` 对应版本标签下取。
+带你走完安装（`npm install -g @larksuite/cli`）、绑定应用（`lark-cli config init --new`，国际版 Lark 加 `--brand lark`）、登录（`lark-cli auth login --recommend`），之后用到哪个领域就用 `lark-cli skills read <名字>` 现读那一份官方说明 —— 这些说明内置在命令行二进制里、随版本更新，不用把二十多个技能全部常驻每个会话。当前领域已装官方 `lark-*` 技能时，它让位给那个技能。内置说明只含文字，要用到辅助脚本时，去 `larksuite/cli` 对应版本标签下取该领域的整个目录（保持原结构）。
 
 > **前置**：需要 Node.js 来跑 `npm install -g @larksuite/cli`，以及一个能在所在企业里创建自建应用的飞书账号。
 

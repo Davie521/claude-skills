@@ -23,7 +23,7 @@ description: "Feishu (Lark) via the official lark-cli (@larksuite/cli): messages
 
 官方还提供 `npx @larksuite/cli@latest install` 安装向导，它会用 `npx skills add` 把官方技能装进技能目录、常驻系统提示。只想按需使用就跳过它，用本技能现读。
 
-注意：内置说明**只含文字，不含 `scripts/`、`assets/` 目录**。说明里要求跑脚本时（比如表格的图表质量检查、幻灯片的 XML 校验），去 GitHub `larksuite/cli` 与本机 `lark-cli --version` 相同的版本标签下，取 `skills/<名字>/scripts/` 里对应的文件，或改装该领域的官方技能。
+注意：内置说明**只含文字，不含 `scripts/`、`assets/` 目录**。说明里要求跑脚本时（比如表格的图表质量检查、幻灯片的 XML 校验），去 GitHub `larksuite/cli` 与本机 `lark-cli --version` 相同的版本标签下，取**整个 `skills/<名字>/` 目录并保持原有结构**（脚本会引入同目录的其他脚本、读上一级 `references/` 里的文件，只取单个脚本会跑不起来），或改装该领域的官方技能。
 
 ## 按需读官方说明
 

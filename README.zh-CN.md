@@ -196,12 +196,12 @@ HEIC→PNG（`sips`）→ EXIF 旋转矫正 → 模型直接读图并翻译 → 
 
 ### `feishu` — 飞书 / Lark 集成
 
-**定位**：通过 MCP 操作飞书 —— 发消息、建群、建文档、传文件、查人。
-**触发**：提到飞书 / Lark，或要发消息到飞书群 / 建飞书文档 / 查联系人时
+**定位**：通过飞书官方命令行 `lark-cli` 操作飞书 —— 消息与群聊、云文档、表格、多维表格、云盘、知识库、日历、任务、邮件、会议、审批。
+**触发**：提到飞书 / Lark 或给了飞书链接、且没装该领域的官方 `lark-*` 技能时；或需要安装、绑定应用、登录 `lark-cli` 时
 
-走官方 lark-mcp CLI 的 MCP server（工具形如 `mcp__feishu__im_v1_message_create`），覆盖 IM、docx、drive、wiki 四类 API。
+带你走完安装（`npm install -g @larksuite/cli`）、绑定应用（`lark-cli config init --new`，国际版 Lark 加 `--brand lark`）、登录（`lark-cli auth login --recommend`），之后用到哪个领域就用 `lark-cli skills read <名字>` 现读那一份官方说明 —— 这些说明内置在命令行二进制里、随版本更新，不用把二十多个技能全部常驻每个会话。当前领域已装官方 `lark-*` 技能时，它让位给那个技能。内置说明只含文字，要用到辅助脚本时，去 `larksuite/cli` 对应版本标签下取该领域的整个目录（保持原结构）。
 
-> **前置**：feishu MCP server 需已配置。工具不在时，skill 会明确提示你去配置，而不是瞎猜 API 形状。
+> **前置**：需要 Node.js 来跑 `npm install -g @larksuite/cli`，以及一个能在所在企业里创建自建应用的飞书账号。
 
 ---
 
@@ -614,7 +614,7 @@ done
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) — `cpr` 工作流需要
-- 飞书 MCP server — `feishu` skill 需要
+- 飞书官方命令行（`npm install -g @larksuite/cli`）— `feishu` skill 需要
 - Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要；`dev-workflow` 的 `cpr` 审查闸门也靠它们（还要装 `codex` plugin）
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / Context7 / Gemini / ElevenLabs / fal.ai 等）

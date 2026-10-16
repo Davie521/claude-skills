@@ -19,7 +19,7 @@
     },
     {
       "name": "work-tools",
-      "description": "Work integrations: Feishu/Lark MCP for messaging, groups, and document import/read (no file upload/download — official lark-mcp limitation)",
+      "description": "Work integrations: Feishu/Lark via the official lark-cli — install, app setup and login, then on-demand official guides for messages, docs, sheets, Base, calendar, tasks, mail and more",
       "source": "./plugins/work-tools",
       "category": "productivity"
     },

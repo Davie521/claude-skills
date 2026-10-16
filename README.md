@@ -193,12 +193,12 @@ The target reader is a **vibe coder** — someone who directs AI to write code b
 
 ### `feishu` — Feishu/Lark integration
 
-**For**: sending messages, creating groups, importing/reading docs, looking up users. No file upload/download and no direct cloud-doc editing — official lark-mcp limitations.
-**Trigger**: Feishu/Lark is mentioned, or you want to message a Feishu group / import or read a Feishu doc / find a contact
+**For**: everything Feishu/Lark through the official `lark-cli` — messages and group chats, docs, sheets, Base, drive, wiki, calendar, tasks, mail, meetings, approvals.
+**Trigger**: Feishu/Lark is mentioned or a Feishu link is shared and the official `lark-*` skill for that domain isn't installed, or `lark-cli` needs installing, app setup or login
 
-Runs on the official lark-mcp CLI MCP server (tools look like `mcp__feishu__im_v1_message_create`), covering IM, docx, drive and wiki APIs.
+Walks through install (`npm install -g @larksuite/cli`), app setup (`lark-cli config init --new`, plus `--brand lark` for international Lark) and login (`lark-cli auth login --recommend`), then loads only the official domain guide it needs with `lark-cli skills read <name>` — the guides ship inside the CLI binary and stay in sync with its version, so you don't preload two dozen skills into every session. Where the official `lark-*` skill for the domain at hand is installed, it defers to that skill. The embedded guides are text only — when one calls for a helper script, fetch that skill's whole directory (layout intact) from the matching `larksuite/cli` release tag.
 
-> **Prerequisite**: the feishu MCP server must be configured. If those tools are absent, the skill tells you to configure it rather than guessing at an API shape.
+> **Prerequisite**: Node.js for `npm install -g @larksuite/cli`, and a Feishu/Lark account that can create a self-built app in its tenant.
 
 ---
 
@@ -612,7 +612,7 @@ Most skills auto-trigger from natural language matching their description — th
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - GitHub CLI (`gh`) for the `cpr` workflow
-- Feishu MCP server for the `feishu` skill
+- Official Feishu/Lark CLI (`npm install -g @larksuite/cli`) for the `feishu` skill
 - Codex CLI ≥ a version with `codex exec --ignore-user-config`, plus `~/.local/bin/codex-run` and `codex-best-model`, for the `codex` plugin — and for `dev-workflow`'s `cpr` review gate (which also needs the `codex` plugin installed)
 - A Python venv for the `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` scripts
 - Various API keys depending on skill (Exa, firecrawl, Context7, Gemini, ElevenLabs, fal.ai, …)

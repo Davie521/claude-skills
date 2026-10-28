@@ -76,7 +76,7 @@ cat "$(git rev-parse --git-dir)/cpr-review-<PR号>" 2>/dev/null       # 每次�
    （审查期间可能有人推了提交，或把 PR 改指向别的分支），不一致就回第 4 步。一致再合并：
    `gh pr merge <PR号> --merge --delete-branch --match-head-commit <那个 SHA>`，把合并锁在审过的那个提交上。
    核对之后远端又变了，GitHub 会拒绝合并：同样回第 4 步，**别去掉这个参数重试**。
-   合并后以 `gh pr view <PR号> --json state` 为 `MERGED` 为准。`--delete-branch` 不一定把本地切回 main：
+   合并后以 `gh api repos/<o>/<r>/pulls/<PR号> --jq .merged` 为 `true` 为准（走 REST，GraphQL 报 EOF 时也查得到；别拿命令没报错当合并成功）。`--delete-branch` 不一定把本地切回 main：
    还停在功能分支就 `git switch main && git pull --ff-only && git branch -d <分支>`
    （在另开的工作树里，main 被主树占着切不过去，就留给收尾处理）。
    PR 上有人请求变更 → 暂停合并并通知用户

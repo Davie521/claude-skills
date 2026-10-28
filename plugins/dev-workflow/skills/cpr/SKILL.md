@@ -16,6 +16,7 @@ description: "Automated Git PR workflow: detect status → commit → create PR 
 5. **不用 Copilot 审查**（用户 2026-10-10 定）— 不请求、不等待、不处理，见末节
 6. **先确认审查用得了** — 审查要 `codex` 插件（`codex:codex-review` 技能）和 `~/.local/bin/codex-run`。
    动手提交之前先 `command -v codex-run`，没有就停下告诉用户，别跳过审查直接合并
+7. **gh / GitHub 出怪现象先读技能 `gh-pr-traps`** — `graphql: EOF`、update-branch 或 push 后 head SHA 不对、新提交一个检查都不触发、`gh auth status` 说没登录、OIDC 规则被拒等；合并成功与否一律以 `gh api repos/<o>/<r>/pulls/<n> --jq .merged` 为准（全局 CLAUDE.md 的 gh 一节同样常驻）
 
 ## 状态检测
 
@@ -75,7 +76,7 @@ cat "$(git rev-parse --git-dir)/cpr-review-<PR号>" 2>/dev/null       # 每次�
    （审查期间可能有人推了提交，或把 PR 改指向别的分支），不一致就回第 4 步。一致再合并：
    `gh pr merge <PR号> --merge --delete-branch --match-head-commit <那个 SHA>`，把合并锁在审过的那个提交上。
    核对之后远端又变了，GitHub 会拒绝合并：同样回第 4 步，**别去掉这个参数重试**。
-   合并后以 `gh pr view <PR号> --json state` 为 `MERGED` 为准。`--delete-branch` 不一定把本地切回 main：
+   合并后以 `gh api repos/<o>/<r>/pulls/<PR号> --jq .merged` 为 `true` 为准（走 REST，GraphQL 报 EOF 时也查得到；别拿命令没报错当合并成功）。`--delete-branch` 不一定把本地切回 main：
    还停在功能分支就 `git switch main && git pull --ff-only && git branch -d <分支>`
    （在另开的工作树里，main 被主树占着切不过去，就留给收尾处理）。
    PR 上有人请求变更 → 暂停合并并通知用户

@@ -13,10 +13,10 @@ description: "Automated Git PR workflow: detect status → commit → create PR 
 2. **不要停下来问用户** — 每步完成后直接继续；只有碰到下文「停下来让用户拍板」列出的情况才停
 3. **循环修复直到通过** — CI 失败 → 修；Codex 审查没通过 → 修 → 再审，直到通过
 4. **完整执行** — 三件事都满足才算结束：CI 通过（或确认该仓库无 CI）；最近一轮 Codex 审查审的就是当前 HEAD，并且过闸（见「处理审查结果」）；合并完成
-5. **gh / GitHub 出怪现象先读技能 `gh-pr-traps`** — `graphql: EOF`、update-branch 或 push 后 head SHA 不对、新提交一个检查都不触发、`gh auth status` 说没登录、OIDC 规则被拒等；合并成功与否一律以 `gh api repos/<o>/<r>/pulls/<n> --jq .merged` 为准（全局 CLAUDE.md 的 gh 一节同样常驻）
 5. **不用 Copilot 审查**（用户 2026-10-10 定）— 不请求、不等待、不处理，见末节
 6. **先确认审查用得了** — 审查要 `codex` 插件（`codex:codex-review` 技能）和 `~/.local/bin/codex-run`。
    动手提交之前先 `command -v codex-run`，没有就停下告诉用户，别跳过审查直接合并
+7. **gh / GitHub 出怪现象先读技能 `gh-pr-traps`** — `graphql: EOF`、update-branch 或 push 后 head SHA 不对、新提交一个检查都不触发、`gh auth status` 说没登录、OIDC 规则被拒等；合并成功与否一律以 `gh api repos/<o>/<r>/pulls/<n> --jq .merged` 为准（全局 CLAUDE.md 的 gh 一节同样常驻）
 
 ## 状态检测
 

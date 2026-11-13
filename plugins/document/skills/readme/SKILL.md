@@ -1,6 +1,6 @@
 ---
 name: readme
-description: "Write, rewrite or audit a repository README. Treats the README as a reader funnel and a contract: what it is and what it looks like first, then install, then limits, with everything else moved to docs/; every command, number and default traced to the code; no AI tone. Covers public tools and libraries, web apps with a demo, and private repos whose readers are future-you and an agent. Use when the user says 'README', '写 README', '改 README', '看看 README', 'README 太长/太像 AI 写的', '开源前收拾一下仓库', or a repo needs its front page."
+description: "Write, rewrite or audit a repository README. Treats the README as a reader funnel and a contract: what it is and what it looks like first, then install, then limits, with everything else moved to docs/; every command, number and default traced to the code; no AI tone. Covers public tools and libraries, web apps with a demo, and private repos whose readers are future-you and an agent. Use when the user says 'README', '写 README', '改 README', '看看 README', 'README 太长/太像 AI 写的', '开源前收拾一下仓库', or a repo needs its front page. Not a marketing page, not a docs site, and not a sentence-level de-AI pass (use lieflat-less-ai-tone for that)."
 ---
 
 # readme
@@ -11,9 +11,38 @@ README 同时是一份契约：它说这个项目做什么、怎么用，读者�
 
 这两条是下面所有规则的来源。碰到规则没覆盖的情况，回到这两条去判断。
 
-## 什么时候不用
+## 默认立场
 
-- 用户要写完整的文档站、教程、API 参考：那是 `docs/` 的活，README 只给它们指路。
+- 作者写的 README 往往是在推销，不是在帮读者做判断。审的时候先问：读者读完第一屏，能不能决定「要 / 不要」？
+- README 里的说法默认不可信，直到在代码、日志、CI 里找到出处为止。旧 README 也一样：作者写的时候是对的，现在不一定还对。
+- 功能列表是作者想让你看的，用法和限制才是读者要的。
+- 写得像 AI 不是因为用了某种格式，而是因为说了核对不了的话。改 AI 腔先删空话，不是先改格式。
+
+## 硬性边界
+
+**信息守恒。** README 里每一条事实（命令、路径、数字、默认值、版本、功能、限制）都要能指出出处：`文件:行`、日志、CI 记录、实测输出。指不出来就不写。改写已有 README 时：
+
+- 不许新增原来没有、代码里也找不到的功能、数字、用户评价、效果宣称。
+- 不许删掉限制和限定说法（「仅 macOS」「实验性」「免费版没有」），也不许把「可能」改成「会」。
+- 作者写的内容是「搬走」不是「删掉」：搬去 `docs/` 并留链接。过时、错误的可以删，但要在汇报里写明删了什么、为什么删。
+
+**不碰的东西。** 协议文本、作者署名、致谢、作者喜欢的装饰（徽章、logo、star 曲线），没有用户同意不改不删。
+
+## 必须停下来问用户的地方
+
+下面这几处必须停下来，等用户回复再继续，不要默认往下做：
+
+1. **读者是谁拿不准时**：比如仓库既像公开工具又像私人脚本。
+2. **要删作者写的整节内容或装饰时**：先列出来要删什么、为什么删。
+3. **缺真实截图或产物样例时**：请用户提供，不要拿旧图凑，也不要自己造。
+4. **发现协议和宣传的用法互相矛盾、仓库里有私人信息、Demo 挂了时**：告诉用户，不替他改协议、删文件、改部署。审查模式下不用中断，写进报告就行。
+5. **改 GitHub 上的东西之前**：改 About 描述、推送、开 PR，都要先问。
+
+## 哪些不归这个 skill
+
+- 写完整的文档站、教程、API 参考：那是 `docs/` 的活，README 只给它们指路。
+- 逐句清理中文 AI 腔：交给 `lieflat-less-ai-tone`。本 skill 只处理 README 特有的写法（见 [references/ai-tone.md](references/ai-tone.md)）。
+- 检查 Markdown 锚点渲染、gh 的怪问题：见 `gh-pr-traps`。
 - README 已经好用，用户只是想换个风格：没有读者受益的改动不做。
 - 只想改一个错字、补一行：直接改，不用走下面的流程。
 
@@ -59,14 +88,14 @@ README 同时是一份契约：它说这个项目做什么、怎么用，读者�
 - **同一件事说了几遍。** 版本号、阈值在三个地方各说一次，迟早有一处会过时。
 - **过时。** 链接失效、提到已删除的文件，命令早就改了。
 - **说法比代码大。** 写着有的功能其实没有，写着「可选」的其实是必填，没实现的写成已有。
-- **读起来像生成的。** 满屏加粗、每节一张表、emoji 小标题、三连排比、面面俱到的 FAQ、「强大 / 无缝 / 一站式」这类词。读者一眼认出来，就不再相信后面的内容。
+- **读起来像生成的。** 按 [references/ai-tone.md](references/ai-tone.md) 的白名单逐条找：空形容词、emoji 小标题、功能名代替功能、推销式开头、编造的数字、空占位小节……每条都有触发标记。那份文件里还有一张「不作为修改理由」表：问题小标题、README 很长、粗体开头的功能列表，这些高星仓库里人写的也常见，不能当毛病。
 
 动手前还有三件事：
 1. 跑 `git status`。工作区不干净就别直接改，README 可能带着作者还没提交的东西。
 2. grep 一下测试和 CI 里有没有钉死 README 文字的断言（标题、文件列表），否则改完 CI 会红。
 3. 看看有没有派生副本（`README.zh-CN.md`、官网文案、包管理器上的描述），它们要一起改，或者明确说这次不改。
 
-用户只要审查的话，到这里就停：按下面「汇报」一节的格式出报告，不动文件。
+用户只要审查的话：不动任何文件，跳过第 4 步，但第 5 步的核验照做（能安全跑的命令就跑，跑不了的从代码推断），然后按「汇报」一节的格式出报告。
 
 ### 4. 写
 
@@ -86,7 +115,7 @@ README 同时是一份契约：它说这个项目做什么、怎么用，读者�
 - **作者喜欢的保留。** 徽章、logo、star 曲线这类装饰，作者没同意就不删。清单是为作者服务的，不是反过来。
 - **高星仓库里也有不该学的。** 营销横幅、赞助链接和其他项目推荐挡在介绍前面、版本更新日志占据开头、`Made with Go`/`PRs Welcome` 这类没有信息量的徽章，都不要照搬。
 
-文风：句子短，一句只说一个事实；能用数字的地方不用形容词。粗体只留给读者会踩的坑。表格只在有两个以上维度需要对比时才用。写完对照 [references/checklist.md](references/checklist.md) 里的「AI 腔」一节扫一遍。
+文风：句子短，一句只说一个事实；能用数字的地方不用形容词。写完按 [references/ai-tone.md](references/ai-tone.md) 逐条扫一遍；中文 README 装了 `lieflat-less-ai-tone` 的，再用它过一遍句子。
 
 中英双语的项目，中文版要意译而不是逐句直译：按中文技术写作的节奏重写，但小节、表格、链接、数字和英文版一一对应，方便机械核对。两份 README 的顶部互相链接。
 
@@ -114,12 +143,46 @@ README 是契约，交付前把它当契约查一遍：
 需要你定的：…
 ```
 
-只审查时，只列不合格的项，每项给出位置。问题出在 README 以外的，写成「README:行 ↔ 文件:行」。最后加一段「陌生人会在哪里离开」。
+只审查时，用下面这个格式。每一节都要给出状态，没查的写「未核对」并说明原因，不能空着，也不能假装查过：
+
+```
+## README 审查：<仓库名>
+
+读者和类型：<按第 1 步的表>　依据：<为什么这么判断>
+
+### 第一屏：未核对 / 合格 / 有问题
+### 事实（命令、数字、配置）：未核对 / 部分核对（核了 N 项，没核 M 项）/ 全部对上 / N 处不符
+### 结构：未核对 / 合格 / 有问题
+### AI 腔：未核对 / 没有 / N 处
+### 隐私：未核对 / 干净 / 有问题
+
+不合格的项（按对读者的伤害从大到小排）
+1. [清单编号] 问题一句话。README:行（↔ 文件:行）。实测 / 读代码推断。
+
+核对过、没问题的：…
+没核对的、为什么：…
+陌生人会在哪里离开：…
+其他观察（对不上编号的）：…
+```
+
+每一项都要标出 [references/checklist.md](references/checklist.md) 里的编号（比如 `[F3]`）或 [references/ai-tone.md](references/ai-tone.md) 里的规则号（比如 `[AI-5]`）。对不上任何编号的，说明它不是这份 skill 定义的问题，单独列在最后的「其他观察」里，不混进不合格项。
+
+## 最终验收
+
+交付前逐条确认：
+
+- 每一处改动都能对上某条规则（第 4 步的某一条、checklist 编号或 AI 腔规则号）。对不上的改动撤销，恢复原文。
+- README 里每一条事实都能指出出处（信息守恒）。
+- 原来的限制、限定说法都还在，语气没有被加重。
+- 作者的内容没有被静默删掉；删了的都在汇报里写明。
+- 「必须停下来问」的那几处，真的停下来问过了。
+- 第 5 步的核验做完了，没做的在汇报里写明。
 
 提交信息写读者能感到的变化，比如 `docs: say what this does in the first screen`，正文写为什么改、实测时发现了什么。推送之前先问用户。
 
 ## 参考文件
 
 - [references/examples.md](references/examples.md)：从用户 star 过的高星仓库里摘出来的真实写法，每条说明为什么好，最后一节是高星仓库里也不该学的。写第一屏、功能和安装之前读。
-- [references/checklist.md](references/checklist.md)：审查用的逐项清单，含 AI 腔和隐私两节。
+- [references/checklist.md](references/checklist.md)：审查用的逐项清单，每项有编号，汇报时引用。
+- [references/ai-tone.md](references/ai-tone.md)：README 里的 AI 腔白名单，每条有触发标记和改法，附「不作为修改理由」表。
 - [references/sources.md](references/sources.md)：这份 skill 参考了哪些外部资料，以及哪些没采纳、为什么。

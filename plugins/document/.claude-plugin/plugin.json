@@ -1,6 +1,6 @@
 {
   "name": "document",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Document tools: README writing/audit, A4 cheatsheets, doc co-authoring, PDF, visa translation, codebase-to-course interactive tutorials",
   "author": {
     "name": "Yifan"

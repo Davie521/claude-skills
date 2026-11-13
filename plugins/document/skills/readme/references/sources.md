@@ -4,6 +4,12 @@
 
 **第二版（11/14）的结构改动**：第一版是一份规则清单，用户看了觉得不够好。第二版照 better-readme 的写法，先立「漏斗」和「契约」两条主线，每条规则都写出原因；照 readme-polish 补了「什么时候不用」一节和汇报格式；照 Anthropic skill-creator 的建议，少写硬性的「必须」，多讲为什么，并把范本改成好写法和差写法的对照。
 
+**第四版（11/14）的写法学自高星 skill 本身**（不是它们的 README）：
+- `lieflat-less-ai-tone`（writing-dna-skill 仓库）：白名单式规则，每条有触发标记和 ❌/✅；「不作为改写理由」表；信息守恒（不许新增、不许删限定词）；最终验收要求每处改动都对上一条编号规则。→ 本 skill 的 ai-tone.md、硬性边界、最终验收。
+- `software-copyright-materials`（SoftwareCopyright-Skill）：「强制人工门禁」，写明哪几步必须停下来等用户，不许默认继续。→ 「必须停下来问用户的地方」。
+- `nature-paper-xray`（nature-skills）：先写「默认立场」；在描述里说清它不是什么，并指向兄弟 skill；没读完要说停在哪。→ 默认立场、「哪些不归这个 skill」。
+- `code-review`（Claude-Code-Game-Studios）：报告每节都给状态，包括 NOT ASSESSED。→ 审查报告模板里的「未核对」。
+
 ## 别人写的 README skill
 
 - [tommy0103/better-readme-skill](https://github.com/tommy0103/better-readme-skill)：最好的一份，第二版的骨架照它的思路写。采纳了这些：先审后改；前 50 行别放内部实现；维护者内容和用户内容分开；一个事实只住一处；「搬走不删」；带过来的事实重新核实；以陌生人身份重读；用决定清单汇报。

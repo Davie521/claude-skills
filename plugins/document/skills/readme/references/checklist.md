@@ -1,6 +1,6 @@
 # README 检查清单
 
-审查模式下只列不过的项，每项写「README:行」，问题出在 README 之外的写「README:行 ↔ 文件:行」，并标明实测还是读代码推断。写作模式下交付前自查。
+审查时逐项对照，报告里只列不合格的项（格式见 SKILL.md「汇报」）。每项写「README:行」；问题出在 README 之外的，写「README:行 ↔ 文件:行」，并标明是实测还是读代码推断。写作时用它在交付前自查。
 
 ## 第一屏（不滚动能看到的部分）
 
@@ -25,27 +25,32 @@
 
 ## 结构
 
+- [ ] 给维护者看的东西（发版流程、目录树、CI 密钥、调试指南）不在 README 里，已经搬去 `CONTRIBUTING.md` 或 `docs/` 并留了链接。
 - [ ] 只回答：是什么、跟别的有什么不同、怎么装、有什么限制、细节去哪看。其余已搬进 `docs/`。
 - [ ] 一个事实只出现一次。
 - [ ] 安装是一步（一条命令或一段给 agent 的提示词），而且只写了读者还剩下要做的事。
 - [ ] 第一次试用可能出现的「怎么没反应」已经预先说了，并给了验证方法。
 - [ ] 没有空占位的小节（空的 Support、Roadmap、FAQ、Authors）。
 - [ ] 超过约 150 行正文（不算代码块）的，已经考虑搬走或者加了目录。
+- [ ] 作者原有的装饰（徽章、logo、star 曲线）没有在作者不同意的情况下删掉。
 - [ ] 双语：两份的小节、命令、数字逐项对齐，中文是重写而不是逐句翻译。
 
-## AI 腔（出现就改）
+## AI 腔
 
-- [ ] emoji 小标题（🚀 Quick Start、✨ Features、📦 Installation）。
-- [ ] 吹嘘词：强大、轻量、优雅、无缝、一站式、开箱即用、赋能、极致；blazing fast、seamless、robust、powerful、leverage、cutting-edge、effortless。
-- [ ] 三连排比、「三道防线」式编号口号、每段一句金句。
-- [ ] 满屏加粗：一节超过两处。
-- [ ] 每节一张表，包括只有一个维度的信息。
-- [ ] 没人问过的 FAQ。
-- [ ] 「总而言之」「值得一提的是」「In conclusion」「Moreover」这类过渡。
-- [ ] 用散文把代码复述一遍，而不是链到代码。
-- [ ] 模棱两可的说法：「可能」「通常」「应该可以」，而事实其实可以查清。
-- [ ] 一墙徽章，或者「made with ❤️」「PRs welcome」这类没有信息量的徽章。
-- [ ] Features 里的粗体是名词（「Smart Thresholds」），不是结论（「Only when it is worth it.」）。
+下面这些不是要勾的项，是出现了就要改的写法。
+
+
+- emoji 小标题（🚀 Quick Start、✨ Features、📦 Installation）。
+- 吹嘘词：强大、轻量、优雅、无缝、一站式、开箱即用、赋能、极致；blazing fast、seamless、robust、powerful、leverage、cutting-edge、effortless。
+- 三连排比、「三道防线」式编号口号、每段一句金句。
+- 满屏加粗：一节超过两处。
+- 每节一张表，包括只有一个维度的信息。
+- 没人问过的 FAQ。
+- 「总而言之」「值得一提的是」「In conclusion」「Moreover」这类过渡。
+- 用散文把代码复述一遍，而不是链到代码。
+- 模棱两可的说法：「可能」「通常」「应该可以」，而事实其实可以查清。
+- 一墙徽章，或者「made with ❤️」「PRs welcome」这类没有信息量的徽章。
+- Features 里的粗体是名词（「Smart Thresholds」），不是结论（「Only when it is worth it.」）。
 
 ## 隐私（私人仓库也要查）
 

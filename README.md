@@ -11,7 +11,7 @@ Every skill below names what it's for in its heading, then states how it's **tri
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
 | [`dev-workflow`](#dev-workflow) | 10 | Git PR automation with auto-merge, deep planning, **grilling, diagnosis, codebase deepening, triage** |
-| [`document`](#document) | 5 | A4 cheatsheets, doc co-authoring, PDF, visa doc translation, codebase-to-course |
+| [`document`](#document) | 6 | README writing/audit, A4 cheatsheets, doc co-authoring, PDF, visa doc translation, codebase-to-course |
 | [`work-tools`](#work-tools) | 1 | Feishu/Lark integration |
 | [`writing`](#writing) | 3 | Vibe writing with voice capture, multi-platform crosspost, video editing |
 | [`design`](#design) | 2 | UI/UX Pro Max, UX critique |
@@ -186,6 +186,12 @@ HEIC→PNG via `sips` → EXIF rotation correction → the model reads and trans
 **Trigger**: say "turn this into a course", or ask how a codebase works as a walkthrough
 
 The target reader is a **vibe coder** — someone who directs AI to write code but has no CS training. Four phases: deep-read the codebase (trace data flow, identify the "characters") → design a 5–8 module outline (drill down from behaviour the user already knows) → generate one self-contained HTML file → open it in a browser and walk it. Five interaction types are mandatory: component group-chat animation, data-flow animation, code ↔ plain-English pairing, scenario quizzes, term tooltips. Content discipline: never abridge the real code, never reuse a metaphor (no restaurant analogies), at least half of every screen is visual.
+
+### `readme` — Write, rewrite or audit a README
+
+**Trigger**: "README", "write/fix the README", "check this README", "the README reads like AI wrote it"
+
+Treats a README as a reader funnel and a contract: what it is, how to use it and what it produces come first; every command, number and default must trace to the code. Separate orders for tools, libraries, agent skills, web apps with a demo and private repos. Exemplars are real excerpts from high-star repos (Claude-Code-Game-Studios, process-compose, SoftwareCopyright-Skill, writing-dna-skill), including what not to copy from them. Has five places where it must stop and ask, a whitelist of README-specific AI tells with a "not a reason to change" table, a numbered checklist, and an audit report where every section is marked checked or not assessed.
 
 ---
 

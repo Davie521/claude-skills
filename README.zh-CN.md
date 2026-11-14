@@ -11,7 +11,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 | Plugin | Skill 数 | 用途 |
 |--------|---------|------|
 | [`dev-workflow`](#dev-workflow) | 10 | Git PR 自动化（含自动合并）、深度规划、**拷问、调试纪律、架构深化、issue triage** |
-| [`document`](#document) | 5 | A4 速查表、文档协作、PDF、签证文档翻译、codebase-to-course |
+| [`document`](#document) | 6 | 写 / 审 README、A4 速查表、文档协作、PDF、签证文档翻译、codebase-to-course |
 | [`work-tools`](#work-tools) | 1 | 飞书集成 |
 | [`writing`](#writing) | 3 | Vibe 写作（含声音捕捉）、多平台分发、视频编辑 |
 | [`design`](#design) | 2 | UI/UX Pro Max、UX critique |
@@ -189,6 +189,12 @@ HEIC→PNG（`sips`）→ EXIF 旋转矫正 → 模型直接读图并翻译 → 
 **触发**：说 turn this into a course / 讲讲这个代码库怎么工作 / 做个交互式教程
 
 目标读者是 **vibe coder** —— 会指挥 AI 写码但没受过 CS 训练的人。四阶段：深读代码库（追数据流、找出「角色」）→ 设计 5-8 个模块的课纲（从用户已知的行为层层下钻）→ 生成单文件 HTML → 浏览器打开走查。五种交互元素强制齐全：组件群聊动画、数据流动画、代码 ↔ 白话对照、场景式测验、术语 tooltip。内容纪律：代码原样不许精简、隐喻不许复用（禁餐厅梗）、每屏至少一半是视觉元素。
+
+### `readme` — 写、改、审 README
+
+**触发**：说 README / 写 README / 改 README / 看看这个 README / README 太像 AI 写的
+
+把 README 当成漏斗和契约：最先写清「是什么、怎么用、会得到什么」；每条命令、每个数字、每个默认值都要在代码里找到出处。工具、库、agent skill、有在线 Demo 的网页、私人仓库各有一套顺序。范本是从高星仓库里摘的真实写法（Claude-Code-Game-Studios、process-compose、SoftwareCopyright-Skill、writing-dna-skill），也列了它们哪些地方不该学。写明了 5 个必须停下来问的地方；README 特有的 AI 腔规则做成白名单，另附一张「不作为修改理由」表；检查项编了号；审查报告每节都要标明核对过还是没核对。
 
 ---
 

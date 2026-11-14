@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
+Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 51 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
 
 每个 skill 的标题就点明它解决什么，下面写清**触发**（怎么让它上场）和**机制**（它内部实际怎么跑）；标题不够说明白的，另起一行 **定位** 补上。
 
@@ -20,7 +20,7 @@ Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个
 | [`data`](#data) | 2 | 迁移 + PostgreSQL 速查、自动爬虫 |
 | [`quality`](#quality) | 8 | TDD、E2E、安全审查/扫描、对抗式验证 |
 | [`code-review`](#code-review) | 5 agent + 1 命令 | `/code-review` 自动按语言分发到 Python/TypeScript/Swift 专家 + 强制 security 审查 |
-| [`research`](#research) | 3 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律 |
+| [`research`](#research) | 4 | 深度研究（含市场调研）、搜索路由、LLM 成本纪律、OpenCLI 安装引导 |
 | [`skills`](#skills) | 3 | Skill 管理 — 盘点、合规审计、规则蒸馏 |
 | [`business`](#business) | 1 | 投资人材料 + outreach 跟进节奏 |
 | [`codex`](#codex) | 2 | Codex 第二意见（只读 `codex exec`）— 代码审查、方案质疑 |
@@ -499,6 +499,24 @@ Page Object Model 组织测试；trace 用配置项 `use: { trace: 'on-first-ret
 
 > **定价原则**：一律现查（`claude-api` skill 或官方定价页），文档里绝不硬编码价格数字 —— 硬编码的价格半年后就是错的。
 
+### `setup-opencli` — 带新用户装好 OpenCLI，并验证真能读到数据
+
+**定位**：[OpenCLI](https://github.com/jackwener/OpenCLI) 借用你 Chrome 里的登录态，把小红书、X、B站、知乎、淘宝等 100 多个网站变成命令行命令。这个 skill 只管「装好、连上、验证」，日常用法交给 OpenCLI 自带的 skill（`opencli skills read opencli-usage`），那份跟着版本走。
+**触发**：提到 OpenCLI 或要求安装；任务要读登录后才能看的网站而 `opencli` 还没装好或没连上；`opencli` 报 `command not found` / `BROWSER_CONNECT` / `Extension: disconnected` / `attach failed`；要升级 opencli 或它提示有新版本时
+
+流程：
+
+0. 先跑 `opencli doctor`，三行 `[OK]` 就直接干活，不走安装。opencli 自己打印的安装/升级/清理提示（`Update available`、GitHub 发布包 *Load unpacked*、「删掉本地适配器副本」）一律不照做
+1. **先确认装了 Chrome，再在装任何东西之前讲清楚、等你同意**：一个全局 npm 包、一个 Chrome 扩展，以及代价——本地 daemon 没有按用户的口令，而且会一直在后台跑到你手动停掉；Chrome 连着时，这台电脑上的任何程序（包括别的账户）都能带着你的登录态操作 Chrome、读你的 cookie；也讲清楚怎么全部撤掉
+2. 检查 Node（≥ 21，装当前 LTS；有 Homebrew 用它，没有就用不需要管理员权限的 fnm），不用 `sudo npm`。Claude Code 自己的 shell 要重启才看得到新的 `PATH`，所以新装的命令一律用绝对路径调
+3. `npm install -g @jackwener/opencli`，处理 `EACCES` 和 PATH 问题
+4. 在 Chrome 里打开扩展商店页，「添加至 Chrome」由你来点（Chrome 不允许程序代装）；连不上时按表排查（开错用户、多个用户同时连着、daemon 版本过旧……），附一个只读脚本，查出扩展装在哪个 Chrome 用户里（商店版或解压版）、是否启用、当前开的是不是那个用户
+5. 你登录目标网站后，跑一条只有登录才有结果的 `access: read` 命令，拿到真实数据才算装好（只有公开内容的网站，退而用 `opencli browser` 验证连通）；绝不拿 `access: write` 的命令做测试
+
+附 `references/pitfalls.md`：官方 skill 没写的坑——**升级会悄悄删掉你 eject 改过的适配器**（要 `--ignore-scripts`）、`attach failed`（页面里有别的扩展的 frame，或会话指错了标签页）、`eval` 漂到 `about:blank`、上传被拒、风控限速。
+
+> **只在 macOS 上实测过。** Linux / Windows 流程相同，但打开 Chrome、查进程的命令不同，skill 会照实告诉你而不是瞎猜。
+
 ---
 
 ## skills
@@ -617,6 +635,7 @@ done
 - 飞书官方命令行（`npm install -g @larksuite/cli`）— `feishu` skill 需要
 - Codex CLI（需支持 `codex exec --ignore-user-config`）+ `~/.local/bin/codex-run` + `codex-best-model` — `codex` plugin 需要；`dev-workflow` 的 `cpr` 审查闸门也靠它们（还要装 `codex` plugin）
 - Python venv — `pdf` / `cheatsheet` / `ui-ux-pro-max` / `skill-comply` 的脚本需要
+- Node.js ≥ 21（推荐当前 LTS）和 Google Chrome — `setup-opencli` 需要
 - 各类 API key 按 skill 不同（Exa / firecrawl / Context7 / Gemini / ElevenLabs / fal.ai 等）
 
 ## 许可证

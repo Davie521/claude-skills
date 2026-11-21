@@ -67,7 +67,7 @@
     },
     {
       "name": "research",
-      "description": "Research and LLM engineering: deep research with scenario checklists, search routing across MCPs, LLM cost discipline (regex-first parsing + model routing)",
+      "description": "Research and LLM engineering: deep research with scenario checklists, search routing across MCPs, LLM cost discipline (regex-first parsing + model routing), guided OpenCLI setup (install, connect Chrome, verify on a logged-in site)",
       "source": "./plugins/research",
       "category": "productivity"
     },

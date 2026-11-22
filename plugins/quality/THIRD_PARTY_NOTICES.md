@@ -8,7 +8,7 @@ Clause applies to it.
 ## everything-claude-code
 
 - Source: https://github.com/affaan-m/everything-claude-code
-- License: MIT, Copyright (c) 2026 Affaan Mustafa
+- License: MIT; Copyright (c) 2026 Affaan Mustafa
 - License text: reproduced at the end of this file
 - Copied and modified. Some of these skills credit their own authors in an `origin:` field (for example santa-method, Ronald Skelton); they reached this repository through everything-claude-code under its MIT license.
 - Paths:
@@ -24,17 +24,17 @@ Clause applies to it.
 ## mattpocock/skills
 
 - Source: https://github.com/mattpocock/skills
-- License: MIT, Copyright (c) 2026 Matt Pocock
+- License: MIT; Copyright (c) 2026 Matt Pocock
 - License text: reproduced at the end of this file
-- Copied and modified; each skill names its upstream path in an Origin footer. tdd-workflow only has a grafted section (see its Provenance footer).
+- Copied and modified; each skill names its upstream path in an Origin or Provenance footer.
 - Paths:
-  - `skills/tdd-workflow`
+  - `skills/tdd-workflow` — the grafted section named in its Provenance footer
 
 ---
 
 # License texts
 
-## everything-claude-code
+## everything-claude-code — everything-claude-code.MIT.txt
 
 ```text
 MIT License
@@ -60,7 +60,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## mattpocock/skills
+## mattpocock/skills — mattpocock-skills.MIT.txt
 
 ```text
 MIT License

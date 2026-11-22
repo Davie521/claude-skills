@@ -76,3 +76,7 @@ description: "AI-assisted writing workflow with four phases: Learn (Socratic dia
 - [结构模式](references/structure-patterns.md)
 - [学习指南](references/learning-guide.md)
 - [写作指南](references/writing-guide.md)
+
+## Provenance
+
+本 skill 主体为原创。「声音五维清单」和「禁用词表 / 去 AI 腔」两部分（本文件与 `references/writing-guide.md`）改写自 [everything-claude-code](https://github.com/affaan-m/everything-claude-code) 的 `article-writing` skill（MIT）。

@@ -8,19 +8,19 @@ Clause applies to it.
 ## everything-claude-code
 
 - Source: https://github.com/affaan-m/everything-claude-code
-- License: MIT, Copyright (c) 2026 Affaan Mustafa
+- License: MIT; Copyright (c) 2026 Affaan Mustafa
 - License text: reproduced at the end of this file
 - Copied and modified. Some of these skills credit their own authors in an `origin:` field (for example santa-method, Ronald Skelton); they reached this repository through everything-claude-code under its MIT license.
 - Paths:
   - `skills/llm-cost-discipline`
-  - `skills/research`
+  - `skills/research` — including the scenario checklists merged from market-research
   - `skills/search-routing`
 
 ---
 
 # License texts
 
-## everything-claude-code
+## everything-claude-code — everything-claude-code.MIT.txt
 
 ```text
 MIT License

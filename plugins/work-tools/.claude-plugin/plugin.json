@@ -1,6 +1,6 @@
 {
   "name": "work-tools",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Work integrations: Feishu/Lark via the official lark-cli — install, app setup and login, then on-demand official guides for messages, docs, sheets, Base, calendar, tasks, mail and more",
   "author": {
     "name": "Yifan"

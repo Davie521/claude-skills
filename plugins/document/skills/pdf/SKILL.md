@@ -332,4 +332,4 @@ Files changed from upstream:
 - `SKILL.md`: added the Environment Setup section and the precedence note in `description`; file references use lowercase `reference.md` / `forms.md`; fixed a typo ("the font size").
 - `forms.md`: venv reminder at the top, `check_fillable_fields.py` path fixed, optional validation-image step added.
 - `scripts/convert_pdf_to_images.py`: creates the output directory if it is missing.
-- `scripts/check_bounding_boxes_test.py`: new file, not from upstream.
+- Removed `scripts/check_bounding_boxes_test.py`: it came from an earlier upstream revision that was not Apache-licensed and is not part of `2c5958e`.

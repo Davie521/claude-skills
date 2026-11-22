@@ -157,3 +157,7 @@ writing-dna-skill 的小标题依次是：它解决什么问题 / 适合什么 /
 - **赞助、其他项目、「New Skill」推荐挡在介绍前面**：ui-ux-pro-max-skill 在一句话介绍和正文之间，插了赞助链接和其他项目的推荐。
 - **把发起人的商务信息放在最前**：nature-skills 的第一节是「项目发起人与运营信息」，包括代充、商务合作。读者要往下翻好几屏才看到「快速开始」。
 - **版本更新日志占据开头**：ui-ux-pro-max-skill 的第一个二级标题是「What's New in v2.0」，没用过 v1 的读者读起来没有上下文。
+
+## 引文来源
+
+本文件为点评目的简短引用了上表各仓库的公开 README，出处已在正文里逐条写明。`writing-dna-skill` 和 `SoftwareCopyright-Skill` 的引文取自它们以 MIT 发布时的版本（分别是 `9e780d0` 和 `e78f746`），许可证见插件目录下的 THIRD_PARTY_NOTICES.md。

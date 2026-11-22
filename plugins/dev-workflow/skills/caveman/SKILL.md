@@ -55,4 +55,4 @@ Example -- destructive op:
 
 ## Origin
 
-Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `productivity/caveman`. License: MIT.
+Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `productivity/caveman`, which builds on [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) (MIT, Copyright (c) 2026 Julius Brussee). License: MIT.

@@ -8,18 +8,20 @@ Clause applies to it.
 ## everything-claude-code
 
 - Source: https://github.com/affaan-m/everything-claude-code
-- License: MIT, Copyright (c) 2026 Affaan Mustafa
+- License: MIT; Copyright (c) 2026 Affaan Mustafa
 - License text: reproduced at the end of this file
 - Copied and modified. Some of these skills credit their own authors in an `origin:` field (for example santa-method, Ronald Skelton); they reached this repository through everything-claude-code under its MIT license.
 - Paths:
-  - `skills/deep-plan`
+  - `skills/cleanup` — Phase 4 placement rules, from the learn-eval skill
+  - `skills/deep-plan` — the plan flow it extends
+  - `skills/grill-with-docs/ADR-FORMAT.md` — the ADR spec: Index, Consent, Reading ADRs back
 
 ## mattpocock/skills
 
 - Source: https://github.com/mattpocock/skills
-- License: MIT, Copyright (c) 2026 Matt Pocock
+- License: MIT; Copyright (c) 2026 Matt Pocock
 - License text: reproduced at the end of this file
-- Copied and modified; each skill names its upstream path in an Origin footer. tdd-workflow only has a grafted section (see its Provenance footer).
+- Copied and modified; each skill names its upstream path in an Origin or Provenance footer.
 - Paths:
   - `skills/caveman`
   - `skills/diagnose`
@@ -29,10 +31,19 @@ Clause applies to it.
   - `skills/to-prd`
   - `skills/triage`
 
+## JuliusBrussee/caveman
+
+- Source: https://github.com/JuliusBrussee/caveman
+- License: MIT (at commit d84127c; the project has since moved to Apache-2.0); Copyright (c) 2026 Julius Brussee
+- License text: reproduced at the end of this file
+- The original that mattpocock/skills' caveman builds on.
+- Paths:
+  - `skills/caveman`
+
 ## close-skill
 
 - Source: https://github.com/fogarasy/close-skill
-- License: MIT, Copyright (c) 2026 @thomasfogarasy
+- License: MIT; Copyright (c) 2026 @thomasfogarasy
 - License text: reproduced at the end of this file
 - Checks rewritten into cleanup; see its Provenance footer.
 - Paths:
@@ -41,7 +52,7 @@ Clause applies to it.
 ## claude-code-shepherd
 
 - Source: https://github.com/mgorkemuz/claude-code-shepherd
-- License: MIT, Copyright (c) 2026 claude-clean contributors
+- License: MIT; Copyright (c) 2026 claude-clean contributors
 - License text: reproduced at the end of this file
 - Ideas adapted into cleanup; see its Provenance footer.
 - Paths:
@@ -50,7 +61,7 @@ Clause applies to it.
 ## AgentDeck
 
 - Source: https://github.com/puritysb/AgentDeck
-- License: MIT, Copyright (c) 2025 SerendipityBound
+- License: MIT; Copyright (c) 2025 SerendipityBound
 - License text: reproduced at the end of this file
 - Ideas from its session-end skill adapted into cleanup; see its Provenance footer.
 - Paths:
@@ -60,7 +71,7 @@ Clause applies to it.
 
 # License texts
 
-## everything-claude-code
+## everything-claude-code — everything-claude-code.MIT.txt
 
 ```text
 MIT License
@@ -86,7 +97,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## mattpocock/skills
+## mattpocock/skills — mattpocock-skills.MIT.txt
 
 ```text
 MIT License
@@ -112,7 +123,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## close-skill
+## JuliusBrussee/caveman — caveman.MIT.txt
+
+```text
+MIT License
+
+Copyright (c) 2026 Julius Brussee
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## close-skill — close-skill.MIT.txt
 
 ```text
 MIT License
@@ -138,7 +175,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## claude-code-shepherd
+## claude-code-shepherd — claude-code-shepherd.MIT.txt
 
 ```text
 MIT License
@@ -164,7 +201,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## AgentDeck
+## AgentDeck — AgentDeck.MIT.txt
 
 ```text
 MIT License

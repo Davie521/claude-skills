@@ -9,10 +9,13 @@ writes, from the SOURCES table below:
   plugins/<name>/LICENSE                    copy of the root LICENSE
   plugins/<name>/THIRD_PARTY_NOTICES.md     only the sources that plugin contains
 
+A plugin that is entirely another author's work (a source with
+"whole_plugin": True) keeps that author's LICENSE; no copy is written over it.
+
 Usage:
-  python3 tools/license_notices.py          write the files
-  python3 tools/license_notices.py --check  exit 1 if any file is out of date
-                                            or a listed path no longer exists
+  python3 tools/license_notices.py          write the files, delete stale notices
+  python3 tools/license_notices.py --check  exit 1 if any file is out of date or
+                                            stale, or a listed path is missing
 
 When you migrate or graft material from another project, add it to SOURCES
 and run the script.
@@ -22,15 +25,18 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+NOTICES = "THIRD_PARTY_NOTICES.md"
 
-# Plugins that are entirely someone else's work and carry that author's LICENSE
-# at the plugin root; the Licensor's LICENSE is not copied into them.
-THIRD_PARTY_ONLY_PLUGINS = {"session-summary"}
-
-# Each source: where it came from, its license, and the paths in this repo that
-# contain its material. "license_file" is either a file under licenses/ whose
-# full text is reproduced in the notices, or a path (relative to the repo root)
-# of a license file that already sits next to the material.
+# Each source:
+#   name, url, license, copyright, note
+#   license_text   file under licenses/ reproduced in full in the notices
+#   extra_texts    further files reproduced in full (e.g. an Apache NOTICE)
+#   license_file   license file that already sits next to the material
+#   license_text_note  used when neither of the above exists
+#   whole_plugin   True if the source's single path is a whole plugin that is
+#                  entirely this author's work
+#   paths          repo paths holding the material; an entry may be
+#                  (path, "which part of it") when only part of it is borrowed
 SOURCES = [
     {
         "name": "everything-claude-code",
@@ -43,11 +49,14 @@ SOURCES = [
         "Skelton); they reached this repository through everything-claude-code "
         "under its MIT license.",
         "paths": [
-            "plugins/business/skills/investor-materials",
-            "plugins/code-review",
+            ("plugins/business/skills/investor-materials", "including the outreach cadence merged from investor-outreach"),
+            ("plugins/code-review/agents", "the five reviewer agents; swift-reviewer was written here from everything-claude-code's Swift rules"),
+            ("plugins/code-review/commands/code-review.md", "the dispatcher's base; the Gate A/B triage workflow is original"),
             "plugins/data/skills/data-scraper-agent",
             "plugins/data/skills/database-migrations",
-            "plugins/dev-workflow/skills/deep-plan",
+            ("plugins/dev-workflow/skills/cleanup", "Phase 4 placement rules, from the learn-eval skill"),
+            ("plugins/dev-workflow/skills/deep-plan", "the plan flow it extends"),
+            ("plugins/dev-workflow/skills/grill-with-docs/ADR-FORMAT.md", "the ADR spec: Index, Consent, Reading ADRs back"),
             "plugins/document/skills/visa-doc-translate",
             "plugins/quality/skills/ai-regression-testing",
             "plugins/quality/skills/click-path-audit",
@@ -58,7 +67,7 @@ SOURCES = [
             "plugins/quality/skills/security-scan",
             "plugins/quality/skills/tdd-workflow",
             "plugins/research/skills/llm-cost-discipline",
-            "plugins/research/skills/research",
+            ("plugins/research/skills/research", "including the scenario checklists merged from market-research"),
             "plugins/research/skills/search-routing",
             "plugins/skills/skills/rules-distill",
             "plugins/skills/skills/skill-comply",
@@ -66,16 +75,27 @@ SOURCES = [
             "plugins/swift/skills/foundation-models-on-device",
             "plugins/swift/skills/liquid-glass-design",
             "plugins/swift/skills/swift-concurrency-6-2",
-            "plugins/swift/skills/swiftui-patterns",
+            ("plugins/swift/skills/swiftui-patterns", "including actor-persistence and protocol-di"),
             "plugins/web/skills/api-design",
             "plugins/web/skills/bun-runtime",
             "plugins/web/skills/content-hash-cache-pattern",
             "plugins/web/skills/deployment-patterns",
             "plugins/web/skills/docker-patterns",
             "plugins/web/skills/mcp-server-patterns",
-            "plugins/writing/skills/crosspost",
+            ("plugins/writing/skills/crosspost", "including content-engine"),
             "plugins/writing/skills/video-editing",
+            ("plugins/writing/skills/vibe-writing", "the voice checklist and banned-word list, from article-writing; see its Provenance footer"),
         ],
+    },
+    {
+        "name": "supabase/agent-skills",
+        "url": "https://github.com/supabase/agent-skills",
+        "license": "MIT",
+        "copyright": "Copyright (c) 2026 Supabase",
+        "license_text": "licenses/supabase-agent-skills.MIT.txt",
+        "note": "Reached this repository through everything-claude-code; the "
+        "skill credits it in place.",
+        "paths": [("plugins/data/skills/database-migrations", "the PostgreSQL appendix")],
     },
     {
         "name": "mattpocock/skills",
@@ -84,8 +104,7 @@ SOURCES = [
         "copyright": "Copyright (c) 2026 Matt Pocock",
         "license_text": "licenses/mattpocock-skills.MIT.txt",
         "note": "Copied and modified; each skill names its upstream path in an "
-        "Origin footer. tdd-workflow only has a grafted section (see its "
-        "Provenance footer).",
+        "Origin or Provenance footer.",
         "paths": [
             "plugins/dev-workflow/skills/caveman",
             "plugins/dev-workflow/skills/diagnose",
@@ -94,8 +113,17 @@ SOURCES = [
             "plugins/dev-workflow/skills/prototype",
             "plugins/dev-workflow/skills/to-prd",
             "plugins/dev-workflow/skills/triage",
-            "plugins/quality/skills/tdd-workflow",
+            ("plugins/quality/skills/tdd-workflow", "the grafted section named in its Provenance footer"),
         ],
+    },
+    {
+        "name": "JuliusBrussee/caveman",
+        "url": "https://github.com/JuliusBrussee/caveman",
+        "license": "MIT (at commit d84127c; the project has since moved to Apache-2.0)",
+        "copyright": "Copyright (c) 2026 Julius Brussee",
+        "license_text": "licenses/caveman.MIT.txt",
+        "note": "The original that mattpocock/skills' caveman builds on.",
+        "paths": ["plugins/dev-workflow/skills/caveman"],
     },
     {
         "name": "close-skill",
@@ -126,6 +154,17 @@ SOURCES = [
         "paths": ["plugins/dev-workflow/skills/cleanup"],
     },
     {
+        "name": "openai/codex-plugin-cc",
+        "url": "https://github.com/openai/codex-plugin-cc",
+        "license": "Apache-2.0",
+        "copyright": "Copyright 2026 OpenAI",
+        "license_text": "licenses/codex-plugin-cc.Apache-2.0.txt",
+        "extra_texts": ["licenses/codex-plugin-cc.NOTICE.txt"],
+        "note": "Rules adapted from its codex-result-handling skill; see the "
+        "skill's Provenance footer. Its NOTICE file is reproduced below.",
+        "paths": [("plugins/codex/skills/codex-review", "the presentation rules under \"After the call\"")],
+    },
+    {
         "name": "ui-ux-pro-max-skill",
         "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
         "license": "MIT",
@@ -133,6 +172,37 @@ SOURCES = [
         "license_file": "plugins/design/skills/ui-ux-pro-max/LICENSE",
         "note": "Copied and modified.",
         "paths": ["plugins/design/skills/ui-ux-pro-max"],
+    },
+    {
+        "name": "vercel-labs/web-interface-guidelines",
+        "url": "https://github.com/vercel-labs/web-interface-guidelines",
+        "license": "MIT",
+        "copyright": "Copyright (c) 2025 Vercel Labs",
+        "license_text": "licenses/web-interface-guidelines.MIT.txt",
+        "note": "Reached this repository through ui-ux-pro-max-skill, which "
+        "imported it in its commit bf0b627.",
+        "paths": ["plugins/design/skills/ui-ux-pro-max/data/web-interface.csv"],
+    },
+    {
+        "name": "vercel-labs/agent-skills (react-best-practices)",
+        "url": "https://github.com/vercel-labs/agent-skills",
+        "license": "MIT",
+        "copyright": "Vercel",
+        "license_text_note": "the repository publishes no license file; its "
+        "README and the skill's metadata state MIT",
+        "note": "Reached this repository through ui-ux-pro-max-skill, which "
+        "imported it in its commit bf0b627.",
+        "paths": ["plugins/design/skills/ui-ux-pro-max/data/react-performance.csv"],
+    },
+    {
+        "name": "Leonxlnx/taste-skill",
+        "url": "https://github.com/Leonxlnx/taste-skill",
+        "license": "MIT",
+        "copyright": "Copyright (c) 2026 Leonxlnx",
+        "license_text": "licenses/taste-skill.MIT.txt",
+        "note": "Its design-system map (section 2) was kept when the skill was "
+        "retired; the file says so in a footnote.",
+        "paths": ["plugins/design/skills/ui-ux-pro-max/reference/design-system-map.md"],
     },
     {
         "name": "impeccable",
@@ -144,17 +214,56 @@ SOURCES = [
         "paths": ["plugins/design/skills/critique"],
     },
     {
-        "name": "anthropics/skills",
+        "name": "anthropics/skills (pdf)",
         "url": "https://github.com/anthropics/skills",
-        "license": "Apache-2.0",
+        "license": "Apache-2.0 (from commit 2c5958e)",
         "copyright": "Copyright Anthropic, PBC",
         "license_file": "plugins/document/skills/pdf/LICENSE.txt",
-        "note": "Modified; the changes are listed in each skill's Origin "
-        "section. doc-coauthoring carries its own copy of the license.",
-        "paths": [
-            "plugins/document/skills/doc-coauthoring",
-            "plugins/document/skills/pdf",
-        ],
+        "note": "Modified; the changes are listed in the skill's Origin section.",
+        "paths": ["plugins/document/skills/pdf"],
+    },
+    {
+        "name": "anthropics/skills (doc-coauthoring)",
+        "url": "https://github.com/anthropics/skills",
+        "license": "unconfirmed",
+        "copyright": "Copyright Anthropic, PBC",
+        "license_text_note": "none; unlike the repository's other skills this "
+        "one ships no LICENSE.txt, and the README does not name it",
+        "note": "Modified. This collection's LICENSE does not cover it.",
+        "paths": ["plugins/document/skills/doc-coauthoring"],
+    },
+    {
+        "name": "codebase-to-course",
+        "url": "https://github.com/zarazhangrui/codebase-to-course",
+        "license": "none published",
+        "copyright": "all rights reserved by the author (Zara Zhang)",
+        "license_text_note": "none",
+        "note": "Adapted with changes. The author has published no license "
+        "(see https://github.com/zarazhangrui/codebase-to-course/issues/10), "
+        "so neither this collection's LICENSE nor any open-source grant "
+        "covers it. It will be removed or relicensed if the author asks or "
+        "publishes terms.",
+        "paths": ["plugins/document/skills/codebase-to-course"],
+    },
+    {
+        "name": "writing-dna-skill",
+        "url": "https://github.com/larashero3-dotcom/writing-dna-skill",
+        "license": "MIT (at commit 9e780d0)",
+        "copyright": "Copyright (c) 2026",
+        "license_text": "licenses/writing-dna-skill.MIT.txt",
+        "note": "Short README passages quoted for commentary, taken from the "
+        "MIT-licensed revision.",
+        "paths": [("plugins/document/skills/readme/references/examples.md", "quoted passages")],
+    },
+    {
+        "name": "SoftwareCopyright-Skill",
+        "url": "https://github.com/Fokkyp/SoftwareCopyright-Skill",
+        "license": "MIT (at commit e78f746)",
+        "copyright": "Copyright (c) 2026 Software Copyright Materials contributors",
+        "license_text": "licenses/SoftwareCopyright-Skill.MIT.txt",
+        "note": "Short README passages quoted for commentary, taken from the "
+        "MIT-licensed revision.",
+        "paths": [("plugins/document/skills/readme/references/examples.md", "quoted passages")],
     },
     {
         "name": "FlorianBruniaux/claude-code-plugins",
@@ -162,20 +271,9 @@ SOURCES = [
         "license": "MIT",
         "copyright": "Copyright (c) 2026 Florian Bruniaux",
         "license_file": "plugins/session-summary/LICENSE",
-        "note": "Vendored at 23883a1; the whole plugin is that author's work.",
+        "whole_plugin": True,
+        "note": "Vendored at 23883a1.",
         "paths": ["plugins/session-summary"],
-    },
-    {
-        "name": "codebase-to-course",
-        "url": "https://github.com/zarazhangrui/codebase-to-course",
-        "license": "none published",
-        "copyright": "all rights reserved by the author (Zara Zhang)",
-        "note": "Adapted with changes. The author has published no license "
-        "(see https://github.com/zarazhangrui/codebase-to-course/issues/10), "
-        "so neither this collection's LICENSE nor any open-source grant "
-        "covers it. It will be removed or relicensed if the author asks or "
-        "publishes terms.",
-        "paths": ["plugins/document/skills/codebase-to-course"],
     },
 ]
 
@@ -187,22 +285,7 @@ stays under its original terms; neither the Licensor's LICENSE nor the Commons
 Clause applies to it.
 """
 
-
-def read(rel):
-    with open(os.path.join(ROOT, rel), encoding="utf-8") as f:
-        return f.read()
-
-
-def plugin_of(path):
-    parts = path.split("/")
-    return parts[1] if len(parts) > 1 and parts[0] == "plugins" else None
-
-
-def relative_to(path, base):
-    return os.path.relpath(path, base) if base else path
-
-
-HEADER_THIRD_PARTY_ONLY = """# Third-party notices
+HEADER_WHOLE_PLUGIN = """# Third-party notices
 
 This plugin is another author's work, redistributed under its original license
 (`LICENSE` in this directory). The Licensor's MIT-with-Commons-Clause terms do
@@ -210,62 +293,111 @@ not apply to it.
 """
 
 
-def render(sources, base, where, header=None):
-    out = [header or HEADER.format(where=where)]
+def split(entry):
+    return entry if isinstance(entry, tuple) else (entry, None)
+
+
+def under(path, base):
+    return base is None or path == base or path.startswith(base + "/")
+
+
+def read(rel):
+    with open(os.path.join(ROOT, rel), encoding="utf-8") as f:
+        return f.read()
+
+
+def render(sources, base, header):
+    out = [header]
     texts = []
     for s in sources:
-        paths = [p for p in s["paths"] if base is None or p == base or p.startswith(base + "/")]
         out.append(f"## {s['name']}\n")
         out.append(f"- Source: {s['url']}")
-        out.append(f"- License: {s['license']}, {s['copyright']}")
+        out.append(f"- License: {s['license']}; {s['copyright']}")
         if "license_file" in s:
-            out.append(f"- License text: `{relative_to(s['license_file'], base)}`")
+            out.append(f"- License text: `{os.path.relpath(s['license_file'], base or '.')}`")
         elif "license_text" in s:
             out.append("- License text: reproduced at the end of this file")
         else:
-            out.append("- License text: none")
+            out.append(f"- License text: {s['license_text_note']}")
         out.append(f"- {s['note']}")
         out.append("- Paths:")
-        out.extend(f"  - `{relative_to(p, base) if p != base else '.'}`" for p in paths)
+        for entry in s["paths"]:
+            path, part = split(entry)
+            if not under(path, base):
+                continue
+            shown = os.path.relpath(path, base) if base else path
+            out.append(f"  - `{shown}`" + (f" — {part}" if part else ""))
         out.append("")
-        if "license_text" in s:
-            texts.append((s["name"], read(s["license_text"]).rstrip("\n")))
+        for t in ([s["license_text"]] if "license_text" in s else []) + s.get("extra_texts", []):
+            texts.append((s["name"], t))
     if texts:
         out.append("---\n")
         out.append("# License texts\n")
-        for name, text in texts:
-            out.append(f"## {name}\n")
+        for name, rel in texts:
+            out.append(f"## {name} — {os.path.basename(rel)}\n")
             out.append("```text")
-            out.append(text)
+            out.append(read(rel).rstrip("\n"))
             out.append("```\n")
     return "\n".join(out).rstrip("\n") + "\n"
 
 
-def wanted_files():
-    files = {}
-    files["THIRD_PARTY_NOTICES.md"] = render(SOURCES, None, "this repository")
+def plugins():
+    base = os.path.join(ROOT, "plugins")
+    return sorted(d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d)))
+
+
+def plan():
+    """Return (files to write, generated notices that should no longer exist, problems)."""
+    problems = []
+    whole = {}
+    protected = set()
+    for s in SOURCES:
+        for entry in s["paths"]:
+            path, _ = split(entry)
+            if not os.path.exists(os.path.join(ROOT, path)):
+                problems.append(f"missing path listed in SOURCES: {path}")
+        for rel in [s.get("license_file"), s.get("license_text"), *s.get("extra_texts", [])]:
+            if rel and not os.path.exists(os.path.join(ROOT, rel)):
+                problems.append(f"missing license file listed in SOURCES: {rel}")
+        if s.get("license_file"):
+            protected.add(s["license_file"])
+        if s.get("whole_plugin"):
+            (path, _), = map(split, s["paths"])
+            whole[path] = s
+
+    files = {NOTICES: render(SOURCES, None, HEADER.format(where="this repository"))}
+    stale = []
     root_license = read("LICENSE")
-    plugins = sorted(d for d in os.listdir(os.path.join(ROOT, "plugins"))
-                     if os.path.isdir(os.path.join(ROOT, "plugins", d)))
-    for name in plugins:
+    for name in plugins():
         base = f"plugins/{name}"
-        if name not in THIRD_PARTY_ONLY_PLUGINS:
+        if base not in whole:
             files[f"{base}/LICENSE"] = root_license
-        used = [s for s in SOURCES if any(p == base or p.startswith(base + "/") for p in s["paths"])]
+        used = [s for s in SOURCES if any(under(split(e)[0], base) for e in s["paths"])]
+        notices = f"{base}/{NOTICES}"
         if used:
-            header = HEADER_THIRD_PARTY_ONLY if name in THIRD_PARTY_ONLY_PLUGINS else None
-            files[f"{base}/THIRD_PARTY_NOTICES.md"] = render(used, base, "this plugin", header)
-    return files
+            header = HEADER_WHOLE_PLUGIN if base in whole else HEADER.format(where="this plugin")
+            files[notices] = render(used, base, header)
+        elif os.path.exists(os.path.join(ROOT, notices)):
+            stale.append(notices)
+
+    for rel in files:
+        if rel in protected:
+            problems.append(f"refusing to overwrite a third-party license file: {rel}")
+        path = os.path.join(ROOT, rel)
+        real_dir = os.path.realpath(os.path.dirname(path))
+        if os.path.islink(path) or not (real_dir + os.sep).startswith(os.path.realpath(ROOT) + os.sep):
+            problems.append(f"refusing to write through a symlink or outside the repo: {rel}")
+    return files, stale, problems
 
 
 def main():
     check = "--check" in sys.argv[1:]
-    problems = []
-    for s in SOURCES:
-        for p in s["paths"] + [s.get("license_file"), s.get("license_text")]:
-            if p and not os.path.exists(os.path.join(ROOT, p)):
-                problems.append(f"missing path listed in SOURCES: {p}")
-    for rel, content in wanted_files().items():
+    files, stale, problems = plan()
+    if problems:
+        for p in problems:
+            print(p, file=sys.stderr)
+        return 1
+    for rel, content in files.items():
         path = os.path.join(ROOT, rel)
         current = open(path, encoding="utf-8").read() if os.path.exists(path) else None
         if current == content:
@@ -276,6 +408,12 @@ def main():
             with open(path, "w", encoding="utf-8") as f:
                 f.write(content)
             print(f"wrote {rel}")
+    for rel in stale:
+        if check:
+            problems.append(f"stale (plugin has no third-party material): {rel}")
+        else:
+            os.remove(os.path.join(ROOT, rel))
+            print(f"removed {rel}")
     for p in problems:
         print(p, file=sys.stderr)
     return 1 if problems else 0

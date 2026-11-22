@@ -629,6 +629,6 @@ done
 
 为这个合集写的技能按 [MIT 加 Commons Clause](LICENSE) 授权：哪里都能用，上班时用也可以，可以修改、可以分享你的改动；不可以拿去卖。「卖」包括直接卖这些技能，也包括卖一个价值全部或主要来自它们的产品或服务（收费托管、咨询、支持也算）。在本身不靠这些技能的收费工作里顺手用一下，不受限制。需要商业授权请写信到 [daviefan@outlook.com](mailto:daviefan@outlook.com)。
 
-这里很多技能是从别的项目搬来或改写的，它们沿用原作者的条款（MIT 或 Apache 2.0；`codebase-to-course` 的作者没有发布许可证，是例外），这个合集的许可证和 Commons Clause 都不适用于它们；[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 列出了每个来源、它的许可证和涉及的路径。每个插件目录里都有自己的 `LICENSE`，涉及第三方内容的还有 `THIRD_PARTY_NOTICES.md`，单独安装一个插件时条款也跟着走。
+这里很多技能是从别的项目搬来或改写的，它们沿用原作者的条款（大多是 MIT 或 Apache 2.0；`codebase-to-course` 和 `doc-coauthoring` 没有公开的许可证，是例外），这个合集的许可证和 Commons Clause 都不适用于它们；[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 列出了每个来源、它的许可证和涉及的路径。每个插件目录里都有自己的 `LICENSE`，涉及第三方内容的还有 `THIRD_PARTY_NOTICES.md`，单独安装一个插件时条款也跟着走。
 
 在这次改动之前，自述里写的是「MIT」。此前已发布的版本中作者自己写的部分继续按 MIT 授权；任何版本里的第三方内容，始终按原作者的条款。

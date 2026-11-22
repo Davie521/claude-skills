@@ -8,20 +8,20 @@ Clause applies to it.
 ## everything-claude-code
 
 - Source: https://github.com/affaan-m/everything-claude-code
-- License: MIT, Copyright (c) 2026 Affaan Mustafa
+- License: MIT; Copyright (c) 2026 Affaan Mustafa
 - License text: reproduced at the end of this file
 - Copied and modified. Some of these skills credit their own authors in an `origin:` field (for example santa-method, Ronald Skelton); they reached this repository through everything-claude-code under its MIT license.
 - Paths:
   - `skills/foundation-models-on-device`
   - `skills/liquid-glass-design`
   - `skills/swift-concurrency-6-2`
-  - `skills/swiftui-patterns`
+  - `skills/swiftui-patterns` — including actor-persistence and protocol-di
 
 ---
 
 # License texts
 
-## everything-claude-code
+## everything-claude-code — everything-claude-code.MIT.txt
 
 ```text
 MIT License

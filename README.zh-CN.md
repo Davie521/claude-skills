@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 50 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
+Yifan 个人 Claude Code 插件市场 — **15 个 plugin / 51 个 skill + 5 个 review agent + 1 个 review 命令**，覆盖开发工作流、设计、语言模式、测试、研究等。
 
 每个 skill 的标题就点明它解决什么，下面写清**触发**（怎么让它上场）和**机制**（它内部实际怎么跑）；标题不够说明白的，另起一行 **定位** 补上。
 

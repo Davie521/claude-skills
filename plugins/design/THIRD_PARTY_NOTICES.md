@@ -46,7 +46,7 @@ Clause applies to it.
 - Source: https://github.com/pbakaus/impeccable
 - License: Apache-2.0; Copyright 2025 Paul Bakaus
 - License text: `skills/critique/LICENSE.txt`
-- Modified; the changes are listed in the skill's Origin section.
+- Modified; the changes are listed in the skill's Origin section. The NOTICE of the revision it was taken from (8531503) is reproduced below.
 - Paths:
   - `skills/critique`
 
@@ -104,4 +104,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
+
+## impeccable — impeccable.NOTICE.md
+
+```text
+# Notice
+
+Impeccable
+Copyright 2025-2026 Paul Bakaus
+
+## CLI and Detection Engine
+
+The CLI and detection engine ([`impeccable`](https://www.npmjs.com/package/impeccable))
+live in a [separate repo](https://github.com/pbakaus/impeccable-cli) licensed under
+the Business Source License 1.1 (BSL-1.1), not Apache 2.0.
+
+Free for individuals, open source projects, and organizations with 5 or fewer people
+or under $1M ARR. Commercial license required otherwise.
+
+## Anthropic frontend-design Skill
+
+The `impeccable` skill in this project builds on Anthropic's original frontend-design skill.
+
+**Original work:** https://github.com/anthropics/skills/tree/main/skills/frontend-design
+**Original license:** Apache License 2.0
+**Copyright:** 2025 Anthropic, PBC
+
+This project extends the original with:
+- 7 domain-specific reference files (typography, color-and-contrast, spatial-design, motion-design, interaction-design, responsive-design, ux-writing)
+- 22 steering commands
+- Expanded patterns and anti-patterns
 ```

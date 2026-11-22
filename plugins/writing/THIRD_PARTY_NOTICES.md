@@ -16,6 +16,15 @@ Clause applies to it.
   - `skills/video-editing`
   - `skills/vibe-writing` — the voice checklist and banned-word list, from article-writing; see its Provenance footer
 
+## Tasihi89/vibe-writing-workflow
+
+- Source: https://github.com/Tasihi89/vibe-writing-workflow
+- License: none published; all rights reserved by the author
+- License text: none
+- vibe-writing borrows the workflow (four stages; iteration triggered by 整理 / 润色 with two or three structure options). No text was copied; see the skill's Provenance footer.
+- Paths:
+  - `skills/vibe-writing` — workflow idea only
+
 ---
 
 # License texts

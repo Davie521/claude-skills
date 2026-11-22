@@ -160,7 +160,7 @@ Clause applies to it.
 - Source: https://github.com/pbakaus/impeccable
 - License: Apache-2.0; Copyright 2025 Paul Bakaus
 - License text: `plugins/design/skills/critique/LICENSE.txt`
-- Modified; the changes are listed in the skill's Origin section.
+- Modified; the changes are listed in the skill's Origin section. The NOTICE of the revision it was taken from (8531503) is reproduced below.
 - Paths:
   - `plugins/design/skills/critique`
 
@@ -196,18 +196,38 @@ Clause applies to it.
 - Source: https://github.com/larashero3-dotcom/writing-dna-skill
 - License: MIT (at commit 9e780d0); Copyright (c) 2026
 - License text: reproduced at the end of this file
-- Short README passages quoted for commentary, taken from the MIT-licensed revision.
+- Short README passages quoted for commentary, taken from the MIT-licensed revision. ai-tone.md only borrows the rule format of its lieflat-less-ai-tone skill; no text was copied.
 - Paths:
   - `plugins/document/skills/readme/references/examples.md` — quoted passages
+  - `plugins/document/skills/readme/references/ai-tone.md` — rule format only
 
 ## SoftwareCopyright-Skill
 
 - Source: https://github.com/Fokkyp/SoftwareCopyright-Skill
 - License: MIT (at commit e78f746); Copyright (c) 2026 Software Copyright Materials contributors
 - License text: reproduced at the end of this file
-- Short README passages quoted for commentary, taken from the MIT-licensed revision.
+- Short README passages quoted for commentary, taken from the MIT-licensed revision. The readme skill also borrows its idea of mandatory stop-and-ask gates; no text was copied.
 - Paths:
   - `plugins/document/skills/readme/references/examples.md` — quoted passages
+  - `plugins/document/skills/readme/SKILL.md` — the stop-and-ask gate idea
+
+## tommy0103/better-readme-skill
+
+- Source: https://github.com/tommy0103/better-readme-skill
+- License: MIT; Copyright (c) 2026 tommy0103 and contributors
+- License text: reproduced at the end of this file
+- The readme skill's audit-first structure follows its approach; the text was written here. See references/sources.md.
+- Paths:
+  - `plugins/document/skills/readme` — structure and audit rules, rewritten
+
+## Tasihi89/vibe-writing-workflow
+
+- Source: https://github.com/Tasihi89/vibe-writing-workflow
+- License: none published; all rights reserved by the author
+- License text: none
+- vibe-writing borrows the workflow (four stages; iteration triggered by 整理 / 润色 with two or three structure options). No text was copied; see the skill's Provenance footer.
+- Paths:
+  - `plugins/writing/skills/vibe-writing` — workflow idea only
 
 ## FlorianBruniaux/claude-code-plugins
 
@@ -680,6 +700,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## impeccable — impeccable.NOTICE.md
+
+```text
+# Notice
+
+Impeccable
+Copyright 2025-2026 Paul Bakaus
+
+## CLI and Detection Engine
+
+The CLI and detection engine ([`impeccable`](https://www.npmjs.com/package/impeccable))
+live in a [separate repo](https://github.com/pbakaus/impeccable-cli) licensed under
+the Business Source License 1.1 (BSL-1.1), not Apache 2.0.
+
+Free for individuals, open source projects, and organizations with 5 or fewer people
+or under $1M ARR. Commercial license required otherwise.
+
+## Anthropic frontend-design Skill
+
+The `impeccable` skill in this project builds on Anthropic's original frontend-design skill.
+
+**Original work:** https://github.com/anthropics/skills/tree/main/skills/frontend-design
+**Original license:** Apache License 2.0
+**Copyright:** 2025 Anthropic, PBC
+
+This project extends the original with:
+- 7 domain-specific reference files (typography, color-and-contrast, spatial-design, motion-design, interaction-design, responsive-design, ux-writing)
+- 22 steering commands
+- Expanded patterns and anti-patterns
+```
+
 ## writing-dna-skill — writing-dna-skill.MIT.txt
 
 ```text
@@ -712,6 +763,32 @@ SOFTWARE.
 MIT License
 
 Copyright (c) 2026 Software Copyright Materials contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## tommy0103/better-readme-skill — better-readme-skill.MIT.txt
+
+```text
+MIT License
+
+Copyright (c) 2026 tommy0103 and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -79,4 +79,4 @@ description: "AI-assisted writing workflow with four phases: Learn (Socratic dia
 
 ## Provenance
 
-本 skill 主体为原创。「声音五维清单」和「禁用词表 / 去 AI 腔」两部分（本文件与 `references/writing-guide.md`）改写自 [everything-claude-code](https://github.com/affaan-m/everything-claude-code) 的 `article-writing` skill（MIT）。
+整体流程（学习、结构、写作、定稿四个阶段，以及迭代时用「整理」「润色」触发、给两三种结构方案让用户选）借鉴自 [Tasihi89/vibe-writing-workflow](https://github.com/Tasihi89/vibe-writing-workflow)，该项目没有发布许可证；本仓库只借用了流程思路，文字是在这里重新写的。「声音五维清单」和「禁用词表 / 去 AI 腔」两部分（本文件与 `references/writing-guide.md`）改写自 [everything-claude-code](https://github.com/affaan-m/everything-claude-code) 的 `article-writing` skill（MIT）。

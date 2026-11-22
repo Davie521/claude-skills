@@ -21,6 +21,7 @@ When you migrate or graft material from another project, add it to SOURCES
 and run the script.
 """
 
+import argparse
 import os
 import sys
 
@@ -210,7 +211,10 @@ SOURCES = [
         "license": "Apache-2.0",
         "copyright": "Copyright 2025 Paul Bakaus",
         "license_file": "plugins/design/skills/critique/LICENSE.txt",
-        "note": "Modified; the changes are listed in the skill's Origin section.",
+        "extra_texts": ["licenses/impeccable.NOTICE.md"],
+        "note": "Modified; the changes are listed in the skill's Origin section. "
+        "The NOTICE of the revision it was taken from (8531503) is reproduced "
+        "below.",
         "paths": ["plugins/design/skills/critique"],
     },
     {
@@ -252,8 +256,12 @@ SOURCES = [
         "copyright": "Copyright (c) 2026",
         "license_text": "licenses/writing-dna-skill.MIT.txt",
         "note": "Short README passages quoted for commentary, taken from the "
-        "MIT-licensed revision.",
-        "paths": [("plugins/document/skills/readme/references/examples.md", "quoted passages")],
+        "MIT-licensed revision. ai-tone.md only borrows the rule format of its "
+        "lieflat-less-ai-tone skill; no text was copied.",
+        "paths": [
+            ("plugins/document/skills/readme/references/examples.md", "quoted passages"),
+            ("plugins/document/skills/readme/references/ai-tone.md", "rule format only"),
+        ],
     },
     {
         "name": "SoftwareCopyright-Skill",
@@ -262,8 +270,33 @@ SOURCES = [
         "copyright": "Copyright (c) 2026 Software Copyright Materials contributors",
         "license_text": "licenses/SoftwareCopyright-Skill.MIT.txt",
         "note": "Short README passages quoted for commentary, taken from the "
-        "MIT-licensed revision.",
-        "paths": [("plugins/document/skills/readme/references/examples.md", "quoted passages")],
+        "MIT-licensed revision. The readme skill also borrows its idea of "
+        "mandatory stop-and-ask gates; no text was copied.",
+        "paths": [
+            ("plugins/document/skills/readme/references/examples.md", "quoted passages"),
+            ("plugins/document/skills/readme/SKILL.md", "the stop-and-ask gate idea"),
+        ],
+    },
+    {
+        "name": "tommy0103/better-readme-skill",
+        "url": "https://github.com/tommy0103/better-readme-skill",
+        "license": "MIT",
+        "copyright": "Copyright (c) 2026 tommy0103 and contributors",
+        "license_text": "licenses/better-readme-skill.MIT.txt",
+        "note": "The readme skill's audit-first structure follows its approach; "
+        "the text was written here. See references/sources.md.",
+        "paths": [("plugins/document/skills/readme", "structure and audit rules, rewritten")],
+    },
+    {
+        "name": "Tasihi89/vibe-writing-workflow",
+        "url": "https://github.com/Tasihi89/vibe-writing-workflow",
+        "license": "none published",
+        "copyright": "all rights reserved by the author",
+        "license_text_note": "none",
+        "note": "vibe-writing borrows the workflow (four stages; iteration "
+        "triggered by 整理 / 润色 with two or three structure options). No "
+        "text was copied; see the skill's Provenance footer.",
+        "paths": [("plugins/writing/skills/vibe-writing", "workflow idea only")],
     },
     {
         "name": "FlorianBruniaux/claude-code-plugins",
@@ -341,9 +374,20 @@ def render(sources, base, header):
     return "\n".join(out).rstrip("\n") + "\n"
 
 
-def plugins():
+def plugins(problems):
     base = os.path.join(ROOT, "plugins")
-    return sorted(d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d)))
+    names = []
+    for d in sorted(os.listdir(base)):
+        path = os.path.join(base, d)
+        if os.path.islink(path):
+            problems.append(f"refusing to handle a symlinked plugin directory: plugins/{d}")
+        elif os.path.isdir(path):
+            names.append(d)
+    return names
+
+
+def real(rel):
+    return os.path.realpath(os.path.join(ROOT, rel))
 
 
 def plan():
@@ -360,7 +404,7 @@ def plan():
             if rel and not os.path.exists(os.path.join(ROOT, rel)):
                 problems.append(f"missing license file listed in SOURCES: {rel}")
         if s.get("license_file"):
-            protected.add(s["license_file"])
+            protected.add(real(s["license_file"]))
         if s.get("whole_plugin"):
             (path, _), = map(split, s["paths"])
             whole[path] = s
@@ -368,7 +412,7 @@ def plan():
     files = {NOTICES: render(SOURCES, None, HEADER.format(where="this repository"))}
     stale = []
     root_license = read("LICENSE")
-    for name in plugins():
+    for name in plugins(problems):
         base = f"plugins/{name}"
         if base not in whole:
             files[f"{base}/LICENSE"] = root_license
@@ -380,8 +424,8 @@ def plan():
         elif os.path.exists(os.path.join(ROOT, notices)):
             stale.append(notices)
 
-    for rel in files:
-        if rel in protected:
+    for rel in list(files) + stale:
+        if real(rel) in protected:
             problems.append(f"refusing to overwrite a third-party license file: {rel}")
         path = os.path.join(ROOT, rel)
         real_dir = os.path.realpath(os.path.dirname(path))
@@ -390,8 +434,11 @@ def plan():
     return files, stale, problems
 
 
-def main():
-    check = "--check" in sys.argv[1:]
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    parser.add_argument("--check", action="store_true",
+                        help="report out-of-date or stale files without writing")
+    check = parser.parse_args(sys.argv[1:] if argv is None else argv).check
     files, stale, problems = plan()
     if problems:
         for p in problems:

@@ -160,7 +160,7 @@ A4 横版、5 栏布局、6pt 字体的极限密度排版，支持 LaTeX 数学�
 
 ### `pdf` — PDF 全套处理
 
-**定位**：提取、生成、表单填写、OCR 的 9 个可跑脚本。
+**定位**：提取、生成、表单填写、OCR 的 8 个可跑脚本。
 **触发**：处理 PDF —— 抽文本表格、填表单、拆合页面、转图片
 
 表单流程是最完整的一条链：`check_fillable_fields.py` 判断这份 PDF 到底能不能填 → `extract_form_field_info.py` 提字段信息 → `fill_fillable_fields.py` 填写。不可填的走标注路线，优先用精确坐标而不是靠肉眼估：`extract_form_structure.py`（pdfplumber）直接从 PDF 里读出文字标签、横线和复选框方块，只有扫描件才退回到裁剪放大的视觉估算 → `check_bounding_boxes.py` 查重叠和框太小 → `fill_pdf_form_with_annotations.py` 自动识别 `fields.json` 用的是 PDF 点还是图片像素坐标并相应填写 → `create_validation_image.py` 生成验证图（图片坐标流程），肉眼确认位置对不对。

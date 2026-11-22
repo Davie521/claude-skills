@@ -46,18 +46,29 @@ Clause applies to it.
 - Source: https://github.com/larashero3-dotcom/writing-dna-skill
 - License: MIT (at commit 9e780d0); Copyright (c) 2026
 - License text: reproduced at the end of this file
-- Short README passages quoted for commentary, taken from the MIT-licensed revision.
+- Short README passages quoted for commentary, taken from the MIT-licensed revision. ai-tone.md only borrows the rule format of its lieflat-less-ai-tone skill; no text was copied.
 - Paths:
   - `skills/readme/references/examples.md` — quoted passages
+  - `skills/readme/references/ai-tone.md` — rule format only
 
 ## SoftwareCopyright-Skill
 
 - Source: https://github.com/Fokkyp/SoftwareCopyright-Skill
 - License: MIT (at commit e78f746); Copyright (c) 2026 Software Copyright Materials contributors
 - License text: reproduced at the end of this file
-- Short README passages quoted for commentary, taken from the MIT-licensed revision.
+- Short README passages quoted for commentary, taken from the MIT-licensed revision. The readme skill also borrows its idea of mandatory stop-and-ask gates; no text was copied.
 - Paths:
   - `skills/readme/references/examples.md` — quoted passages
+  - `skills/readme/SKILL.md` — the stop-and-ask gate idea
+
+## tommy0103/better-readme-skill
+
+- Source: https://github.com/tommy0103/better-readme-skill
+- License: MIT; Copyright (c) 2026 tommy0103 and contributors
+- License text: reproduced at the end of this file
+- The readme skill's audit-first structure follows its approach; the text was written here. See references/sources.md.
+- Paths:
+  - `skills/readme` — structure and audit rules, rewritten
 
 ---
 
@@ -121,6 +132,32 @@ SOFTWARE.
 MIT License
 
 Copyright (c) 2026 Software Copyright Materials contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## tommy0103/better-readme-skill — better-readme-skill.MIT.txt
+
+```text
+MIT License
+
+Copyright (c) 2026 tommy0103 and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

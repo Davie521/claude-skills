@@ -66,9 +66,9 @@ The discipline of maintaining a domain glossary (this file is one). Produced and
 
 > **Dev**: "We should pull `tdd` from matt's repo. Want me to migrate it?"
 >
-> **Reviewer**: "It's a graft, not a migration — we already have `tdd-workflow` at `plugins/quality/skills/tdd-workflow/`. The matt insights (horizontal-slicing anti-pattern, never-refactor-while-RED) are inserted into the existing SKILL.md. The host file's coverage rules and RED-gate validation discipline are original; the inserted sections get a Provenance footer at the bottom."
+> **Reviewer**: "It's a graft, not a migration — we already have `tdd-workflow` at `plugins/quality/skills/tdd-workflow/`. The matt insights (horizontal-slicing anti-pattern, never-refactor-while-RED) are inserted into the existing SKILL.md. The host file keeps its existing attribution (its base came from everything-claude-code); the inserted sections get a Provenance footer at the bottom."
 >
-> **Dev**: "OK. So if I look at `git log` for that file, the original author shows as Yifan, and the matt content is attributed in the footer rather than the commit author?"
+> **Dev**: "OK. So if I look at `git log` for that file, the commit author shows as Yifan, and the matt content is attributed in the footer rather than the commit author?"
 >
 > **Reviewer**: "Yes — exactly. Migration is a new file with an Origin link; graft is an edit with a Provenance footer."
 

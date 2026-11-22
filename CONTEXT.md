@@ -42,7 +42,7 @@ A footer at the bottom of a Migrated skill citing source repository and license,
 A footer at the bottom of a Grafted skill specifying which sections were inserted from external sources versus which are original to this collection.
 
 **Third-party notices**:
-Every Migration and every Graft from a project with a license also gets an entry in `SOURCES` in `tools/license_notices.py`; then run `python3 tools/license_notices.py`. It regenerates the root `THIRD_PARTY_NOTICES.md` and, in each plugin directory, a copy of `LICENSE` plus that plugin's `THIRD_PARTY_NOTICES.md` — plugins are installed from their own directory, so root files never reach users. `--check` fails when a copy is stale or a listed path is gone. Apache-2.0 material also keeps its license file next to it and lists the changed files in an `## Origin` section. Never migrate from a project that publishes no license.
+Every Migration and every Graft from a project with a license also gets an entry in `SOURCES` in `tools/license_notices.py`; then run `python3 tools/license_notices.py`. It regenerates the root `THIRD_PARTY_NOTICES.md` and, in each plugin directory, a copy of `LICENSE` plus that plugin's `THIRD_PARTY_NOTICES.md` — plugins are installed from their own directory, so root files never reach users. `--check` fails when a copy is stale or a listed path is gone. Apache-2.0 material also keeps its license file next to it and lists the changed files in an `## Origin` section. Do not migrate from a project that publishes no license; the one existing exception, `codebase-to-course`, is listed with "none published" and an Origin section saying the collection's LICENSE does not cover it.
 
 ### Conventions
 

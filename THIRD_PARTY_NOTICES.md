@@ -2,7 +2,8 @@
 
 The Licensor's own work in this repository is licensed under the terms in `LICENSE`
 (MIT with the Commons Clause). The material below comes from other authors and
-stays under its original license; the Commons Clause does not apply to it.
+stays under its original terms; neither the Licensor's LICENSE nor the Commons
+Clause applies to it.
 
 ## everything-claude-code
 
@@ -123,6 +124,15 @@ stays under its original license; the Commons Clause does not apply to it.
 - Vendored at 23883a1; the whole plugin is that author's work.
 - Paths:
   - `plugins/session-summary`
+
+## codebase-to-course
+
+- Source: https://github.com/zarazhangrui/codebase-to-course
+- License: none published, all rights reserved by the author (Zara Zhang)
+- License text: none
+- Adapted with changes. The author has published no license (see https://github.com/zarazhangrui/codebase-to-course/issues/10), so neither this collection's LICENSE nor any open-source grant covers it. It will be removed or relicensed if the author asks or publishes terms.
+- Paths:
+  - `plugins/document/skills/codebase-to-course`
 
 ---
 

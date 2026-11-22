@@ -2,7 +2,8 @@
 
 The Licensor's own work in this plugin is licensed under the terms in `LICENSE`
 (MIT with the Commons Clause). The material below comes from other authors and
-stays under its original license; the Commons Clause does not apply to it.
+stays under its original terms; neither the Licensor's LICENSE nor the Commons
+Clause applies to it.
 
 ## everything-claude-code
 

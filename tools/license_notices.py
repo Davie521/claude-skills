@@ -165,13 +165,26 @@ SOURCES = [
         "note": "Vendored at 23883a1; the whole plugin is that author's work.",
         "paths": ["plugins/session-summary"],
     },
+    {
+        "name": "codebase-to-course",
+        "url": "https://github.com/zarazhangrui/codebase-to-course",
+        "license": "none published",
+        "copyright": "all rights reserved by the author (Zara Zhang)",
+        "note": "Adapted with changes. The author has published no license "
+        "(see https://github.com/zarazhangrui/codebase-to-course/issues/10), "
+        "so neither this collection's LICENSE nor any open-source grant "
+        "covers it. It will be removed or relicensed if the author asks or "
+        "publishes terms.",
+        "paths": ["plugins/document/skills/codebase-to-course"],
+    },
 ]
 
 HEADER = """# Third-party notices
 
 The Licensor's own work in {where} is licensed under the terms in `LICENSE`
 (MIT with the Commons Clause). The material below comes from other authors and
-stays under its original license; the Commons Clause does not apply to it.
+stays under its original terms; neither the Licensor's LICENSE nor the Commons
+Clause applies to it.
 """
 
 
@@ -207,8 +220,10 @@ def render(sources, base, where, header=None):
         out.append(f"- License: {s['license']}, {s['copyright']}")
         if "license_file" in s:
             out.append(f"- License text: `{relative_to(s['license_file'], base)}`")
-        else:
+        elif "license_text" in s:
             out.append("- License text: reproduced at the end of this file")
+        else:
+            out.append("- License text: none")
         out.append(f"- {s['note']}")
         out.append("- Paths:")
         out.extend(f"  - `{relative_to(p, base) if p != base else '.'}`" for p in paths)

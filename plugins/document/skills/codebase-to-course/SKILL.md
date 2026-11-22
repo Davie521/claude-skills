@@ -281,3 +281,7 @@ The `references/` directory contains detailed implementation specs. Read them wh
 
 - **`references/design-system.md`** — Complete CSS custom properties, color palette, typography scale, spacing system, shadows, animations, scrollbar styling. Read this before writing any CSS.
 - **`references/interactive-elements.md`** — Implementation patterns for every interactive element: drag-and-drop quizzes, multiple-choice quizzes, code↔English translations, group chat animations, message flow visualizations, architecture diagrams, pattern cards, callout boxes. Read this before building any interactive elements.
+
+## Origin
+
+Adapted from [zarazhangrui/codebase-to-course](https://github.com/zarazhangrui/codebase-to-course) by Zara Zhang, with changes. The upstream repository publishes no license, so this skill is **not** covered by this collection's LICENSE; all rights in the original remain with its author. It will be removed or relicensed to match if the author publishes terms or asks.

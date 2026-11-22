@@ -1,3 +1,4 @@
+<!-- Modified from anthropics/skills@2c5958e (Apache-2.0); changes are listed in SKILL.md under "Origin". -->
 **CRITICAL: You MUST complete these steps in order. Do not skip ahead to writing code.**
 
 Before running any script, make sure the virtual environment from SKILL.md's "Environment Setup" section is active (`pypdf`, `pdf2image` and `pdfplumber` installed via venv; never `--break-system-packages`).

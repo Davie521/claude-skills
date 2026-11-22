@@ -1,6 +1,7 @@
 ---
 name: doc-coauthoring
 description: Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.
+license: Apache-2.0. Complete terms in LICENSE.txt
 ---
 
 # Doc Co-Authoring Workflow
@@ -356,3 +357,9 @@ Announce document completion. Provide a few final tips:
 - Don't rush through stages
 - Each iteration should make meaningful improvements
 - The goal is a document that actually works for readers
+
+## Origin
+
+Adapted from [anthropics/skills](https://github.com/anthropics/skills) — `skills/doc-coauthoring`, which that repository's README lists as open source under the Apache License 2.0; see LICENSE.txt. Copyright Anthropic, PBC.
+
+Files changed from upstream: `SKILL.md` drops the artifact path and always drafts in a local markdown file, created with the Write tool and edited with the Edit tool (upstream: `create_file` / `str_replace`); the "Artifact Management" notes became "Doc File Management".

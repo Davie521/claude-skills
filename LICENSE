@@ -1,7 +1,7 @@
-Scope: this license covers the original work in this repository. Files and
-directories that carry their own license notice keep those terms, including
-plugins/session-summary (MIT, see its LICENSE) and plugins/document/skills/pdf
-(Anthropic, see its LICENSE.txt).
+Scope: this license covers the Licensor's own work. Material by other authors
+keeps its original license and is not subject to the Commons Clause. It is
+listed in THIRD_PARTY_NOTICES.md next to this file, and a directory that
+carries its own LICENSE or LICENSE.txt is governed by that file.
 
 --------------------------------------------------------------------------------
 

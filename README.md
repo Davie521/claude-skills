@@ -625,14 +625,8 @@ Most skills auto-trigger from natural language matching their description — th
 
 ## License
 
-[MIT with the Commons Clause](LICENSE). Use these skills anywhere, at work
-included, change them and share your changes. What you may not do is sell them,
-or sell a product or service whose value comes entirely or substantially from
-them; paid hosting, consulting and support count as selling. For a commercial
-license, write to [daviefan@outlook.com](mailto:daviefan@outlook.com).
+The skills written for this collection are licensed under [MIT with the Commons Clause](LICENSE). You may use them anywhere, at work included, change them and share your changes. You may not sell them: that covers selling the skills themselves, and selling a product or service — including paid hosting, consulting or support — whose value comes entirely or substantially from them. Using a skill along the way in paid work that is not built on it is fine. For a commercial license, write to [daviefan@outlook.com](mailto:daviefan@outlook.com).
 
-Revisions published before this condition was added were offered under plain
-MIT and stay that way; the condition applies from this change onward.
+Many skills here were migrated or adapted from other projects. Those keep their original licenses (MIT or Apache 2.0) and the Commons Clause does not apply to them; [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists each source, its license and the paths it covers. Every plugin directory carries its own `LICENSE` and, where relevant, `THIRD_PARTY_NOTICES.md`, so the terms travel with an installed plugin.
 
-Third-party parts keep their own terms: `plugins/session-summary` (MIT, see its
-`LICENSE`) and `plugins/document/skills/pdf` (Anthropic, see its `LICENSE.txt`).
+Before this change the README said "MIT". Revisions of the Licensor's own work published until then keep that MIT grant; third-party material in any revision stays under the terms of its original author.

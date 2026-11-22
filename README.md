@@ -625,4 +625,14 @@ Most skills auto-trigger from natural language matching their description — th
 
 ## License
 
-MIT
+[MIT with the Commons Clause](LICENSE). Use these skills anywhere, at work
+included, change them and share your changes. What you may not do is sell them,
+or sell a product or service whose value comes entirely or substantially from
+them; paid hosting, consulting and support count as selling. For a commercial
+license, write to [daviefan@outlook.com](mailto:daviefan@outlook.com).
+
+Revisions published before this condition was added were offered under plain
+MIT and stay that way; the condition applies from this change onward.
+
+Third-party parts keep their own terms: `plugins/session-summary` (MIT, see its
+`LICENSE`) and `plugins/document/skills/pdf` (Anthropic, see its `LICENSE.txt`).

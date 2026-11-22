@@ -627,4 +627,11 @@ done
 
 ## 许可证
 
-MIT
+[MIT 加 Commons Clause](LICENSE)。哪里都能用，上班时用也可以，可以修改、可以分享你的改动。
+不可以的是拿去卖，或者卖一个价值全部或主要来自这些技能的产品或服务；收费托管、咨询、支持都算卖。
+需要商业授权请写信到 [daviefan@outlook.com](mailto:daviefan@outlook.com)。
+
+加上这个条件之前已经发布的版本当时按纯 MIT 提供，继续有效；新条件只管这次改动之后的内容。
+
+第三方部分沿用各自的条款：`plugins/session-summary`（MIT，见其 `LICENSE`）、
+`plugins/document/skills/pdf`（Anthropic，见其 `LICENSE.txt`）。

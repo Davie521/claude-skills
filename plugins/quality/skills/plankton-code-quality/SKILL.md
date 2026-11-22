@@ -235,3 +235,7 @@ Track:
 - average remediation time
 - repeat violations by category
 - merge blocks due to gate failures
+
+## Provenance
+
+Migrated from [everything-claude-code](https://github.com/affaan-m/everything-claude-code) (MIT). The three-phase description and the hook-output table are adapted from [alexfazio/plankton](https://github.com/alexfazio/plankton)'s REFERENCE.md (MIT, Copyright (c) 2025 Alex Fazio).

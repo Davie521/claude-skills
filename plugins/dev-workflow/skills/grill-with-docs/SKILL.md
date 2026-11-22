@@ -98,4 +98,4 @@ If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](
 
 ## Origin
 
-Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/grill-with-docs` and `productivity/grill-me` (absorbed as lightweight mode). License: MIT.
+Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/grill-with-docs` and `productivity/grill-me` (absorbed as lightweight mode). License: MIT. `ADR-FORMAT.md` also absorbs the ADR skill from [everything-claude-code](https://github.com/affaan-m/everything-claude-code) (MIT): its Index, Consent and Reading ADRs back sections.

@@ -291,3 +291,7 @@ VStack { /* content */ }
 - Interactive controls that need visual depth and touch feedback
 - Widgets that should integrate with the system's Liquid Glass appearance
 - Morphing transitions between related UI states
+
+## Provenance
+
+Migrated from [everything-claude-code](https://github.com/affaan-m/everything-claude-code) (MIT). The code examples (the pencil and eraser glass buttons, `GlassEffectContainer` and `glassEffectID` morphing) follow Apple's documentation, [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views). Apple publishes that sample code under its own terms, not an open-source license; neither the MIT license above nor this collection's license covers it.

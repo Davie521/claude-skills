@@ -214,3 +214,7 @@ To use `@concurrent`:
 - Resolving data-race safety compiler errors during Xcode 26 adoption
 - Building MainActor-centric app architectures (most UI apps)
 - Performance optimization — offloading specific heavy computations to background
+
+## Provenance
+
+Migrated from [everything-claude-code](https://github.com/affaan-m/everything-claude-code) (MIT). The `StickerModel` / `PhotoProcessor` examples follow Apple's WWDC25 session [What's new in Swift](https://developer.apple.com/videos/play/wwdc2025/245/). Apple publishes that sample code under its own terms, not an open-source license; neither the MIT license above nor this collection's license covers it.

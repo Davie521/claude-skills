@@ -3,6 +3,7 @@ name: critique
 description: Evaluate design from a UX perspective, assessing visual hierarchy, information architecture, emotional resonance, cognitive load, and overall quality with quantitative scoring, persona-based testing, and actionable feedback. Use when the user asks to review, critique, evaluate, 评审, or give feedback on a design or component. Diagnosis only — critique judges whether the experience works; to produce or modify a design, use ui-ux-pro-max.
 user-invocable: true
 argument-hint: "[area (feature, page, component...)]"
+license: Apache-2.0. Complete terms in LICENSE.txt
 ---
 
 ## PREPARATION
@@ -209,3 +210,9 @@ After presenting the summary, tell the user:
 > You can ask me to run these one at a time, all at once, or in any order you prefer.
 >
 > Re-run `/critique` after fixes to see your score improve.
+
+## Origin
+
+Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — the standalone `critique` skill (`source/skills/critique`, before upstream merged its skills into `/impeccable` on 2026-04-11). Licensed under Apache-2.0; see LICENSE.txt. Copyright 2025 Paul Bakaus. The changes made here are released under the same license.
+
+Files changed from upstream: `SKILL.md` was rewritten (preparation, phases, report format, hand-off to `ui-ux-pro-max`); the three `reference/` files were edited.

@@ -1,20 +1,20 @@
+# Modified from anthropics/skills@2c5958e (Apache-2.0): creates output_dir if missing.
 import os
 import sys
 
 from pdf2image import convert_from_path
 
 
-# Converts each page of a PDF to a PNG image.
 
 
 def convert(pdf_path, output_dir, max_dim=1000):
-    # The caller usually names a directory that doesn't exist yet.
+    # Local change (not upstream): the caller usually names a directory that
+    # doesn't exist yet, so create it.
     os.makedirs(output_dir, exist_ok=True)
 
     images = convert_from_path(pdf_path, dpi=200)
 
     for i, image in enumerate(images):
-        # Scale image if needed to keep width/height under `max_dim`
         width, height = image.size
         if width > max_dim or height > max_dim:
             scale_factor = min(max_dim / width, max_dim / height)
@@ -36,3 +36,4 @@ if __name__ == "__main__":
     pdf_path = sys.argv[1]
     output_directory = sys.argv[2]
     convert(pdf_path, output_directory)
+

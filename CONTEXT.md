@@ -41,6 +41,9 @@ A footer at the bottom of a Migrated skill citing source repository and license,
 **Provenance footer**:
 A footer at the bottom of a Grafted skill specifying which sections were inserted from external sources versus which are original to this collection.
 
+**Third-party notices**:
+Every Migration and every Graft from a project with a license also gets an entry in `SOURCES` in `tools/license_notices.py`; then run `python3 tools/license_notices.py`. It regenerates the root `THIRD_PARTY_NOTICES.md` and, in each plugin directory, a copy of `LICENSE` plus that plugin's `THIRD_PARTY_NOTICES.md` — plugins are installed from their own directory, so root files never reach users. `--check` fails when a copy is stale or a listed path is gone. A plugin that is wholly another author's work is marked `whole_plugin` and keeps that author's LICENSE. Bump the version of every plugin whose files changed, or installed copies keep the old terms. Apache-2.0 material also keeps its license file next to it and lists the changed files in an `## Origin` section. Do not migrate from a project that publishes no license; the two existing exceptions, `codebase-to-course` (no license) and `doc-coauthoring` (license unconfirmed), are listed as such and their Origin sections say the collection's LICENSE does not cover them.
+
 ### Conventions
 
 **Active-prompt pattern**:
@@ -63,9 +66,9 @@ The discipline of maintaining a domain glossary (this file is one). Produced and
 
 > **Dev**: "We should pull `tdd` from matt's repo. Want me to migrate it?"
 >
-> **Reviewer**: "It's a graft, not a migration — we already have `tdd-workflow` at `plugins/quality/skills/tdd-workflow/`. The matt insights (horizontal-slicing anti-pattern, never-refactor-while-RED) are inserted into the existing SKILL.md. The host file's coverage rules and RED-gate validation discipline are original; the inserted sections get a Provenance footer at the bottom."
+> **Reviewer**: "It's a graft, not a migration — we already have `tdd-workflow` at `plugins/quality/skills/tdd-workflow/`. The matt insights (horizontal-slicing anti-pattern, never-refactor-while-RED) are inserted into the existing SKILL.md. The host file keeps its existing attribution (its base came from everything-claude-code); the inserted sections get a Provenance footer at the bottom."
 >
-> **Dev**: "OK. So if I look at `git log` for that file, the original author shows as Yifan, and the matt content is attributed in the footer rather than the commit author?"
+> **Dev**: "OK. So if I look at `git log` for that file, the commit author shows as Yifan, and the matt content is attributed in the footer rather than the commit author?"
 >
 > **Reviewer**: "Yes — exactly. Migration is a new file with an Origin link; graft is an edit with a Provenance footer."
 

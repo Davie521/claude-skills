@@ -196,3 +196,7 @@ Apply the same rules as the `codex-result-handling` skill in the upstream plugin
 
 - Not `codex:codex-rescue` — that's for "Claude is stuck, hand off to Codex to implement". This is review-only.
 - Not the place to call `setup`, `cancel`, `status`, `result`. Those live in the upstream `openai-codex` plugin's slash commands.
+
+## Provenance
+
+The presentation rules under "After the call" (keep Codex's ordering, paths and evidence labels; stop after presenting findings; do not substitute a review when the run failed) are adapted from the `codex-result-handling` skill in [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc), Apache-2.0, Copyright 2026 OpenAI; see the plugin's THIRD_PARTY_NOTICES.md. The rest of this skill is original.

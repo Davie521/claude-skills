@@ -160,7 +160,7 @@ A4 横版、5 栏布局、6pt 字体的极限密度排版，支持 LaTeX 数学�
 
 ### `pdf` — PDF 全套处理
 
-**定位**：提取、生成、表单填写、OCR 的 9 个可跑脚本。
+**定位**：提取、生成、表单填写、OCR 的 8 个可跑脚本。
 **触发**：处理 PDF —— 抽文本表格、填表单、拆合页面、转图片
 
 表单流程是最完整的一条链：`check_fillable_fields.py` 判断这份 PDF 到底能不能填 → `extract_form_field_info.py` 提字段信息 → `fill_fillable_fields.py` 填写。不可填的走标注路线，优先用精确坐标而不是靠肉眼估：`extract_form_structure.py`（pdfplumber）直接从 PDF 里读出文字标签、横线和复选框方块，只有扫描件才退回到裁剪放大的视觉估算 → `check_bounding_boxes.py` 查重叠和框太小 → `fill_pdf_form_with_annotations.py` 自动识别 `fields.json` 用的是 PDF 点还是图片像素坐标并相应填写 → `create_validation_image.py` 生成验证图（图片坐标流程），肉眼确认位置对不对。
@@ -627,4 +627,8 @@ done
 
 ## 许可证
 
-MIT
+为这个合集写的技能按 [MIT 加 Commons Clause](LICENSE) 授权：哪里都能用，上班时用也可以，可以修改、可以分享你的改动；不可以拿去卖。「卖」包括直接卖这些技能，也包括卖一个价值全部或主要来自它们的产品或服务（收费托管、咨询、支持也算）。在本身不靠这些技能的收费工作里顺手用一下，不受限制。需要商业授权请写信到 [daviefan@outlook.com](mailto:daviefan@outlook.com)。
+
+这里很多技能是从别的项目搬来或改写的，从这些项目拿来的内容沿用原作者的条款（大多是 MIT 或 Apache 2.0；`codebase-to-course` 和 `doc-coauthoring` 没有公开的许可证），Commons Clause 不适用于这些内容；在这里做的修改和新增部分按这个合集的许可证授权，所以同一个文件里可能两种条款并存；例外是自带许可证文件的技能（`pdf`、`critique`、`ui-ux-pro-max`），整个技能连同在这里做的修改都按它自带的许可证授权。[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 列出了每个来源、它的许可证，以及哪些文件或文件的哪部分来自它。每个插件目录里都有自己的 `LICENSE`，涉及第三方内容的还有 `THIRD_PARTY_NOTICES.md`，单独安装一个插件时条款也跟着走。
+
+在这次改动之前，自述里写的是「MIT」。此前已发布的版本中作者自己写的部分继续按 MIT 授权；任何版本里的第三方内容，始终按原作者的条款。

@@ -1,3 +1,4 @@
+<!-- Modified from pbakaus/impeccable (Apache-2.0); see ../SKILL.md "Origin". -->
 # Heuristics Scoring Guide
 
 Score each of Nielsen's 10 Usability Heuristics on a 0–4 scale. Be honest — a 4 means genuinely excellent, not "good enough."

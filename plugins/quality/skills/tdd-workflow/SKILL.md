@@ -505,4 +505,4 @@ npm test && npm run lint
 
 ## Provenance
 
-Anti-pattern guidance (vertical-tracer-bullet vs horizontal slicing) and the explicit "never refactor while RED" rule were grafted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/tdd`. License: MIT. The rest of this skill (RED-gate validation rules, coverage targets, Git checkpoint discipline, test patterns) is original to this collection.
+Anti-pattern guidance (vertical-tracer-bullet vs horizontal slicing) and the explicit "never refactor while RED" rule were grafted from [mattpocock/skills](https://github.com/mattpocock/skills) — `engineering/tdd`. License: MIT. The base of this skill (coverage targets, Git checkpoint discipline, test patterns and the RED-gate rules) was migrated from [everything-claude-code](https://github.com/affaan-m/everything-claude-code) (MIT) and edited here; see the plugin's THIRD_PARTY_NOTICES.md.

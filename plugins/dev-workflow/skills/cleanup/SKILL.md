@@ -106,4 +106,4 @@ print([p['name'] for p in m['plugins'] if json.load(open(os.path.join(p['source'
 - Phase 2「对话遗言扫描」、Phase 3 临时文件命名模式、开头的触发防护、报告输出前自检、轻量会话快速收场 —— 改写自 [fogarasy/close-skill](https://github.com/fogarasy/close-skill)（MIT）。
 - Phase 1「kill 前核血统」思路、孤儿进程 reparent 告警与 shepherd 工具提示 —— 源自 [mgorkemuz/claude-code-shepherd](https://github.com/mgorkemuz/claude-code-shepherd)。
 - Phase 4 持久/临时知识二分、机密禁写 —— 源自 [puritysb/AgentDeck](https://github.com/puritysb/AgentDeck) 的 `session-end` skill。
-- Phase 4 Global/Project 放置判断（含「拿不准选 Global」tiebreaker）、「优先并入已有文件不新建」、废弃数值评分 rubric 的决策记录 —— 并入自本仓库原 `skills:learn-eval` skill（已删除，精华全部吸收至此）。
+- Phase 4 Global/Project 放置判断（含「拿不准选 Global」tiebreaker）、「优先并入已有文件不新建」、废弃数值评分 rubric 的决策记录 —— 并入自本仓库原 `skills:learn-eval` skill（该 skill 来自 [everything-claude-code](https://github.com/affaan-m/everything-claude-code)，MIT；已删除，精华全部吸收至此）。

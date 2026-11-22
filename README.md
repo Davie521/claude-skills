@@ -161,7 +161,7 @@ A4 landscape, 5 columns, 6pt font — maximum information density. Supports LaTe
 
 **Trigger**: processing PDFs — extracting text/tables, filling forms, splitting/merging, converting to images
 
-9 pypdf/pdf2image/pdfplumber scripts. The form path is the complete chain: `check_fillable_fields.py` decides whether the PDF is fillable at all → `extract_form_field_info.py` pulls field info → `fill_fillable_fields.py` fills it. Non-fillable PDFs take the annotation route, which prefers exact coordinates over eyeballing: `extract_form_structure.py` (pdfplumber) reads labels, rules and checkbox squares straight out of the PDF, falling back to zoomed visual estimation only for scanned pages → `check_bounding_boxes.py` catches overlaps and undersized boxes → `fill_pdf_form_with_annotations.py` auto-detects whether your `fields.json` is in PDF points or image pixels and fills accordingly → `create_validation_image.py` renders a verification image (image-coordinate flow) so you can eyeball placement.
+8 pypdf/pdf2image/pdfplumber scripts. The form path is the complete chain: `check_fillable_fields.py` decides whether the PDF is fillable at all → `extract_form_field_info.py` pulls field info → `fill_fillable_fields.py` fills it. Non-fillable PDFs take the annotation route, which prefers exact coordinates over eyeballing: `extract_form_structure.py` (pdfplumber) reads labels, rules and checkbox squares straight out of the PDF, falling back to zoomed visual estimation only for scanned pages → `check_bounding_boxes.py` catches overlaps and undersized boxes → `fill_pdf_form_with_annotations.py` auto-detects whether your `fields.json` is in PDF points or image pixels and fills accordingly → `create_validation_image.py` renders a verification image (image-coordinate flow) so you can eyeball placement.
 
 > **Prerequisites**: a venv (`python3 -m venv` — `--break-system-packages` is explicitly forbidden), plus system poppler for `pdf2image`.
 
@@ -625,4 +625,8 @@ Most skills auto-trigger from natural language matching their description — th
 
 ## License
 
-MIT
+The skills written for this collection are licensed under [MIT with the Commons Clause](LICENSE). You may use them anywhere, at work included, change them and share your changes. You may not sell them: that covers selling the skills themselves, and selling a product or service — including paid hosting, consulting or support — whose value comes entirely or substantially from them. Using a skill along the way in paid work that is not built on it is fine. For a commercial license, write to [daviefan@outlook.com](mailto:daviefan@outlook.com).
+
+Many skills here were migrated or adapted from other projects. The material taken from those projects keeps its original terms — mostly MIT or Apache 2.0; `codebase-to-course` and `doc-coauthoring` have no published license — and the Commons Clause does not apply to it. Changes and additions made here are covered by this collection's license, so a single file can be under both — except in a skill that ships its own license file (`pdf`, `critique`, `ui-ux-pro-max`), which is released under that license as a whole, changes included. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists each source, its license, and which files or parts of files came from it. Every plugin directory carries its own `LICENSE` and, where relevant, `THIRD_PARTY_NOTICES.md`, so the terms travel with an installed plugin.
+
+Before this change the README said "MIT". Revisions of the Licensor's own work published until then keep that MIT grant; third-party material in any revision stays under the terms of its original author.

@@ -1,3 +1,4 @@
+<!-- Modified from pbakaus/impeccable (Apache-2.0); see ../SKILL.md "Origin". -->
 # Persona-Based Design Testing
 
 Test the interface through the eyes of 5 distinct user archetypes. Each persona exposes different failure modes that a single "design director" perspective would miss.

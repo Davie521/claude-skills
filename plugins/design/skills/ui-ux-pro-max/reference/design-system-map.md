@@ -47,5 +47,5 @@ comments about what is borrowed inspiration vs. official material.
 
 ---
 
-*Salvaged from the retired `taste-skill` (§2), which was removed 2026-08-08 —
+*Salvaged from the retired `taste-skill` (§2; [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), MIT, Copyright (c) 2026 Leonxlnx), which was removed 2026-08-08 —
 it was the one thing that skill covered and Hallmark does not.*

@@ -36,7 +36,7 @@ Clause applies to it.
 ## JuliusBrussee/caveman
 
 - Source: https://github.com/JuliusBrussee/caveman
-- License: MIT (at commit d84127c; the project has since moved to Apache-2.0); Copyright (c) 2026 Julius Brussee
+- License: MIT (at commit fbfe83b; the project has since moved to Apache-2.0); Copyright (c) 2026 Julius Brussee
 - License text: reproduced at the end of this file
 - The original that mattpocock/skills' caveman builds on.
 - Paths:

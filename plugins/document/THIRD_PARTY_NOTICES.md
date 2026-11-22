@@ -61,7 +61,7 @@ Clause applies to it.
 - Short README passages quoted for commentary, taken from the MIT-licensed revision. The readme skill also borrows its idea of mandatory stop-and-ask gates; no text was copied.
 - Paths:
   - `skills/readme/references/examples.md` — quoted passages
-  - `skills/readme/SKILL.md` — the stop-and-ask gate idea
+  - `skills/readme/SKILL.md` — the stop-and-ask gate idea, and quoted passages
 
 ## Donchitos/Claude-Code-Game-Studios
 
@@ -70,6 +70,7 @@ Clause applies to it.
 - License text: reproduced at the end of this file
 - Short README passages quoted for commentary.
 - Paths:
+  - `skills/readme/SKILL.md` — quoted passages
   - `skills/readme/references/examples.md` — quoted passages
 
 ## F1bonacc1/process-compose
@@ -79,6 +80,8 @@ Clause applies to it.
 - License text: reproduced at the end of this file
 - Short README passages quoted for commentary.
 - Paths:
+  - `skills/readme/SKILL.md` — quoted passages
+  - `skills/readme/references/ai-tone.md` — quoted passage
   - `skills/readme/references/examples.md` — quoted passages
 
 ## joshuayoes/ios-simulator-mcp

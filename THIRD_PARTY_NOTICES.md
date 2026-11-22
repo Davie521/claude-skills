@@ -51,6 +51,25 @@ Clause applies to it.
   - `plugins/writing/skills/video-editing`
   - `plugins/writing/skills/vibe-writing` — the voice checklist and banned-word list, from article-writing; see its Provenance footer
 
+## alexfazio/plankton
+
+- Source: https://github.com/alexfazio/plankton
+- License: MIT; Copyright (c) 2025 Alex Fazio
+- License text: reproduced at the end of this file
+- Reached this repository through everything-claude-code; see the skill's Provenance footer.
+- Paths:
+  - `plugins/quality/skills/plankton-code-quality` — the three-phase description and the hook-output table
+
+## Apple sample code
+
+- Source: https://developer.apple.com
+- License: Apple's own terms for sample code; not an open-source license; Copyright Apple Inc.
+- License text: none reproduced; see each skill's Provenance footer for the page it follows
+- Reached this repository through everything-claude-code. Neither everything-claude-code's MIT license nor this collection's license covers these examples.
+- Paths:
+  - `plugins/swift/skills/liquid-glass-design` — code examples from "Applying Liquid Glass to custom views"
+  - `plugins/swift/skills/swift-concurrency-6-2` — the StickerModel / PhotoProcessor examples from WWDC25 "What's new in Swift"
+
 ## supabase/agent-skills
 
 - Source: https://github.com/supabase/agent-skills
@@ -79,7 +98,7 @@ Clause applies to it.
 ## JuliusBrussee/caveman
 
 - Source: https://github.com/JuliusBrussee/caveman
-- License: MIT (at commit d84127c; the project has since moved to Apache-2.0); Copyright (c) 2026 Julius Brussee
+- License: MIT (at commit fbfe83b; the project has since moved to Apache-2.0); Copyright (c) 2026 Julius Brussee
 - License text: reproduced at the end of this file
 - The original that mattpocock/skills' caveman builds on.
 - Paths:
@@ -211,7 +230,7 @@ Clause applies to it.
 - Short README passages quoted for commentary, taken from the MIT-licensed revision. The readme skill also borrows its idea of mandatory stop-and-ask gates; no text was copied.
 - Paths:
   - `plugins/document/skills/readme/references/examples.md` — quoted passages
-  - `plugins/document/skills/readme/SKILL.md` — the stop-and-ask gate idea
+  - `plugins/document/skills/readme/SKILL.md` — the stop-and-ask gate idea, and quoted passages
 
 ## Donchitos/Claude-Code-Game-Studios
 
@@ -220,6 +239,7 @@ Clause applies to it.
 - License text: reproduced at the end of this file
 - Short README passages quoted for commentary.
 - Paths:
+  - `plugins/document/skills/readme/SKILL.md` — quoted passages
   - `plugins/document/skills/readme/references/examples.md` — quoted passages
 
 ## F1bonacc1/process-compose
@@ -229,6 +249,8 @@ Clause applies to it.
 - License text: reproduced at the end of this file
 - Short README passages quoted for commentary.
 - Paths:
+  - `plugins/document/skills/readme/SKILL.md` — quoted passages
+  - `plugins/document/skills/readme/references/ai-tone.md` — quoted passage
   - `plugins/document/skills/readme/references/examples.md` — quoted passages
 
 ## joshuayoes/ios-simulator-mcp
@@ -277,6 +299,32 @@ Clause applies to it.
 MIT License
 
 Copyright (c) 2026 Affaan Mustafa
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## alexfazio/plankton — plankton.MIT.txt
+
+```text
+MIT License
+
+Copyright (c) 2025 Alex Fazio
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

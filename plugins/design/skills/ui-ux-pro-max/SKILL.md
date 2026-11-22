@@ -403,4 +403,4 @@ Before delivering UI code, verify these items:
 
 ## Origin
 
-Adapted from [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill). MIT License, Copyright (c) 2024 Next Level Builder; see LICENSE.
+Adapted from [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill). MIT License, Copyright (c) 2024 Next Level Builder; see LICENSE. The changes made here are released under the same license.

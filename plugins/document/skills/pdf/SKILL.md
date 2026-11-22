@@ -325,7 +325,7 @@ with open("encrypted.pdf", "wb") as output:
 
 ## Origin
 
-Adapted from [anthropics/skills](https://github.com/anthropics/skills) — `skills/pdf` at commit `2c5958e` (2026-11-06), the revision that moved the skill to the Apache License 2.0. Licensed under Apache-2.0; see LICENSE.txt. Copyright Anthropic, PBC.
+Adapted from [anthropics/skills](https://github.com/anthropics/skills) — `skills/pdf` at commit `2c5958e` (2026-11-06), the revision that moved the skill to the Apache License 2.0. Licensed under Apache-2.0; see LICENSE.txt. Copyright Anthropic, PBC. The changes made here are released under the same license.
 
 Files changed from upstream:
 

@@ -213,6 +213,6 @@ After presenting the summary, tell the user:
 
 ## Origin
 
-Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — the standalone `critique` skill (`source/skills/critique`, before upstream merged its skills into `/impeccable` on 2026-04-11). Licensed under Apache-2.0; see LICENSE.txt. Copyright 2025 Paul Bakaus.
+Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — the standalone `critique` skill (`source/skills/critique`, before upstream merged its skills into `/impeccable` on 2026-04-11). Licensed under Apache-2.0; see LICENSE.txt. Copyright 2025 Paul Bakaus. The changes made here are released under the same license.
 
 Files changed from upstream: `SKILL.md` was rewritten (preparation, phases, report format, hand-off to `ui-ux-pro-max`); the three `reference/` files were edited.

@@ -19,6 +19,16 @@ Clause applies to it.
   - `skills/swift-concurrency-6-2`
   - `skills/swiftui-patterns` — including actor-persistence and protocol-di
 
+## Apple sample code
+
+- Source: https://developer.apple.com
+- License: Apple's own terms for sample code; not an open-source license; Copyright Apple Inc.
+- License text: none reproduced; see each skill's Provenance footer for the page it follows
+- Reached this repository through everything-claude-code. Neither everything-claude-code's MIT license nor this collection's license covers these examples.
+- Paths:
+  - `skills/liquid-glass-design` — code examples from "Applying Liquid Glass to custom views"
+  - `skills/swift-concurrency-6-2` — the StickerModel / PhotoProcessor examples from WWDC25 "What's new in Swift"
+
 ---
 
 # License texts

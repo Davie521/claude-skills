@@ -189,4 +189,4 @@ README 是契约，交付前把它当契约查一遍：
 
 ## Provenance
 
-写法和规则格式借鉴了多个公开项目，逐条记在 [references/sources.md](references/sources.md)：例如 `ai-tone.md` 的白名单式规则格式学自 writing-dna-skill 的 `lieflat-less-ai-tone`，审查流程的骨架照 [tommy0103/better-readme-skill](https://github.com/tommy0103/better-readme-skill)（MIT）的思路写。文字都是在这里重新写的，没有照抄；`references/examples.md` 里的引文另有出处说明。
+写法和规则格式借鉴了多个公开项目，逐条记在 [references/sources.md](references/sources.md)：例如 `ai-tone.md` 的白名单式规则格式学自 writing-dna-skill 的 `lieflat-less-ai-tone`，审查流程的骨架照 [tommy0103/better-readme-skill](https://github.com/tommy0103/better-readme-skill)（MIT）的思路写。规则文字是在这里重新写的。用作例子的原文引用（本文件里引了 Claude-Code-Game-Studios、process-compose、SoftwareCopyright-Skill，`references/ai-tone.md` 里引了 process-compose，`references/examples.md` 里引得最多）都标了出处，许可证见插件目录下的 THIRD_PARTY_NOTICES.md。
